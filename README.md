@@ -7,7 +7,7 @@
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge)
 ![Qiskit](https://img.shields.io/badge/Qiskit-Latest-6929C4?style=for-the-badge)
 ![PennyLane](https://img.shields.io/badge/PennyLane-Latest-10B981?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
 
 </p>
