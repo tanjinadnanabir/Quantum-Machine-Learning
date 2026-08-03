@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quantum Machine Learning — Interactive Learning Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="modules-registry.js"></script>
+<style>
+:root{
+  --bg:#070b14;
+  --bg-2:#0b111f;
+  --panel:#0e1526;
+  --panel-2:#101a2e;
+  --line:rgba(148,178,224,0.14);
+  --line-strong:rgba(148,178,224,0.28);
+  --ink:#e9eef8;
+  --ink-dim:#9fb0c9;
+  --ink-faint:#5f7089;
+  --cyan:#5ad1e6;
+  --cyan-dim:rgba(90,209,230,0.14);
+  --violet:#b39bff;
+  --violet-dim:rgba(179,155,255,0.14);
+  --amber:#f2a341;
+  --amber-dim:rgba(242,163,65,0.14);
+  --blue:#4fa3f7;
+  --grey-dim:rgba(148,178,224,0.12);
+  --serif:'Fraunces', Georgia, serif;
+  --sans:'Inter', -apple-system, sans-serif;
+  --mono:'JetBrains Mono', 'Courier New', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  overflow-x:hidden;
+  position:relative;
+  line-height:1.6;
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
+}
+
+/* ---------- background texture ---------- */
+.bg-grid{
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(148,178,224,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148,178,224,0.035) 1px, transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(ellipse 90% 70% at 50% 0%, black 40%, transparent 100%);
+}
+#particle-canvas{position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.55;}
+
+/* ---------- nav ---------- */
+header{
+  position:sticky; top:0; z-index:50;
+  backdrop-filter:blur(14px);
+  background:rgba(7,11,20,0.72);
+  border-bottom:1px solid var(--line);
+}
+.nav-wrap{
+  max-width:1280px; margin:0 auto; padding:16px 32px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+/* .logo{
+  font-family:var(--mono); font-weight:700; font-size:15px;
+  color:var(--cyan); border:1px solid var(--line-strong); border-radius:8px;
+  padding:6px 12px; letter-spacing:0.5px; white-space:nowrap;
+} */
+.logo{
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:15px;
+    color:var(--cyan);
+    border:1px solid var(--line-strong);
+    border-radius:8px;
+    padding:6px 12px;
+    letter-spacing:.5px;
+    white-space:nowrap;
+
+    text-decoration:none;
+    display:inline-block;
+    transition:.25s;
+}
+
+.logo:hover{
+    color:white;
+    border-color:var(--cyan);
+    box-shadow:0 0 18px rgba(90,209,230,.25);
+}
+.logo span{color:var(--ink-faint);}
+nav ul{list-style:none; display:flex; gap:30px;}
+nav a{
+  color:var(--ink-dim); text-decoration:none; font-size:13px; font-weight:600;
+  letter-spacing:0.06em; text-transform:uppercase; transition:color .2s;
+  position:relative;
+}
+nav a:hover{color:var(--ink);}
+nav a::after{
+  content:''; position:absolute; left:0; bottom:-6px; width:0; height:1px;
+  background:var(--cyan); transition:width .25s ease;
+}
+nav a:hover::after{width:100%;}
+.nav-cta{
+  display:flex; align-items:center; gap:14px;
+}
+.burger{display:none; flex-direction:column; gap:5px; cursor:pointer; background:none; border:none;}
+.burger span{width:22px; height:2px; background:var(--ink); display:block;}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:13px 24px; border-radius:9px; font-size:14px; font-weight:600;
+  text-decoration:none; cursor:pointer; border:1px solid transparent;
+  transition:transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s;
+  font-family:var(--sans);
+}
+.btn-primary{background:var(--blue); color:#04101f;}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 30px -8px rgba(79,163,247,0.55);}
+.btn-ghost{background:transparent; border-color:var(--line-strong); color:var(--ink);}
+.btn-ghost:hover{border-color:var(--ink-dim); transform:translateY(-2px);}
+.btn-outline-amber{background:transparent; border-color:var(--amber); color:var(--amber);}
+.btn-outline-amber:hover{background:var(--amber-dim); transform:translateY(-2px);}
+
+/* ---------- hero ---------- */
+.hero{
+  position:relative; z-index:1;
+  max-width:1280px; margin:0 auto;
+  padding:96px 32px 80px;
+  display:grid; grid-template-columns:1.05fr 0.95fr; gap:60px; align-items:center;
+}
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px;
+  border:1px solid var(--line-strong); border-radius:100px;
+  padding:7px 16px; font-family:var(--mono); font-size:11.5px;
+  letter-spacing:0.14em; text-transform:uppercase; color:var(--cyan);
+  background:var(--cyan-dim); margin-bottom:26px;
+}
+.eyebrow .dot{width:6px; height:6px; border-radius:50%; background:var(--cyan); box-shadow:0 0 8px var(--cyan);}
+h1.headline{
+  font-family:var(--serif); font-weight:600; font-size:clamp(40px,5.2vw,66px);
+  line-height:1.04; letter-spacing:-0.01em; color:var(--ink);
+}
+h1.headline em{
+  font-style:italic; font-weight:500;
+  background:linear-gradient(100deg,var(--cyan),var(--violet) 60%, var(--amber));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.hero-role{
+  margin-top:18px; font-family:var(--mono); font-size:13px; letter-spacing:0.08em;
+  text-transform:uppercase; color:var(--ink-dim); display:flex; gap:10px; flex-wrap:wrap;
+}
+.hero-role b{color:var(--violet); font-weight:600;}
+.hero-lede{
+  margin-top:22px; font-size:16.5px; color:var(--ink-dim); max-width:580px;
+}
+.hero-lede b{color:var(--ink); font-weight:600;}
+.hero-actions{display:flex; gap:14px; margin-top:36px; flex-wrap:wrap;}
+.hero-stats{display:flex; gap:34px; margin-top:46px; flex-wrap:wrap;}
+.hero-stats div{border-left:1px solid var(--line-strong); padding-left:14px;}
+.hero-stats .n{font-family:var(--serif); font-size:26px; font-weight:600; color:var(--ink);}
+.hero-stats .l{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-top:2px;}
+
+/* ---------- hero circuit terminal panel ---------- */
+.terminal{
+  background:linear-gradient(180deg,var(--panel-2),var(--panel));
+  border:1px solid var(--line-strong); border-radius:16px; overflow:hidden;
+  box-shadow:0 30px 80px -30px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.02) inset;
+  position:relative;
+}
+.terminal::before{
+  content:''; position:absolute; inset:-1px; border-radius:16px; padding:1px;
+  background:linear-gradient(140deg, rgba(90,209,230,0.35), transparent 30%, transparent 70%, rgba(179,155,255,0.3));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none;
+}
+.term-bar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 16px; border-bottom:1px solid var(--line);
+  font-family:var(--mono); font-size:11px; color:var(--ink-faint);
+}
+.term-dots{display:flex; gap:6px;}
+.term-dots span{width:9px; height:9px; border-radius:50%; background:#2a3550;}
+.term-title{color:var(--ink-dim); letter-spacing:0.04em;}
+.term-body{padding:26px 22px 18px;}
+.term-body svg{width:100%; height:auto; display:block;}
+.term-footer{
+  display:flex; justify-content:space-between; padding:12px 18px;
+  border-top:1px solid var(--line); font-family:var(--mono); font-size:10.5px; color:var(--ink-faint);
+}
+.term-footer .live{color:#5ee6a0; display:flex; align-items:center; gap:6px;}
+.term-footer .live::before{content:''; width:6px; height:6px; border-radius:50%; background:#5ee6a0; box-shadow:0 0 6px #5ee6a0; animation:blink 1.6s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.25;}}
+
+.qwire{stroke:rgba(148,178,224,0.35); stroke-width:1.5;}
+.qgate{fill:var(--panel); stroke:var(--line-strong); stroke-width:1.2;}
+.qgate-label{font-family:var(--mono); font-size:11px; fill:var(--ink-dim);}
+.qlabel{font-family:var(--mono); font-size:11px; fill:var(--ink-faint);}
+.pulse{fill:var(--cyan); filter:drop-shadow(0 0 6px var(--cyan));}
+.pulse.p2{fill:var(--violet); filter:drop-shadow(0 0 6px var(--violet));}
+.pulse.p3{fill:var(--amber); filter:drop-shadow(0 0 6px var(--amber));}
+
+/* ---------- section shell ---------- */
+section{position:relative; z-index:1;}
+.section-inner{max-width:1280px; margin:0 auto; padding:100px 32px;}
+.section-head{max-width:680px; margin-bottom:56px;}
+.section-eyebrow{
+  font-family:var(--mono); font-size:11.5px; letter-spacing:0.16em; text-transform:uppercase;
+  color:var(--violet); margin-bottom:14px; display:flex; align-items:center; gap:10px;
+}
+.section-eyebrow::before{content:''; width:24px; height:1px; background:var(--violet);}
+.section-head h2{
+  font-family:var(--serif); font-weight:600; font-size:clamp(30px,3.6vw,44px);
+  letter-spacing:-0.01em; line-height:1.1;
+}
+.section-head p{margin-top:16px; color:var(--ink-dim); font-size:15.5px; max-width:600px;}
+
+.reveal{opacity:0; transform:translateY(28px); transition:opacity .7s ease, transform .7s ease;}
+.reveal.in{opacity:1; transform:translateY(0);}
+
+/* ---------- vision strip ---------- */
+.vision{border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:var(--panel);}
+.vision-inner{max-width:1280px; margin:0 auto; padding:64px 32px; display:grid; grid-template-columns:repeat(4,1fr); gap:36px;}
+.vision-item .k{font-family:var(--mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--cyan); margin-bottom:10px;}
+.vision-item p{font-size:14px; color:var(--ink-dim); line-height:1.6;}
+@media (max-width:900px){.vision-inner{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:560px){.vision-inner{grid-template-columns:1fr;}}
+
+/* ---------- roadmap ---------- */
+.roadmap{background:linear-gradient(180deg, transparent, rgba(11,17,31,0.6) 8%, rgba(11,17,31,0.6) 92%, transparent);}
+.roadmap-track{position:relative; padding-left:2px;}
+.roadmap-line{position:absolute; left:29px; top:10px; bottom:10px; width:2px; background:var(--line);}
+.roadmap-line-fill{position:absolute; left:0; top:0; width:100%; height:0%; background:linear-gradient(180deg,var(--ink-faint),var(--cyan),var(--violet),var(--amber)); transition:height 1.4s cubic-bezier(.2,.7,.2,1);}
+.phase{position:relative; padding-left:76px; margin-bottom:14px;}
+.phase-num{
+  position:absolute; left:0; top:2px; width:60px; height:60px; border-radius:50%;
+  background:var(--panel); border:1.5px solid var(--line-strong);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-weight:700; font-size:16px; color:var(--ink-dim);
+  transition:border-color .3s, color .3s, box-shadow .3s; z-index:2; text-align:center; line-height:1.1;
+}
+.phase.active .phase-num{border-color:var(--cyan); color:var(--cyan); box-shadow:0 0 22px -4px rgba(90,209,230,0.6);}
+.phase-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px 24px; cursor:pointer; transition:border-color .25s, background .25s;}
+.phase-card:hover{border-color:var(--line-strong); background:var(--panel-2);}
+.phase-top{display:flex; align-items:flex-start; justify-content:space-between; gap:16px;}
+.phase-title{font-family:var(--serif); font-size:21px; font-weight:600; color:var(--ink);}
+.phase-sub{font-size:13px; color:var(--ink-faint); margin-top:2px;}
+.phase-meta{display:flex; gap:16px; margin-top:10px; flex-wrap:wrap; font-family:var(--mono); font-size:11px; letter-spacing:0.04em; color:var(--ink-faint);}
+.phase-meta span{display:flex; align-items:center; gap:6px;}
+.phase-tag{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; padding:4px 10px; border-radius:100px; border:1px solid var(--line-strong); color:var(--ink-dim); white-space:nowrap; height:fit-content;}
+.tag-grey{color:var(--ink-dim); border-color:var(--line-strong); background:var(--grey-dim);}
+.tag-cyan{color:var(--cyan); border-color:rgba(90,209,230,0.4); background:var(--cyan-dim);}
+.tag-violet{color:var(--violet); border-color:rgba(179,155,255,0.4); background:var(--violet-dim);}
+.tag-amber{color:var(--amber); border-color:rgba(242,163,65,0.4); background:var(--amber-dim);}
+.chevron{width:20px; height:20px; flex-shrink:0; margin-top:2px; transition:transform .3s ease; color:var(--ink-faint);}
+.phase.open .chevron{transform:rotate(180deg); color:var(--ink);}
+.phase-body{max-height:0; overflow:hidden; transition:max-height .5s ease;}
+.phase.open .phase-body{max-height:1400px;}
+.phase-body-inner{padding-top:18px; margin-top:18px; border-top:1px solid var(--line);}
+.phase-desc{color:var(--ink-dim); font-size:14.5px; margin-bottom:18px;}
+.mod-list{display:flex; flex-direction:column; gap:10px;}
+.mod-row{display:grid; grid-template-columns:52px 1fr; gap:14px; padding:12px 14px; border-radius:10px; background:var(--panel-2); border:1px solid var(--line);}
+.mod-row .mid{font-family:var(--mono); font-size:12px; color:var(--ink-faint); padding-top:2px;}
+.mod-row h5{font-size:14.5px; font-weight:700; color:var(--ink); margin-bottom:4px;}
+.mod-row .mtopics{font-size:12.5px; color:var(--ink-dim); line-height:1.55;}
+.proj-row{
+  margin-top:14px; padding:14px 16px; border-radius:10px; border:1px dashed var(--line-strong);
+  background:linear-gradient(90deg, rgba(90,209,230,0.05), rgba(179,155,255,0.05));
+  font-size:13px; color:var(--ink-dim);
+}
+.proj-row b{color:var(--ink); font-family:var(--mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; display:block; margin-bottom:4px;}
+
+/* ---------- curriculum ---------- */
+.curriculum-grid{display:grid; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:16px; overflow:hidden;}
+.phase-block-head{display:flex; align-items:center; gap:14px; padding:22px 26px; background:var(--panel); border-bottom:1px solid var(--line);}
+.phase-block-head .pn{font-family:var(--mono); font-size:12px; color:var(--ink-faint);}
+.phase-block-head h3{font-family:var(--serif); font-size:19px; font-weight:600;}
+.module-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line);}
+.module{background:var(--bg); padding:20px 22px; transition:background .2s; display:flex; flex-direction:column; gap:8px; min-height:150px;}
+.module:hover{background:var(--panel);}
+.module .mnum{font-family:var(--mono); font-size:11px; color:var(--ink-faint);}
+.module h4{font-size:14px; font-weight:600; color:var(--ink); line-height:1.35;}
+.module p{font-size:12.5px; color:var(--ink-faint); line-height:1.5; flex-grow:1;}
+.module .mfoot{font-family:var(--mono); font-size:10px; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink-faint); display:flex; justify-content:space-between; align-items:center;}
+.status-dot{width:6px; height:6px; border-radius:50%; background:#3a4a68; display:inline-block; margin-right:5px;}
+.status-dot.dot-live{background:var(--cyan); box-shadow:0 0 6px var(--cyan);}
+.status-dot.dot-progress{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+.status-dot.dot-mastered{background:var(--green); box-shadow:0 0 6px var(--green);}
+.module[data-module]{position:relative;}
+.module.live-linkable{cursor:pointer;}
+.module.live-linkable:hover{background:var(--panel-2);}
+.mini-link{display:inline-block; margin-top:8px; font-family:var(--mono); font-size:10.5px; color:var(--cyan); text-decoration:none; letter-spacing:0.03em;}
+.mini-link:hover{text-decoration:underline;}
+@media (max-width:900px){.module-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:560px){.module-grid{grid-template-columns:1fr;}}
+
+/* ---------- platform features ---------- */
+.platform-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+.feature-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:26px 24px; transition:transform .3s, border-color .3s; position:relative; overflow:hidden;}
+.feature-card:hover{transform:translateY(-6px); border-color:var(--line-strong);}
+.feature-icon{width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:var(--violet-dim); color:var(--violet); margin-bottom:16px; font-size:18px;}
+.feature-card h4{font-size:15.5px; font-weight:700; margin-bottom:8px;}
+.feature-card p{font-size:13px; color:var(--ink-dim); margin-bottom:14px;}
+.feature-tags{display:flex; gap:6px; flex-wrap:wrap;}
+.chip{font-family:var(--mono); font-size:10px; letter-spacing:0.03em; color:var(--ink-faint); border:1px solid var(--line); padding:3px 8px; border-radius:100px;}
+@media (max-width:980px){.platform-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:600px){.platform-grid{grid-template-columns:1fr;}}
+
+/* ---------- tech stack strip ---------- */
+.stack{border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:var(--panel); overflow:hidden;}
+.stack-track{display:flex; gap:14px; padding:26px 0; animation:scrollx 34s linear infinite; width:max-content;}
+.stack:hover .stack-track{animation-play-state:paused;}
+.stack-badge{
+  font-family:var(--mono); font-size:12.5px; color:var(--ink-dim); border:1px solid var(--line-strong);
+  padding:9px 18px; border-radius:100px; white-space:nowrap; background:var(--panel-2);
+  display:flex; align-items:center; gap:8px;
+}
+.stack-badge::before{content:'◆'; color:var(--cyan); font-size:8px;}
+@keyframes scrollx{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* ---------- resources ---------- */
+.resource-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:18px;}
+.resource-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:26px 22px; position:relative; overflow:hidden; transition:transform .3s, border-color .3s;}
+.resource-card:hover{transform:translateY(-6px); border-color:var(--line-strong);}
+.resource-icon{width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:var(--cyan-dim); color:var(--cyan); margin-bottom:16px;}
+.resource-card h4{font-size:15.5px; font-weight:700; margin-bottom:8px;}
+.resource-card p{font-size:13px; color:var(--ink-dim); margin-bottom:16px;}
+.soon-badge{font-family:var(--mono); font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--amber); border:1px solid rgba(242,163,65,0.4); background:var(--amber-dim); padding:4px 9px; border-radius:100px; display:inline-block;}
+@media (max-width:900px){.resource-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:560px){.resource-grid{grid-template-columns:1fr;}}
+
+/* ---------- footer ---------- */
+footer{padding:60px 32px 40px; border-top:1px solid var(--line);}
+.footer-inner{max-width:1280px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:24px;}
+.footer-brand{font-family:var(--mono); color:var(--ink-faint); font-size:13px;}
+.social{display:flex; gap:12px;}
+.social a{width:36px; height:36px; border-radius:8px; border:1px solid var(--line-strong); display:flex; align-items:center; justify-content:center; color:var(--ink-dim); text-decoration:none; font-size:13px; transition:border-color .2s, color .2s;}
+.social a:hover{border-color:var(--cyan); color:var(--cyan);}
+
+@media (max-width:980px){
+  .hero{grid-template-columns:1fr; padding-top:60px;}
+  nav ul{display:none;}
+  .burger{display:flex;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+<div class="bg-grid"></div>
+
+<header>
+  <div class="nav-wrap">
+    <!-- <div class="logo">{QML}<span></span></div> -->
+     <a href="#home" class="logo">{QML}<span></span></a>
+    <nav>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+        <li><a href="#curriculum">Curriculum</a></li>
+        <li><a href="#platform">Platform</a></li>
+        <li><a href="#resources">Resources</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="nav-cta">
+      <a href="progress-hub.html" class="btn btn-ghost" style="padding:9px 16px; font-size:13px;">My Progress</a>
+      <button class="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<!-- <section class="hero"> -->
+<section id="home" class="hero">
+  <div>
+    <div class="eyebrow"><span class="dot"></span>AI-POWERED · INTERACTIVE · OPEN-SOURCE EDUCATION</div>
+    <h1 class="headline">Quantum Machine<br>Learning, <em>mapped</em><br>end to end.</h1>
+    <div class="hero-role">AI <b>→</b> CLASSICAL ML <b>→</b> QUANTUM COMPUTING <b>→</b> QML</div>
+    <p class="hero-lede">An AI-powered, interactive platform that teaches Quantum Machine Learning from first principles to real research — bridging Artificial Intelligence, classical ML, and quantum computing through <b>visualizations, simulations, coding labs, and a personal AI tutor</b>, in one learning ecosystem.</p>
+    <div class="hero-actions">
+      <a href="#roadmap" class="btn btn-primary">View the Roadmap →</a>
+      <a href="#curriculum" class="btn btn-ghost">Explore Curriculum</a>
+      <a href="https://www.thewiser.org/summer-program-2026/wisereducationchallenge" target="_blank" rel="noopener" class="btn btn-outline-amber">WISER Challenge ↗</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="n">03</div><div class="l">Learning Levels</div></div>
+      <div><div class="n">12</div><div class="l">Core Modules</div></div>
+      <div><div class="n">15</div><div class="l">Platform Features</div></div>
+      <div><div class="n">∞</div><div class="l">Open Resources</div></div>
+    </div>
+  </div>
+
+  <div class="terminal">
+    <div class="term-bar">
+      <div class="term-dots"><span></span><span></span><span></span></div>
+      <div class="term-title">circuit_builder.py — PennyLane</div>
+      <div>Python 3.11</div>
+    </div>
+    <div class="term-body">
+      <svg viewBox="0 0 460 260" xmlns="http://www.w3.org/2000/svg">
+        <line class="qwire" x1="40" y1="40"  x2="430" y2="40"/>
+        <line class="qwire" x1="40" y1="100" x2="430" y2="100"/>
+        <line class="qwire" x1="40" y1="160" x2="430" y2="160"/>
+        <line class="qwire" x1="40" y1="220" x2="430" y2="220"/>
+        <text class="qlabel" x="6" y="44">q0</text>
+        <text class="qlabel" x="6" y="104">q1</text>
+        <text class="qlabel" x="6" y="164">q2</text>
+        <text class="qlabel" x="6" y="224">q3</text>
+
+        <rect class="qgate" x="70" y="24" width="32" height="32" rx="6"/>
+        <text class="qgate-label" x="80" y="45">H</text>
+        <rect class="qgate" x="70" y="84" width="32" height="32" rx="6"/>
+        <text class="qgate-label" x="80" y="105">H</text>
+        <rect class="qgate" x="70" y="144" width="32" height="32" rx="6"/>
+        <text class="qgate-label" x="80" y="165">H</text>
+        <rect class="qgate" x="70" y="204" width="32" height="32" rx="6"/>
+        <text class="qgate-label" x="80" y="225">H</text>
+
+        <line class="qwire" x1="150" y1="40" x2="150" y2="100"/>
+        <circle cx="150" cy="40" r="5" fill="var(--ink-dim)"/>
+        <circle cx="150" cy="100" r="10" fill="none" stroke="var(--ink-dim)" stroke-width="1.5"/>
+        <line x1="143" y1="100" x2="157" y2="100" stroke="var(--ink-dim)" stroke-width="1.5"/>
+        <line x1="150" y1="93" x2="150" y2="107" stroke="var(--ink-dim)" stroke-width="1.5"/>
+
+        <line class="qwire" x1="190" y1="100" x2="190" y2="160"/>
+        <circle cx="190" cy="100" r="5" fill="var(--ink-dim)"/>
+        <circle cx="190" cy="160" r="10" fill="none" stroke="var(--ink-dim)" stroke-width="1.5"/>
+        <line x1="183" y1="160" x2="197" y2="160" stroke="var(--ink-dim)" stroke-width="1.5"/>
+        <line x1="190" y1="153" x2="190" y2="167" stroke="var(--ink-dim)" stroke-width="1.5"/>
+
+        <line class="qwire" x1="230" y1="160" x2="230" y2="220"/>
+        <circle cx="230" cy="160" r="5" fill="var(--ink-dim)"/>
+        <circle cx="230" cy="220" r="10" fill="none" stroke="var(--ink-dim)" stroke-width="1.5"/>
+        <line x1="223" y1="220" x2="237" y2="220" stroke="var(--ink-dim)" stroke-width="1.5"/>
+        <line x1="230" y1="213" x2="230" y2="227" stroke="var(--ink-dim)" stroke-width="1.5"/>
+
+        <rect class="qgate" x="270" y="24" width="40" height="32" rx="6"/>
+        <text class="qgate-label" x="278" y="45">Ry(θ)</text>
+        <rect class="qgate" x="270" y="84" width="40" height="32" rx="6"/>
+        <text class="qgate-label" x="278" y="105">Rz(θ)</text>
+        <rect class="qgate" x="270" y="144" width="40" height="32" rx="6"/>
+        <text class="qgate-label" x="278" y="165">Ry(θ)</text>
+        <rect class="qgate" x="270" y="204" width="40" height="32" rx="6"/>
+        <text class="qgate-label" x="278" y="225">Rz(θ)</text>
+
+        <rect x="360" y="24" width="34" height="32" rx="6" fill="none" stroke="var(--cyan)" stroke-width="1.4"/>
+        <path d="M366 48 A 8 8 0 0 1 382 48" fill="none" stroke="var(--cyan)" stroke-width="1.4"/>
+        <line x1="374" y1="48" x2="382" y2="34" stroke="var(--cyan)" stroke-width="1.4"/>
+        <rect x="360" y="84" width="34" height="32" rx="6" fill="none" stroke="var(--cyan)" stroke-width="1.4"/>
+        <path d="M366 108 A 8 8 0 0 1 382 108" fill="none" stroke="var(--cyan)" stroke-width="1.4"/>
+        <line x1="374" y1="108" x2="382" y2="94" stroke="var(--cyan)" stroke-width="1.4"/>
+        <rect x="360" y="144" width="34" height="32" rx="6" fill="none" stroke="var(--cyan)" stroke-width="1.4"/>
+        <path d="M366 168 A 8 8 0 0 1 382 168" fill="none" stroke="var(--cyan)" stroke-width="1.4"/>
+        <line x1="374" y1="168" x2="382" y2="154" stroke="var(--cyan)" stroke-width="1.4"/>
+        <rect x="360" y="204" width="34" height="32" rx="6" fill="none" stroke="var(--cyan)" stroke-width="1.4"/>
+        <path d="M366 228 A 8 8 0 0 1 382 228" fill="none" stroke="var(--cyan)" stroke-width="1.4"/>
+        <line x1="374" y1="228" x2="382" y2="214" stroke="var(--cyan)" stroke-width="1.4"/>
+
+        <circle class="pulse" r="4"><animateMotion dur="3.2s" repeatCount="indefinite" path="M40,40 L430,40"/></circle>
+        <circle class="pulse p2" r="4"><animateMotion dur="3.6s" repeatCount="indefinite" begin="0.4s" path="M40,100 L430,100"/></circle>
+        <circle class="pulse p3" r="4"><animateMotion dur="4s" repeatCount="indefinite" begin="0.9s" path="M40,160 L430,160"/></circle>
+        <circle class="pulse" r="4"><animateMotion dur="3.4s" repeatCount="indefinite" begin="1.3s" path="M40,220 L430,220"/></circle>
+      </svg>
+    </div>
+    <div class="term-footer">
+      <span class="live">expectation converging · loss 0.043</span>
+      <span>4 qubits · depth 3</span>
+    </div>
+  </div>
+</section>
+
+<section class="vision">
+  <div class="vision-inner">
+    <div class="vision-item reveal">
+      <div class="k">The Gap</div>
+      <p>Most learners hit a wall between "I understand qubits" and "I can build a quantum model." Very few resources bridge AI, classical ML, and quantum computing in one continuous path.</p>
+    </div>
+    <div class="vision-item reveal">
+      <div class="k">The Approach</div>
+      <p>Structured, project-based learning: every concept moves from theory → visualization → code → execution → analysis, on real frameworks and real quantum hardware.</p>
+    </div>
+    <div class="vision-item reveal">
+      <div class="k">The Platform</div>
+      <p>A single ecosystem combining a drag-and-drop circuit simulator, 3D visualizations, adaptive quizzes, and an AI-powered quantum tutor available at every step.</p>
+    </div>
+    <div class="vision-item reveal">
+      <div class="k">The Vision</div>
+      <p>To democratize Quantum Machine Learning education — open-source, accessible, and practical for students, educators, and researchers alike.</p>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap" class="roadmap">
+  <div class="section-inner">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">The Roadmap</div>
+      <h2>Three levels, twelve modules</h2>
+      <p>An optional math &amp; code primer, then a straight line from "what is AI?" to a full research capstone. Click a level to see its modules.</p>
+    </div>
+
+    <div class="roadmap-track">
+      <div class="roadmap-line"><div class="roadmap-line-fill" id="lineFill"></div></div>
+
+      <div class="phase reveal" data-phase="0">
+        <div class="phase-num">Prep</div>
+        <div class="phase-card">
+          <div class="phase-top">
+            <div>
+              <div class="phase-title">Prerequisite Primer</div>
+              <div class="phase-sub">Optional — for learners without a math or Python background</div>
+              <div class="phase-meta"><span>◷ Self-paced</span><span>◆ Math · Python · NumPy</span></div>
+            </div>
+            <span class="phase-tag tag-grey">Optional</span>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="phase-body"><div class="phase-body-inner">
+            <div class="phase-desc">Not part of the core WISER curriculum, but recommended before Level 1 if vectors, complex numbers, or Python are rusty.</div>
+            <div class="mod-list">
+              <a class="mod-row" href="primer-tutorial.html#ch1" style="text-decoration:none; color:inherit; cursor:pointer;"><div class="mid">P.1</div><div><h5>Linear Algebra &amp; Vector Spaces</h5><div class="mtopics">Vectors, matrices, tensor products, eigenvalues — the notation quantum computing runs on.</div></div></a>
+              <a class="mod-row" href="primer-tutorial.html#ch2" style="text-decoration:none; color:inherit; cursor:pointer;"><div class="mid">P.2</div><div><h5>Complex Numbers &amp; Dirac Notation Primer</h5><div class="mtopics">Amplitudes, phases, bra-ket notation before it appears in Module 5.</div></div></a>
+              <a class="mod-row" href="primer-tutorial.html#ch3" style="text-decoration:none; color:inherit; cursor:pointer;"><div class="mid">P.3</div><div><h5>Python &amp; NumPy for Scientific Computing</h5><div class="mtopics">Array operations, plotting, and the coding habits used in every lab.</div></div></a>
+            </div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="phase reveal" data-phase="1">
+        <div class="phase-num">01</div>
+        <div class="phase-card">
+          <div class="phase-top">
+            <div>
+              <div class="phase-title">Beginner</div>
+              <div class="phase-sub">Foundations of AI, Machine Learning &amp; Quantum Computing</div>
+              <div class="phase-meta"><span>◷ Modules 1–5</span><span>◆ Goal: a strong conceptual foundation before QML begins</span></div>
+            </div>
+            <span class="phase-tag tag-cyan">Level 1</span>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="phase-body"><div class="phase-body-inner">
+            <div class="phase-desc">Builds AI and machine learning literacy alongside the physics and math of quantum computing, so no prior exposure to either field is assumed.</div>
+            <div class="mod-list">
+              <div class="mod-row"><div class="mid">M.1</div><div><h5>Introduction to Artificial Intelligence</h5><div class="mtopics">What is AI, its history and evolution, types of AI, applications, and where the field is heading.</div></div></div>
+              <div class="mod-row"><div class="mid">M.2</div><div><h5>Why Machine Learning?</h5><div class="mtopics">Limits of traditional programming, what ML is, types of ML, the ML workflow, real-world uses.</div></div></div>
+              <div class="mod-row"><div class="mid">M.3</div><div><h5>Classical Machine Learning</h5><div class="mtopics">Supervised, unsupervised &amp; reinforcement learning; regression, classification, decision trees, random forest, SVM, neural networks, deep learning.</div></div></div>
+              <div class="mod-row"><div class="mid">M.4</div><div><h5>Why Quantum Computing?</h5><div class="mtopics">Limits of classical computing, qubits, superposition, entanglement, quantum advantage, real quantum hardware.</div></div></div>
+              <div class="mod-row"><div class="mid">M.5</div><div><h5>Quantum Computing Foundations</h5><div class="mtopics">Linear algebra basics, complex numbers, Dirac notation, quantum gates, circuits, the Bloch sphere, measurement.</div></div></div>
+            </div>
+            <div class="proj-row"><b>Beginner Project</b>AI vs Machine Learning vs Quantum Computing — build simple classical and quantum examples to feel the differences between the three paradigms firsthand.</div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="phase reveal" data-phase="2">
+        <div class="phase-num">02</div>
+        <div class="phase-card">
+          <div class="phase-top">
+            <div>
+              <div class="phase-title">Intermediate</div>
+              <div class="phase-sub">Building the Bridge to Quantum Machine Learning</div>
+              <div class="phase-meta"><span>◷ Modules 6–9</span><span>◆ Goal: implement core QML techniques</span></div>
+            </div>
+            <span class="phase-tag tag-violet">Level 2</span>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="phase-body"><div class="phase-body-inner">
+            <div class="phase-desc">Where ML and quantum computing formally meet — data gets encoded into quantum states and variational circuits start learning.</div>
+            <div class="mod-list">
+              <div class="mod-row"><div class="mid">M.6</div><div><h5>Intersection Between ML and Quantum Computing</h5><div class="mtopics">Evolution of AI and quantum computing, why combine them, hybrid quantum-classical computing, the current research landscape.</div></div></div>
+              <div class="mod-row"><div class="mid">M.7</div><div><h5>Why Quantum Machine Learning?</h5><div class="mtopics">Limits of classical ML, computational complexity, high-dimensional feature spaces, quantum parallelism, potential advantage, open challenges.</div></div></div>
+              <div class="mod-row"><div class="mid">M.8</div><div><h5>Quantum Data Encoding</h5><div class="mtopics">Basis, angle &amp; amplitude encoding, feature maps, data re-uploading.</div></div></div>
+              <div class="mod-row"><div class="mid">M.9</div><div><h5>Variational Quantum Circuits &amp; Core QML Algorithms</h5><div class="mtopics">Parameterized quantum circuits, VQC, QSVM, QNN, quantum kernel methods, quantum PCA, quantum autoencoders.</div></div></div>
+            </div>
+            <div class="proj-row"><b>Intermediate Project</b>Classical ML vs Quantum ML — implement and compare both on the same dataset, analyzing accuracy, computational cost, and scalability.</div>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="phase reveal" data-phase="3">
+        <div class="phase-num">03</div>
+        <div class="phase-card">
+          <div class="phase-top">
+            <div>
+              <div class="phase-title">Advanced</div>
+              <div class="phase-sub">Real-World Applications, Research &amp; Innovation</div>
+              <div class="phase-meta"><span>◷ Modules 10–12</span><span>◆ Goal: apply QML to real problems and research</span></div>
+            </div>
+            <span class="phase-tag tag-amber">Level 3</span>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="phase-body"><div class="phase-body-inner">
+            <div class="phase-desc">The application layer and the open problems — where learners move from tutorials to original, defensible work.</div>
+            <div class="mod-list">
+              <div class="mod-row"><div class="mid">M.10</div><div><h5>Real-World QML Applications</h5><div class="mtopics">Healthcare, drug discovery, finance, cybersecurity, climate science, materials discovery, computer vision, NLP.</div></div></div>
+              <div class="mod-row"><div class="mid">M.11</div><div><h5>Advanced Quantum Machine Learning</h5><div class="mtopics">Quantum reinforcement learning, quantum generative models, quantum graph neural networks, error mitigation, noise, fault-tolerant computing.</div></div></div>
+              <div class="mod-row"><div class="mid">M.12</div><div><h5>Research &amp; Capstone Project</h5><div class="mtopics">Reading QML papers, open research challenges, benchmarking quantum models, responsible AI &amp; quantum computing, future directions.</div></div></div>
+            </div>
+            <div class="proj-row"><b>Final Capstone Project</b>A complete QML application: problem definition, data preprocessing, quantum data encoding, model implementation, training &amp; evaluation, execution on a simulator or IBM Quantum hardware, and full documentation.</div>
+          </div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="curriculum">
+  <div class="section-inner">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">The Curriculum</div>
+      <h2>Every module, at a glance</h2>
+      <p>The full syllabus this site is built to host — tutorials, notebooks, and problem sets will attach to each card as they go live.</p>
+    </div>
+
+    <div class="curriculum-grid reveal">
+      <div class="phase-block-head"><span class="pn">PREREQUISITE</span><h3>Primer (Optional)</h3></div>
+      <div class="module-grid">
+        <div class="module" data-primer="ch1"><span class="mnum">P.1</span><h4>Linear Algebra &amp; Vector Spaces</h4><p>Vectors, matrices, tensor products, eigenvalues.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Optional</span></div></div>
+        <div class="module" data-primer="ch2"><span class="mnum">P.2</span><h4>Complex Numbers &amp; Dirac Notation</h4><p>Amplitudes, phases, and bra-ket notation.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Optional</span></div></div>
+        <div class="module" data-primer="ch3"><span class="mnum">P.3</span><h4>Python &amp; NumPy Primer</h4><p>Array operations and plotting for every lab ahead.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Optional</span></div></div>
+      </div>
+
+      <div class="phase-block-head"><span class="pn">LEVEL 01 · BEGINNER</span><h3>Foundations of AI, ML &amp; Quantum Computing</h3></div>
+      <div class="module-grid">
+        <div class="module" data-module="1"><span class="mnum">1</span><h4>Introduction to Artificial Intelligence</h4><p>History, types, applications, and the future of AI.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Beginner</span></div></div>
+        <div class="module" data-module="2"><span class="mnum">2</span><h4>Why Machine Learning?</h4><p>From rule-based programming to learning from data.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Beginner</span></div></div>
+        <div class="module" data-module="3"><span class="mnum">3</span><h4>Classical Machine Learning</h4><p>Regression, classification, trees, SVMs, neural nets.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Beginner</span></div></div>
+        <div class="module" data-module="4"><span class="mnum">4</span><h4>Why Quantum Computing?</h4><p>Qubits, superposition, entanglement, quantum advantage.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Beginner</span></div></div>
+        <div class="module" data-module="5"><span class="mnum">5</span><h4>Quantum Computing Foundations</h4><p>Gates, circuits, the Bloch sphere, and measurement.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Beginner</span></div></div>
+        <div class="module"><span class="mnum">★</span><h4>Beginner Project</h4><p>AI vs Machine Learning vs Quantum Computing.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Project</span></div></div>
+      </div>
+
+      <div class="phase-block-head"><span class="pn">LEVEL 02 · INTERMEDIATE</span><h3>Building the Bridge to QML</h3></div>
+      <div class="module-grid">
+        <div class="module" data-module="6"><span class="mnum">6</span><h4>Intersection of ML &amp; Quantum Computing</h4><p>Hybrid quantum-classical computing and the research landscape.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Intermediate</span></div></div>
+        <div class="module" data-module="7"><span class="mnum">7</span><h4>Why Quantum Machine Learning?</h4><p>Complexity, high-dimensional spaces, quantum parallelism.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Intermediate</span></div></div>
+        <div class="module" data-module="8"><span class="mnum">8</span><h4>Quantum Data Encoding</h4><p>Basis, angle &amp; amplitude encoding, feature maps.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Intermediate</span></div></div>
+        <div class="module" data-module="9"><span class="mnum">9</span><h4>Variational Circuits &amp; Core QML Algorithms</h4><p>VQC, QSVM, QNN, quantum kernels, quantum PCA.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Intermediate</span></div></div>
+        <div class="module"><span class="mnum">★</span><h4>Intermediate Project</h4><p>Classical ML vs Quantum ML, benchmarked side by side.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Project</span></div></div>
+      </div>
+
+      <div class="phase-block-head"><span class="pn">LEVEL 03 · ADVANCED</span><h3>Real-World Applications, Research &amp; Innovation</h3></div>
+      <div class="module-grid">
+        <div class="module" data-module="10"><span class="mnum">10</span><h4>Real-World QML Applications</h4><p>Healthcare, finance, cybersecurity, climate, materials, NLP.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Advanced</span></div></div>
+        <div class="module" data-module="11"><span class="mnum">11</span><h4>Advanced Quantum Machine Learning</h4><p>Quantum RL, generative models, graph neural networks.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Advanced</span></div></div>
+        <div class="module" data-module="12"><span class="mnum">12</span><h4>Research &amp; Capstone Project</h4><p>Reading papers, benchmarking, responsible AI &amp; QC.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Advanced</span></div></div>
+        <div class="module"><span class="mnum">★</span><h4>Final Capstone</h4><p>A complete, documented QML application on real hardware.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Project</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="platform">
+  <div class="section-inner">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">The Platform</div>
+      <h2>Fifteen features, one learning ecosystem</h2>
+      <p>Beyond the curriculum: the interactive tools that turn each module from something you read into something you build, run, and get feedback on.</p>
+    </div>
+    <div class="platform-grid reveal">
+      <div class="feature-card">
+        <div class="feature-icon">⌗</div>
+        <h4>Quantum Circuit Simulator</h4>
+        <p>Drag-and-drop circuit builder with state-vector visualization, measurement results, and multi-qubit support.</p>
+        <div class="feature-tags"><span class="chip">Qiskit</span><span class="chip">PennyLane</span></div>
+        <a href="circuit-simulator.html" class="mini-link">Open tool →</a>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">◐</div>
+        <h4>3D Quantum Visualizations</h4>
+        <p>A Bloch sphere explorer, superposition and entanglement animations, and state-evolution playback.</p>
+        <div class="feature-tags"><span class="chip">Three.js</span></div>
+        <a href="bloch-sphere.html" class="mini-link">Open tool →</a>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✺</div>
+        <h4>AI-Powered Quantum Tutor</h4>
+        <p>Free, zero-cost tutor answering questions from every module — no API key, runs entirely in your browser.</p>
+        <div class="feature-tags"><span class="chip">Free</span><span class="chip">Client-Side Search</span></div>
+        <a href="ai-tutor.html" class="mini-link">Open tool →</a>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">▤</div>
+        <h4>Hands-on Coding Labs</h4>
+        <p>Every concept flows Concept → Code → Execute → Visualize → Analyze in an executable notebook.</p>
+        <div class="feature-tags"><span class="chip">Python</span><span class="chip">Jupyter</span></div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✓</div>
+        <h4>Adaptive Quizzes &amp; Assessments</h4>
+        <p>Multiple-choice, coding challenges, and circuit-building exercises with instant, difficulty-adjusted feedback.</p>
+        <div class="feature-tags"><span class="chip">Topic-wise</span><span class="chip">Final tests</span></div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">▦</div>
+        <h4>Learning Analytics Dashboard</h4>
+        <p>Completion percentage, quiz scores, coding progress, skill achievements, and learning streaks in one view.</p>
+        <div class="feature-tags"><span class="chip">Progress tracking</span></div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">◆</div>
+        <h4>Real Quantum Hardware Access</h4>
+        <p>Run your circuits on IBM Quantum hardware, compare against simulator results, and monitor jobs live.</p>
+        <div class="feature-tags"><span class="chip">IBM Quantum</span></div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✦</div>
+        <h4>QML Playground</h4>
+        <p>Experiment with QNNs, VQCs, QSVMs, kernel methods, quantum PCA, and autoencoders against benchmark datasets.</p>
+        <div class="feature-tags"><span class="chip">Compare vs classical</span></div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">▧</div>
+        <h4>Research Hub</h4>
+        <p>Paper summaries, open research problems, benchmark datasets, and a citation library for advanced learners.</p>
+        <div class="feature-tags"><span class="chip">Reading list</span></div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h4>Gamification</h4>
+        <p>XP, achievement badges, learning streaks, leaderboards, and certificates of completion.</p>
+        <div class="feature-tags"><span class="chip">Badges</span><span class="chip">Certificates</span></div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✎</div>
+        <h4>Educator Toolkit</h4>
+        <p>Lecture slides, teaching notes, assignment templates, quiz banks, and lab manuals ready to reuse.</p>
+        <div class="feature-tags"><span class="chip">For instructors</span></div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⬡</div>
+        <h4>Accessibility &amp; Community</h4>
+        <p>Responsive, dark/light themes, an open-source GitHub repo, discussion forums, and a project showcase.</p>
+        <div class="feature-tags"><span class="chip">Open-source</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stack">
+  <div class="stack-track" id="stackTrack">
+    <span class="stack-badge">Next.js</span><span class="stack-badge">React</span><span class="stack-badge">TypeScript</span><span class="stack-badge">Tailwind CSS</span><span class="stack-badge">Framer Motion</span><span class="stack-badge">Three.js</span><span class="stack-badge">FastAPI</span><span class="stack-badge">Firebase</span><span class="stack-badge">Qiskit</span><span class="stack-badge">PennyLane</span><span class="stack-badge">IBM Quantum</span><span class="stack-badge">OpenAI API</span><span class="stack-badge">LangChain</span><span class="stack-badge">ChromaDB</span>
+  </div>
+</section>
+
+<section id="resources">
+  <div class="section-inner">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Resource Hub</div>
+      <h2>Where the tutorials will live</h2>
+      <p>This site is built to host the full library as each module ships — notebooks, video walkthroughs, datasets, and challenge projects, indexed against the roadmap above.</p>
+    </div>
+    <div class="resource-grid reveal">
+      <div class="resource-card">
+        <div class="resource-icon">▤</div>
+        <h4>Interactive Tutorials</h4>
+        <p>Step-by-step lessons with runnable PennyLane / Qiskit notebooks embedded inline.</p>
+        <span class="soon-badge">Coming Soon</span>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">◈</div>
+        <h4>Code Notebooks</h4>
+        <p>Downloadable Jupyter notebooks for every module, from the Bloch sphere to QCNNs.</p>
+        <span class="soon-badge">Coming Soon</span>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">▥</div>
+        <h4>Datasets &amp; Benchmarks</h4>
+        <p>Curated datasets for QML experiments, with baseline classical comparisons.</p>
+        <span class="soon-badge">Coming Soon</span>
+      </div>
+      <div class="resource-card">
+        <div class="resource-icon">✦</div>
+        <h4>Challenge Projects</h4>
+        <p>Original builds like the Barren Plateau Escape Room and Ansatz Breeding Ground.</p>
+        <span class="soon-badge">Coming Soon</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- <footer id="contact">
+  <div class="footer-inner">
+    <div class="footer-brand">Schrödinger's Cats | The Open Learning Platform for Quantum Machine Learning</div>
+    <div class="social">
+      <a href=https://github.com/tanjinadnanabir#" aria-label="GitHub">GH</a>
+      <a href="https://www.linkedin.com/in/tanjinadnanabir/" aria-label="LinkedIn">in</a>
+      <a href="https://x.com/tanjinadnanabir" aria-label="X">X</a>
+      <a href="https://www.youtube.com/@tanjinadnanabir" aria-label="YouTube">YT</a>
+    </div>
+  </div>
+</footer> -->
+
+<footer id="contact">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      Schrödinger's Cats | The Open Learning Platform for Quantum Machine Learning
+    </div>
+
+    <div class="social">
+      <a href="https://github.com/tanjinadnanabir" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+        <i class="fa-brands fa-github"></i>
+      </a>
+
+      <a href="https://www.linkedin.com/in/tanjinadnanabir/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+        <i class="fa-brands fa-linkedin"></i>
+      </a>
+
+      <a href="https://x.com/tanjinadnanabir" target="_blank" rel="noopener noreferrer" aria-label="X">
+        <i class="fa-brands fa-x-twitter"></i>
+      </a>
+
+      <a href="https://www.youtube.com/@tanjinadnanabir" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+        <i class="fa-brands fa-youtube"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+},{threshold:0.12});
+revealEls.forEach(el=>io.observe(el));
+
+document.querySelectorAll('.phase').forEach(phase=>{
+  const card = phase.querySelector('.phase-card');
+  card.addEventListener('click', ()=>{
+    const wasOpen = phase.classList.contains('open');
+    document.querySelectorAll('.phase.open').forEach(p=>p.classList.remove('open'));
+    if(!wasOpen) phase.classList.add('open');
+  });
+});
+document.querySelector('.phase[data-phase="1"]').classList.add('open');
+
+const track = document.querySelector('.roadmap-track');
+const fill = document.getElementById('lineFill');
+function updateFill(){
+  const rect = track.getBoundingClientRect();
+  const vh = window.innerHeight;
+  const total = rect.height;
+  const progressed = Math.min(Math.max(vh*0.75 - rect.top, 0), total);
+  fill.style.height = (progressed/total*100) + '%';
+  document.querySelectorAll('.phase').forEach(p=>{
+    const r = p.getBoundingClientRect();
+    if(r.top < vh*0.8) p.classList.add('active'); else p.classList.remove('active');
+  });
+}
+window.addEventListener('scroll', updateFill);
+window.addEventListener('resize', updateFill);
+updateFill();
+
+const burger = document.querySelector('.burger');
+const navUl = document.querySelector('nav ul');
+burger.addEventListener('click', ()=>{
+  const shown = navUl.style.display === 'flex';
+  navUl.style.display = shown ? 'none' : 'flex';
+  navUl.style.cssText += shown ? '' : 'position:absolute; top:64px; left:0; right:0; background:rgba(7,11,20,0.98); flex-direction:column; padding:20px 32px; gap:18px; border-bottom:1px solid var(--line);';
+});
+
+// duplicate stack track content for seamless loop
+const stackTrack = document.getElementById('stackTrack');
+stackTrack.innerHTML += stackTrack.innerHTML;
+
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+function resize(){ canvas.width = window.innerWidth; canvas.height = document.body.scrollHeight; }
+function initParticles(){
+  particles = [];
+  const count = Math.floor((window.innerWidth * 700) / 90000);
+  for(let i=0;i<count;i++){
+    particles.push({
+      x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+      r: Math.random()*1.6 + 0.6, vy: (Math.random()*0.15+0.04),
+      hue: Math.random()>0.6 ? 'rgba(90,209,230,' : (Math.random()>0.5 ? 'rgba(179,155,255,' : 'rgba(242,163,65,'),
+      alpha: Math.random()*0.5+0.15
+    });
+  }
+}
+resize(); initParticles();
+window.addEventListener('resize', ()=>{ resize(); initParticles(); });
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.y -= p.vy;
+    if(p.y < -10) p.y = canvas.height+10;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctx.fillStyle = p.hue + p.alpha + ')';
+    ctx.fill();
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+/* ---------------- auto-wire curriculum cards to published tutorials ---------------- */
+/* Reads modules-registry.js. Any module with a real file gets turned into a live
+   link with real progress status pulled from localStorage — add a module to the
+   registry and this section updates itself, no HTML edits needed. */
+(function(){
+  if(typeof qmlGetAnalyzedModules !== 'function') return;
+  const analyzed = qmlGetAnalyzedModules();
+  document.querySelectorAll('.module[data-module]').forEach(card=>{
+    const id = parseInt(card.dataset.module, 10);
+    const mod = analyzed.find(m=>m.id===id);
+    if(!mod || !mod.available) return;
+
+    const mfootFirst = card.querySelector('.mfoot span:first-child');
+    let label = 'Available', dotClass = 'dot-live';
+    if(mod.finalDone && mod.mastered === mod.chapters){ label = 'Mastered'; dotClass = 'dot-mastered'; }
+    else if(mod.started){ label = 'In Progress'; dotClass = 'dot-progress'; }
+    if(mfootFirst){ mfootFirst.innerHTML = '<span class="status-dot '+dotClass+'"></span>'+label; }
+
+    card.classList.add('live-linkable');
+    card.addEventListener('click', ()=>{ window.location.href = mod.file; });
+
+    const link = document.createElement('a');
+    link.className = 'mini-link';
+    link.href = mod.file;
+    link.textContent = (mod.started ? 'Continue tutorial' : 'Start tutorial') + ' \u2192';
+    link.addEventListener('click', (e)=> e.stopPropagation());
+    card.appendChild(link);
+  });
+})();
+
+/* ---------------- auto-wire the Prerequisite Primer cards ---------------- */
+(function(){
+  let primerState = null;
+  try{ const saved = localStorage.getItem('qml_primer_state'); if(saved) primerState = JSON.parse(saved); }catch(e){}
+  document.querySelectorAll('.module[data-primer]').forEach(card=>{
+    const chKey = card.dataset.primer;
+    const mfootFirst = card.querySelector('.mfoot span:first-child');
+    let label = 'Available', dotClass = 'dot-live';
+    if(primerState && primerState.chapters && primerState.chapters[chKey]){
+      const ch = primerState.chapters[chKey];
+      if(ch.done && !ch.hadMiss){ label = 'Mastered'; dotClass = 'dot-mastered'; }
+      else if(ch.done || (primerState.xp||0) > 0){ label = 'In Progress'; dotClass = 'dot-progress'; }
+    }
+    if(mfootFirst){ mfootFirst.innerHTML = '<span class="status-dot '+dotClass+'"></span>'+label; }
+    card.classList.add('live-linkable');
+    card.addEventListener('click', ()=>{ window.location.href = 'primer-tutorial.html#'+chKey; });
+    const link = document.createElement('a');
+    link.className = 'mini-link';
+    link.href = 'primer-tutorial.html#'+chKey;
+    link.textContent = 'Start primer \u2192';
+    link.addEventListener('click', (e)=> e.stopPropagation());
+    card.appendChild(link);
+  });
+})();
+</script>
+
+</body>
+</html>

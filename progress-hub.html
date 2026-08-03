@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Learning Dashboard | QML Curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="modules-registry.js"></script>
+<style>
+:root{
+  --bg:#070b14; --bg-2:#0b111f; --panel:#0e1526; --panel-2:#101a2e;
+  --line:rgba(148,178,224,0.14); --line-strong:rgba(148,178,224,0.28);
+  --ink:#e9eef8; --ink-dim:#9fb0c9; --ink-faint:#5f7089;
+  --cyan:#5ad1e6; --cyan-dim:rgba(90,209,230,0.14);
+  --violet:#b39bff; --violet-dim:rgba(179,155,255,0.14);
+  --amber:#f2a341; --amber-dim:rgba(242,163,65,0.14);
+  --green:#5ee6a0; --green-dim:rgba(94,230,160,0.14);
+  --red:#f2726a; --red-dim:rgba(242,114,106,0.14);
+  --blue:#4fa3f7;
+  --serif:'Fraunces', Georgia, serif; --sans:'Inter', -apple-system, sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.6;}
+#particle-canvas{position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.4;}
+.bg-grid{position:fixed; inset:0; z-index:0; pointer-events:none; background-image:linear-gradient(rgba(148,178,224,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(148,178,224,0.035) 1px, transparent 1px); background-size:44px 44px; mask-image:radial-gradient(ellipse 90% 70% at 50% 0%, black 40%, transparent 100%);}
+
+header{position:sticky; top:0; z-index:60; backdrop-filter:blur(14px); background:rgba(7,11,20,0.82); border-bottom:1px solid var(--line);}
+.nav-wrap{max-width:1280px; margin:0 auto; padding:16px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+.logo{font-family:var(--mono); font-weight:700; font-size:15px; color:var(--cyan); border:1px solid var(--line-strong); border-radius:8px; padding:6px 12px; letter-spacing:0.5px; white-space:nowrap;}
+.logo span{color:var(--ink-faint);}
+.back-link{display:flex; align-items:center; gap:8px; color:var(--ink-dim); text-decoration:none; font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; transition:color .2s;}
+.back-link:hover{color:var(--cyan);}
+
+.wrap{max-width:1280px; margin:0 auto; padding:56px 32px 120px; position:relative; z-index:1;}
+
+/* hero stat bar */
+.dash-hero{margin-bottom:48px;}
+.module-eyebrow{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--cyan); background:var(--cyan-dim); margin-bottom:20px;}
+.dash-hero h1{font-family:var(--serif); font-weight:600; font-size:clamp(30px,4vw,44px); letter-spacing:-0.01em;}
+.dash-hero p{margin-top:12px; color:var(--ink-dim); font-size:15.5px; max-width:600px;}
+
+.stat-grid{display:grid; grid-template-columns:1.3fr 1fr 1fr 1fr; gap:16px; margin-top:34px;}
+.stat-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px;}
+.stat-card .lbl{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:10px;}
+.stat-card .val{font-family:var(--serif); font-size:32px; font-weight:600; color:var(--ink);}
+.stat-card .sub{font-size:12px; color:var(--ink-faint); margin-top:4px;}
+
+.level-card{display:flex; flex-direction:column; justify-content:space-between;}
+.level-top{display:flex; align-items:center; justify-content:space-between;}
+.level-name{font-family:var(--serif); font-size:20px; font-weight:600; color:var(--violet);}
+.level-xp{font-family:var(--mono); font-size:11px; color:var(--ink-faint);}
+.xp-track{height:8px; background:var(--panel-2); border-radius:6px; overflow:hidden; border:1px solid var(--line); margin-top:14px;}
+.xp-fill{height:100%; background:linear-gradient(90deg,var(--cyan),var(--violet)); border-radius:6px; width:0%; transition:width 1s ease;}
+
+@media (max-width:980px){.stat-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:560px){.stat-grid{grid-template-columns:1fr;}}
+
+/* continue learning CTA */
+.continue-card{
+  margin-top:20px; padding:24px 26px; border-radius:14px;
+  background:linear-gradient(120deg, rgba(90,209,230,0.08), rgba(179,155,255,0.06));
+  border:1px solid var(--line-strong); display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;
+}
+.continue-left{display:flex; align-items:center; gap:16px;}
+.continue-icon{width:46px; height:46px; border-radius:12px; background:var(--panel); border:1px solid var(--line-strong); display:flex; align-items:center; justify-content:center; font-size:19px; color:var(--cyan); flex-shrink:0;}
+.continue-eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:4px;}
+.continue-title{font-weight:700; font-size:15.5px; color:var(--ink);}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:9px; font-size:13.5px; font-weight:600; text-decoration:none; cursor:pointer; border:1px solid transparent; transition:transform .2s, box-shadow .2s; white-space:nowrap;}
+.btn-primary{background:var(--blue); color:#04101f;}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 26px -8px rgba(79,163,247,0.5);}
+.btn-ghost{background:transparent; border-color:var(--line-strong); color:var(--ink);}
+.btn-ghost:hover{border-color:var(--ink-dim); transform:translateY(-2px);}
+
+/* section shells */
+.dash-section{margin-top:64px;}
+.section-eyebrow{font-family:var(--mono); font-size:11.5px; letter-spacing:0.16em; text-transform:uppercase; color:var(--violet); margin-bottom:14px; display:flex; align-items:center; gap:10px;}
+.section-eyebrow::before{content:''; width:24px; height:1px; background:var(--violet);}
+.dash-section h2{font-family:var(--serif); font-weight:600; font-size:clamp(24px,3vw,32px); letter-spacing:-0.01em; margin-bottom:8px;}
+.dash-section > p{color:var(--ink-dim); font-size:14.5px; max-width:600px; margin-bottom:30px;}
+
+/* level groups of modules */
+.level-group{margin-bottom:36px;}
+.level-group-head{display:flex; align-items:center; gap:12px; margin-bottom:16px;}
+.level-group-head h3{font-family:var(--mono); font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-dim);}
+.level-group-head .count{font-family:var(--mono); font-size:11px; color:var(--ink-faint);}
+.level-line{flex-grow:1; height:1px; background:var(--line);}
+
+.module-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+@media (max-width:980px){.module-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:640px){.module-grid{grid-template-columns:1fr;}}
+
+.mcard{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px; transition:border-color .25s, transform .25s; position:relative; overflow:hidden;}
+.mcard.available:hover{border-color:var(--line-strong); transform:translateY(-3px);}
+.mcard.locked{opacity:0.55;}
+.mcard-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:12px;}
+.mcard-num{font-family:var(--mono); font-size:11px; color:var(--ink-faint);}
+.mcard-title{font-size:14.5px; font-weight:700; color:var(--ink); line-height:1.35; margin-top:4px;}
+.status-pill{font-family:var(--mono); font-size:9.5px; letter-spacing:0.06em; text-transform:uppercase; padding:4px 9px; border-radius:100px; white-space:nowrap; flex-shrink:0;}
+.status-pill.mastered{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.35);}
+.status-pill.progress{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.35);}
+.status-pill.notstarted{background:var(--grey-dim,rgba(148,178,224,0.1)); color:var(--ink-faint); border:1px solid var(--line-strong);}
+.status-pill.soon{background:rgba(148,178,224,0.08); color:var(--ink-faint); border:1px solid var(--line);}
+
+.mcard-bar{height:8px; background:var(--panel-2); border-radius:6px; overflow:hidden; border:1px solid var(--line); display:flex; margin:12px 0 10px;}
+.mcard-bar .seg-mastered{height:100%; background:var(--green);}
+.mcard-bar .seg-partial{height:100%; background:var(--amber);}
+.mcard-foot{display:flex; justify-content:space-between; align-items:center; font-family:var(--mono); font-size:11px; color:var(--ink-faint);}
+.mcard-xp{color:var(--amber);}
+.mcard-link{display:block; margin-top:14px; text-align:center; padding:9px; border-radius:8px; border:1px solid var(--line-strong); color:var(--ink-dim); text-decoration:none; font-size:12.5px; font-weight:600; transition:border-color .2s, color .2s;}
+.mcard-link:hover{border-color:var(--cyan); color:var(--cyan);}
+.mcard-link.disabled{pointer-events:none; opacity:0.5;}
+
+/* badges */
+.badge-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
+@media (max-width:900px){.badge-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:520px){.badge-grid{grid-template-columns:1fr;}}
+.badge-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px; text-align:center; transition:transform .25s, border-color .25s;}
+.badge-card.earned{border-color:rgba(242,163,65,0.4);}
+.badge-card.earned:hover{transform:translateY(-4px);}
+.badge-icon{width:52px; height:52px; border-radius:50%; margin:0 auto 14px; display:flex; align-items:center; justify-content:center; font-size:22px; background:var(--panel-2); border:1.5px solid var(--line-strong); color:var(--ink-faint);}
+.badge-card.earned .badge-icon{background:var(--amber-dim); border-color:var(--amber); color:var(--amber); box-shadow:0 0 20px -4px rgba(242,163,65,0.5);}
+.badge-name{font-size:13px; font-weight:700; color:var(--ink);}
+.badge-card:not(.earned) .badge-name{color:var(--ink-faint);}
+.badge-desc{font-size:11.5px; color:var(--ink-faint); margin-top:6px; line-height:1.5;}
+
+/* reset */
+.reset-row{margin-top:60px; padding-top:24px; border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;}
+.reset-note{font-size:12px; color:var(--ink-faint); font-family:var(--mono);}
+.btn-danger{background:transparent; border:1px solid rgba(242,114,106,0.4); color:var(--red);}
+.btn-danger:hover{background:var(--red-dim); transform:translateY(-2px);}
+
+.reveal{opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease;}
+.reveal.in{opacity:1; transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<canvas id="particle-canvas"></canvas>
+<div class="bg-grid"></div>
+
+<header>
+  <div class="nav-wrap">
+    <div class="logo">{QML}<span></span></div>
+    <a class="back-link" href="qml-roadmap-landing-page.html#curriculum">← Back to Curriculum</a>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="dash-hero reveal">
+    <div class="module-eyebrow">◆ Your Progress</div>
+    <h1>My Learning Dashboard</h1>
+    <p>A live snapshot pulled straight from your quiz results across every module tutorial on this site — no separate login, no separate tracking. Open a module, answer a few questions, and it shows up here.</p>
+
+    <div class="stat-grid">
+      <div class="stat-card level-card">
+        <div class="level-top">
+          <div>
+            <div class="lbl">Current Level</div>
+            <div class="level-name" id="levelName">—</div>
+          </div>
+          <div class="level-xp" id="levelXpLabel">0 XP</div>
+        </div>
+        <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+        <div class="sub" id="xpToNext" style="margin-top:8px;">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="lbl">Total XP</div>
+        <div class="val" id="statTotalXP">0</div>
+        <div class="sub">Earned across all modules</div>
+      </div>
+      <div class="stat-card">
+        <div class="lbl">Chapters Mastered</div>
+        <div class="val" id="statChapters">0 / 0</div>
+        <div class="sub">Perfect quick-checks</div>
+      </div>
+      <div class="stat-card">
+        <div class="lbl">Modules Completed</div>
+        <div class="val" id="statModules">0 / 2</div>
+        <div class="sub" id="statModulesSub">of 2 published</div>
+      </div>
+    </div>
+
+    <div class="continue-card" id="continueCard">
+      <div class="continue-left">
+        <div class="continue-icon">→</div>
+        <div>
+          <div class="continue-eyebrow">Pick Up Where You Left Off</div>
+          <div class="continue-title" id="continueTitle">Loading your progress…</div>
+        </div>
+      </div>
+      <a href="#" class="btn btn-primary" id="continueBtn">Continue →</a>
+    </div>
+  </div>
+
+  <div class="dash-section reveal">
+    <div class="section-eyebrow">Curriculum Map</div>
+    <h2>All 12 modules, tracked in one place</h2>
+    <p>Grouped by level. Modules you've opened show live mastery; the rest are marked as they ship.</p>
+
+    <div id="levelGroups"></div>
+  </div>
+
+  <div class="dash-section reveal">
+    <div class="section-eyebrow">Achievements</div>
+    <h2>Badges</h2>
+    <p>Earned automatically based on your quiz performance — no extra steps.</p>
+    <div class="badge-grid" id="badgeGrid"></div>
+  </div>
+
+  <div class="reset-row">
+    <div class="reset-note">Progress is stored locally in this browser via localStorage — it won't sync across devices.</div>
+    <button class="btn btn-danger" id="resetBtn">Reset All Progress</button>
+  </div>
+
+</div>
+
+<script>
+/* ---------------- module data, from the shared registry ---------------- */
+/* QML_MODULES / qmlGetAnalyzedModules come from modules-registry.js — */
+/* every page on this site reads the same list, so this hub never drifts */
+/* out of sync with the landing page or the tutorials themselves. */
+const analyzed = qmlGetAnalyzedModules();
+const publishedModules = analyzed.filter(m=>m.available);
+
+/* ---------------- aggregate stats ---------------- */
+const totalXP = analyzed.reduce((sum,m)=>sum+m.xp,0);
+const totalMastered = analyzed.reduce((sum,m)=>sum+m.mastered,0);
+const totalChaptersPublished = publishedModules.reduce((sum,m)=>sum+(m.chapters||0),0);
+const modulesCompleted = analyzed.filter(m=>m.finalDone).length;
+
+document.getElementById('statTotalXP').textContent = totalXP;
+document.getElementById('statChapters').textContent = totalMastered+' / '+totalChaptersPublished;
+document.getElementById('statModules').textContent = modulesCompleted+' / '+publishedModules.length;
+document.getElementById('statModulesSub').textContent = 'of '+publishedModules.length+' published';
+
+/* ---------------- level system ---------------- */
+const levels = [
+  {name:'Curious Beginner', min:0, max:99},
+  {name:'Pattern Seeker', min:100, max:249},
+  {name:'Circuit Builder', min:250, max:499},
+  {name:'Quantum Apprentice', min:500, max:799},
+  {name:'Quantum Researcher', min:800, max:Infinity},
+];
+function computeLevel(xp){
+  for(let i=0;i<levels.length;i++){
+    if(xp >= levels[i].min && xp <= levels[i].max) return {level:levels[i], index:i};
+  }
+  return {level:levels[levels.length-1], index:levels.length-1};
+}
+const lvl = computeLevel(totalXP);
+document.getElementById('levelName').textContent = lvl.level.name;
+document.getElementById('levelXpLabel').textContent = totalXP+' XP';
+if(lvl.level.max === Infinity){
+  document.getElementById('xpFill').style.width = '100%';
+  document.getElementById('xpToNext').textContent = 'Max level reached — you\u2019re at the top of the curve.';
+} else {
+  const span = lvl.level.max - lvl.level.min + 1;
+  const into = totalXP - lvl.level.min;
+  const pct = Math.min(100, (into/span)*100);
+  document.getElementById('xpFill').style.width = pct+'%';
+  const remaining = lvl.level.max - totalXP + 1;
+  document.getElementById('xpToNext').textContent = remaining+' XP to '+levels[lvl.index+1].name;
+}
+
+/* ---------------- continue learning CTA ---------------- */
+(function(){
+  const nextUnfinished = analyzed.find(m => m.available && !m.finalDone);
+  const titleEl = document.getElementById('continueTitle');
+  const btnEl = document.getElementById('continueBtn');
+  if(nextUnfinished){
+    const verb = nextUnfinished.started ? 'Resume' : 'Start';
+    titleEl.textContent = verb+' Module '+nextUnfinished.id+' — '+nextUnfinished.title;
+    btnEl.href = nextUnfinished.file;
+    btnEl.textContent = verb+' →';
+  } else if(publishedModules.length > 0) {
+    const nextComingSoon = analyzed.find(m => !m.available);
+    titleEl.textContent = nextComingSoon ? 'All published modules complete — Module '+nextComingSoon.id+' is next, coming soon' : 'All published modules complete!';
+    btnEl.href = 'qml-roadmap-landing-page.html#curriculum';
+    btnEl.textContent = 'View Curriculum →';
+  } else {
+    titleEl.textContent = 'No modules published yet — check back soon';
+    btnEl.href = 'qml-roadmap-landing-page.html#curriculum';
+    btnEl.textContent = 'View Curriculum →';
+  }
+})();
+
+/* ---------------- module cards grouped by level ---------------- */
+function statusFor(m){
+  if(!m.available) return {cls:'soon', label:'Coming Soon'};
+  if(m.finalDone && m.mastered === m.chapters) return {cls:'mastered', label:'Mastered'};
+  if(m.started) return {cls:'progress', label:'In Progress'};
+  return {cls:'notstarted', label:'Not Started'};
+}
+function renderModuleCard(m){
+  const st = statusFor(m);
+  const total = m.chapters || 0;
+  const masteredPct = total ? (m.mastered/total)*100 : 0;
+  const partialPct = total ? ((m.attempted - m.mastered)/total)*100 : 0;
+  const linkHtml = m.available
+    ? `<a class="mcard-link" href="${m.file}">${m.started ? 'Continue Tutorial →' : 'Start Tutorial →'}</a>`
+    : `<a class="mcard-link disabled" href="#">Coming Soon</a>`;
+  return `
+    <div class="mcard ${m.available ? 'available' : 'locked'}">
+      <div class="mcard-top">
+        <div><div class="mcard-num">MODULE ${String(m.id).padStart(2,'0')}</div><div class="mcard-title">${m.title}</div></div>
+        <span class="status-pill ${st.cls}">${st.label}</span>
+      </div>
+      <div class="mcard-bar">
+        <div class="seg-mastered" style="width:${masteredPct}%"></div>
+        <div class="seg-partial" style="width:${partialPct}%"></div>
+      </div>
+      <div class="mcard-foot">
+        <span>${m.available ? m.mastered+' / '+total+' chapters mastered' : (m.chapters ? total+' chapters' : 'Not yet built')}</span>
+        <span class="mcard-xp">${m.xp ? '⚡ '+m.xp+' XP' : ''}</span>
+      </div>
+      ${linkHtml}
+    </div>
+  `;
+}
+(function(){
+  const levelsOrder = ['Beginner','Intermediate','Advanced'];
+  const wrap = document.getElementById('levelGroups');
+  levelsOrder.forEach(levelName=>{
+    const mods = analyzed.filter(m=>m.level===levelName);
+    const doneCount = mods.filter(m=>m.finalDone).length;
+    const group = document.createElement('div');
+    group.className = 'level-group';
+    group.innerHTML = `
+      <div class="level-group-head">
+        <h3>${levelName}</h3>
+        <div class="level-line"></div>
+        <span class="count">${doneCount} / ${mods.length} complete</span>
+      </div>
+      <div class="module-grid">${mods.map(renderModuleCard).join('')}</div>
+    `;
+    wrap.appendChild(group);
+  });
+})();
+
+/* ---------------- badges ---------------- */
+const badgeDefs = [
+  {icon:'✺', name:'First Steps', desc:'Answer your first quick-check question in any module.', test:()=> analyzed.some(m=>m.attempted>0 || m.xp>0)},
+  {icon:'◆', name:'Perfectionist', desc:'Master at least one chapter with a perfect quick-check score.', test:()=> totalMastered >= 1},
+  {icon:'⚡', name:'Charged Up', desc:'Earn 100 XP or more across all modules.', test:()=> totalXP >= 100},
+  {icon:'✓', name:'Module Champion', desc:'Complete a full module\u2019s adaptive assessment with every chapter mastered.', test:()=> analyzed.some(m=>m.perfect)},
+  {icon:'▦', name:'Halfway There', desc:'Master at least half the chapters in any single published module.', test:()=> analyzed.some(m=> m.available && m.chapters && (m.mastered/m.chapters) >= 0.5)},
+  {icon:'⚖', name:'Two for Two', desc:'Finish the adaptive assessment in every currently published module.', test:()=> publishedModules.length>0 && publishedModules.every(m=>m.finalDone)},
+  {icon:'✦', name:'Quantum Apprentice', desc:'Reach 500 XP total.', test:()=> totalXP >= 500},
+  {icon:'▧', name:'Deep Diver', desc:'Master 8 or more chapters across all modules.', test:()=> totalMastered >= 8},
+];
+(function(){
+  const grid = document.getElementById('badgeGrid');
+  badgeDefs.forEach(b=>{
+    const earned = b.test();
+    const card = document.createElement('div');
+    card.className = 'badge-card' + (earned ? ' earned' : '');
+    card.innerHTML = `
+      <div class="badge-icon">${b.icon}</div>
+      <div class="badge-name">${b.name}</div>
+      <div class="badge-desc">${b.desc}</div>
+    `;
+    grid.appendChild(card);
+  });
+})();
+
+/* ---------------- reset ---------------- */
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(confirm('This clears all saved XP and quiz progress for every module tutorial on this device. This cannot be undone. Continue?')){
+    QML_MODULES.forEach(m=>{ if(m.stateKey) try{ localStorage.removeItem(m.stateKey); }catch(e){} });
+    location.reload();
+  }
+});
+
+/* ---------------- particle background (visual consistency with site) ---------------- */
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+function resize(){ canvas.width = window.innerWidth; canvas.height = document.body.scrollHeight; }
+function initParticles(){
+  particles = [];
+  const count = Math.floor((window.innerWidth * 500) / 90000);
+  for(let i=0;i<count;i++){
+    particles.push({
+      x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+      r: Math.random()*1.6 + 0.6, vy: (Math.random()*0.15+0.04),
+      hue: Math.random()>0.6 ? 'rgba(90,209,230,' : (Math.random()>0.5 ? 'rgba(179,155,255,' : 'rgba(242,163,65,'),
+      alpha: Math.random()*0.4+0.1
+    });
+  }
+}
+resize(); initParticles();
+window.addEventListener('resize', ()=>{ resize(); initParticles(); });
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.y -= p.vy;
+    if(p.y < -10) p.y = canvas.height+10;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctx.fillStyle = p.hue + p.alpha + ')';
+    ctx.fill();
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+/* ---------------- reveal on scroll ---------------- */
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+},{threshold:0.08});
+revealEls.forEach(el=>io.observe(el));
+</script>
+
+</body>
+</html>

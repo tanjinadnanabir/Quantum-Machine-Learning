@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 4 — Why Quantum Computing? | QML Curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="modules-registry.js"></script>
+<style>
+:root{
+  --bg:#070b14; --bg-2:#0b111f; --panel:#0e1526; --panel-2:#101a2e;
+  --line:rgba(148,178,224,0.14); --line-strong:rgba(148,178,224,0.28);
+  --ink:#e9eef8; --ink-dim:#9fb0c9; --ink-faint:#5f7089;
+  --cyan:#5ad1e6; --cyan-dim:rgba(90,209,230,0.14);
+  --violet:#b39bff; --violet-dim:rgba(179,155,255,0.14);
+  --amber:#f2a341; --amber-dim:rgba(242,163,65,0.14);
+  --green:#5ee6a0; --green-dim:rgba(94,230,160,0.14);
+  --red:#f2726a; --red-dim:rgba(242,114,106,0.14);
+  --blue:#4fa3f7;
+  --serif:'Fraunces', Georgia, serif; --sans:'Inter', -apple-system, sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.7;}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto !important;}}
+.progress-rail{position:fixed; top:0; left:0; right:0; height:3px; background:var(--line); z-index:100;}
+.progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--violet),var(--amber)); transition:width .1s linear;}
+header{position:sticky; top:3px; z-index:60; backdrop-filter:blur(14px); background:rgba(7,11,20,0.82); border-bottom:1px solid var(--line);}
+.nav-wrap{max-width:1280px; margin:0 auto; padding:14px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+.back-link{display:flex; align-items:center; gap:8px; color:var(--ink-dim); text-decoration:none; font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; transition:color .2s;}
+.back-link:hover{color:var(--cyan);}
+.crumb{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); letter-spacing:0.06em; text-transform:uppercase;}
+.crumb b{color:var(--cyan);}
+.xp-badge{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12.5px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; color:var(--amber); background:var(--amber-dim);}
+.layout{max-width:1280px; margin:0 auto; padding:52px 32px 120px; display:grid; grid-template-columns:260px 1fr; gap:56px;}
+.sidebar{position:sticky; top:80px; align-self:start; height:fit-content; max-height:calc(100vh - 100px); overflow-y:auto;}
+.side-title{font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;}
+.side-list{list-style:none; display:flex; flex-direction:column; gap:1px;}
+.side-list a{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink-dim); font-size:12.5px; padding:8px 12px; border-radius:8px; border-left:2px solid transparent; transition:background .2s, color .2s, border-color .2s;}
+.side-list a:hover{background:var(--panel);}
+.side-list a.active{color:var(--ink); background:var(--panel); border-left-color:var(--cyan);}
+.side-dot{width:7px; height:7px; border-radius:50%; background:#2a3550; flex-shrink:0; transition:background .3s;}
+.side-dot.done{background:var(--green); box-shadow:0 0 6px var(--green);}
+.side-dot.warn{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+.tut-hero{margin-bottom:44px;}
+.module-eyebrow{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--cyan); background:var(--cyan-dim); margin-bottom:20px;}
+.tut-hero h1{font-family:var(--serif); font-weight:600; font-size:clamp(30px,4vw,44px); line-height:1.1; letter-spacing:-0.01em;}
+.tut-hero p.lede{margin-top:16px; color:var(--ink-dim); font-size:16px; max-width:660px;}
+.chip-row{display:flex; gap:8px; margin-top:22px; flex-wrap:wrap;}
+.chip{font-family:var(--mono); font-size:10.5px; letter-spacing:0.04em; color:var(--ink-faint); border:1px solid var(--line); padding:5px 11px; border-radius:100px;}
+.character-card{margin-top:28px; display:flex; gap:18px; align-items:center; padding:20px 22px; background:linear-gradient(120deg, rgba(90,209,230,0.08), rgba(179,155,255,0.05)); border:1px solid var(--line-strong); border-radius:14px;}
+.avatar-ring{width:56px; height:56px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1.5px solid var(--cyan); font-family:var(--serif); font-size:22px; color:var(--cyan);}
+.character-card .cname{font-weight:700; font-size:14.5px; color:var(--ink);}
+.character-card .crole{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:2px;}
+.character-card p{font-size:13.5px; color:var(--ink-dim); margin-top:6px;}
+.chapter{margin-bottom:80px; scroll-margin-top:90px;}
+.chapter-head{display:flex; align-items:center; gap:14px; margin-bottom:20px;}
+.chapter-icon{width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1px solid var(--line-strong); font-size:18px; color:var(--cyan); flex-shrink:0;}
+.chapter-num{font-family:var(--mono); font-size:12px; color:var(--ink-faint); letter-spacing:0.08em; display:block;}
+.chapter h2{font-family:var(--serif); font-weight:600; font-size:clamp(22px,2.6vw,29px); letter-spacing:-0.01em;}
+.story-panel{position:relative; margin:16px 0 22px; padding:18px 22px 18px 48px; border-radius:12px; background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--cyan); font-family:var(--serif); font-style:italic; font-size:14.5px; color:var(--ink-dim); line-height:1.65;}
+.story-panel::before{content:'\201C'; position:absolute; left:14px; top:6px; font-size:32px; color:var(--cyan); font-style:normal; opacity:0.6;}
+.story-panel b{color:var(--ink); font-style:normal;}
+.chapter > p.body-text{color:var(--ink-dim); font-size:14.5px; margin-bottom:14px;}
+.chapter > p.body-text b{color:var(--ink); font-weight:600;}
+.chapter ul.points{margin:14px 0 18px 0; padding-left:0; list-style:none; display:flex; flex-direction:column; gap:9px;}
+.chapter ul.points li{display:flex; gap:10px; font-size:13.5px; color:var(--ink-dim); padding:11px 13px; background:var(--panel); border:1px solid var(--line); border-radius:10px;}
+.chapter ul.points li::before{content:'\25C6'; color:var(--cyan); font-size:8px; margin-top:5px; flex-shrink:0;}
+.callout{margin:18px 0; padding:14px 16px; border-radius:10px; border-left:3px solid var(--violet); background:var(--violet-dim); font-size:13px; color:var(--ink-dim);}
+.callout b{color:var(--ink);}
+.visual-box{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px; margin:20px 0; overflow-x:auto;}
+.visual-label{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+.toggle-btn{font-family:var(--mono); font-size:11px; letter-spacing:0.05em; text-transform:uppercase; padding:8px 16px; border-radius:100px; border:1px solid var(--line-strong); background:transparent; color:var(--ink-dim); cursor:pointer; transition:all .2s;}
+.toggle-btn.active{color:var(--cyan); border-color:var(--cyan); background:var(--cyan-dim);}
+.toggle-btn:disabled{opacity:0.5; cursor:default;}
+.ctrl-row{display:flex; align-items:center; gap:14px; margin-bottom:14px; flex-wrap:wrap;}
+.ctrl-row label{font-family:var(--mono); font-size:11.5px; color:var(--ink-dim); min-width:60px;}
+.ctrl-row input[type=range]{width:160px; accent-color:var(--cyan);}
+.ctrl-readout{font-family:var(--mono); font-size:12px; color:var(--cyan); min-width:40px; display:inline-block;}
+.center-svg{display:flex; justify-content:center;}
+.readout-line{text-align:center; margin-top:10px; font-family:var(--mono); font-size:12px; color:var(--ink-dim);}
+.compare-line{text-align:center; margin-top:6px; font-size:12.5px; color:var(--ink);}
+
+/* flip-card grid (reused for hardware chapter) */
+.encoding-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+.enc-card{perspective:1000px; height:132px; cursor:pointer;}
+.enc-inner{position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d;}
+.enc-card.flipped .enc-inner{transform:rotateY(180deg);}
+.enc-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; padding:13px; display:flex; flex-direction:column; justify-content:center; border:1px solid var(--line-strong);}
+.enc-front{background:var(--panel-2);}
+.enc-front .en{font-family:var(--mono); font-size:9.5px; color:var(--ink-faint); margin-bottom:4px;}
+.enc-front h6{font-size:13px; font-weight:700; color:var(--ink);}
+.enc-back{background:var(--panel); transform:rotateY(180deg); font-size:10.5px; color:var(--ink-dim); line-height:1.5;}
+@media (max-width:760px){.encoding-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:480px){.encoding-grid{grid-template-columns:1fr;}}
+
+/* trial / vote cards (reused for entanglement trials) */
+.forest-grid{display:grid; grid-template-columns:repeat(8,1fr); gap:8px;}
+@media (max-width:700px){.forest-grid{grid-template-columns:repeat(4,1fr);}}
+.tree-vote{background:var(--panel-2); border:1px solid var(--line-strong); border-radius:10px; padding:12px 6px; text-align:center;}
+.tree-vote .ticon{font-size:18px; color:var(--cyan);}
+.tree-vote .tvote{font-family:var(--mono); font-size:9.5px; margin-top:6px; color:var(--ink-dim);}
+.forest-result{margin-top:14px; text-align:center; font-family:var(--mono); font-size:13px; color:var(--ink);}
+
+/* compare toggle panel (ch2) */
+.compare-panel{background:var(--panel-2); border:1px solid var(--line-strong); border-radius:12px; padding:18px 20px; font-size:13px; color:var(--ink-dim); min-height:96px;}
+.compare-panel b{color:var(--ink);}
+.compare-panel ul{margin:8px 0 0 18px;}
+
+/* quiz (shared) */
+.quiz-box{margin-top:24px; background:var(--panel); border:1px solid var(--line-strong); border-radius:14px; padding:22px;}
+.quiz-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
+.quiz-title{font-family:var(--mono); font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--cyan); display:flex; align-items:center; gap:8px;}
+.quiz-score{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);}
+.q-item{margin-bottom:20px;}
+.q-item:last-child{margin-bottom:0;}
+.q-text{font-size:13.5px; font-weight:600; margin-bottom:10px; color:var(--ink);}
+.q-options{display:flex; flex-direction:column; gap:7px;}
+.q-opt{text-align:left; padding:10px 13px; border-radius:9px; border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-dim); font-size:12.5px; cursor:pointer; transition:border-color .2s, background .2s, color .2s; font-family:var(--sans);}
+.q-opt:hover:not(:disabled){border-color:var(--ink-dim); color:var(--ink);}
+.q-opt.correct{border-color:var(--green); background:var(--green-dim); color:var(--green);}
+.q-opt.incorrect{border-color:var(--red); background:var(--red-dim); color:var(--red);}
+.q-opt:disabled{cursor:default;}
+.q-explain{margin-top:9px; font-size:12px; color:var(--ink-dim); padding:10px 13px; border-radius:8px; background:var(--panel-2); border-left:2px solid var(--cyan); display:none;}
+.q-explain.show{display:block;}
+.chapter-status{margin-top:14px; padding:9px 13px; border-radius:8px; font-family:var(--mono); font-size:11px; display:none; align-items:center; gap:8px;}
+.chapter-status.show{display:flex;}
+.chapter-status.mastered{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.35);}
+.chapter-status.review{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.35);}
+.final-assess{margin-top:20px; background:linear-gradient(180deg,var(--panel-2),var(--panel)); border:1px solid var(--line-strong); border-radius:16px; padding:34px;}
+.final-head{margin-bottom:26px;}
+.final-head .module-eyebrow{color:var(--amber); border-color:var(--line-strong); background:var(--amber-dim);}
+.final-head h2{font-family:var(--serif); font-size:clamp(26px,3vw,34px); font-weight:600;}
+.final-head p{color:var(--ink-dim); margin-top:10px; font-size:14.5px;}
+.result-panel{margin-top:28px; padding:24px; border-radius:12px; border:1px solid var(--line-strong); background:var(--bg); display:none;}
+.result-panel.show{display:block;}
+.result-top{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:18px;}
+.result-score{font-family:var(--serif); font-size:44px; font-weight:600;}
+.result-badge{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; padding:6px 14px; border-radius:100px;}
+.result-badge.pass{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.4);}
+.result-badge.retry{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.4);}
+.recommend-list{list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+.recommend-list li{font-size:13px; color:var(--ink-dim); padding:10px 12px; background:var(--panel-2); border-radius:8px; border:1px solid var(--line);}
+.result-actions{display:flex; gap:12px; margin-top:22px; flex-wrap:wrap;}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:9px; font-size:13.5px; font-weight:600; text-decoration:none; cursor:pointer; border:1px solid transparent; transition:transform .2s, box-shadow .2s;}
+.btn-primary{background:var(--blue); color:#04101f;}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 26px -8px rgba(79,163,247,0.5);}
+.btn-ghost{background:transparent; border-color:var(--line-strong); color:var(--ink);}
+.btn-ghost:hover{border-color:var(--ink-dim); transform:translateY(-2px);}
+.reveal{opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease;}
+.reveal.in{opacity:1; transform:translateY(0);}
+.module-nav{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:70px; padding-top:36px; border-top:1px solid var(--line);}
+.mn-card{display:flex; flex-direction:column; gap:6px; padding:20px 22px; border-radius:14px; background:var(--panel); border:1px solid var(--line); text-decoration:none; transition:border-color .25s, transform .25s;}
+.mn-card.enabled:hover{border-color:var(--line-strong); transform:translateY(-3px);}
+.mn-card.disabled{opacity:0.5; cursor:default;}
+.mn-card.next{align-items:flex-end; text-align:right;}
+.mn-eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint);}
+.mn-title{font-family:var(--serif); font-size:16px; font-weight:600; color:var(--ink);}
+.mn-arrow{font-family:var(--mono); font-size:12px; color:var(--cyan);}
+@media (max-width:700px){.module-nav{grid-template-columns:1fr;}}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static; display:flex; overflow-x:auto; gap:4px; padding-bottom:10px; max-height:none;}
+  .side-list{flex-direction:row;}
+  .side-list a{white-space:nowrap;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-rail"><div class="progress-fill" id="progressFill"></div></div>
+
+<header>
+  <div class="nav-wrap">
+    <a class="back-link" href="qml-roadmap-landing-page.html#curriculum">← Back to Curriculum</a>
+    <div class="crumb">LEVEL 1 · BEGINNER — <b>MODULE 4</b></div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a class="back-link" href="progress-hub.html">My Progress</a>
+      <div class="xp-badge">⚡ <span id="xpCount">0</span> XP</div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="side-title">Module 4 Chapters</div>
+    <ul class="side-list" id="sideList">
+      <li><a href="#ch1" data-target="ch1"><span class="side-dot" id="dot-ch1"></span>Limitations of Classical Computing</a></li>
+      <li><a href="#ch2" data-target="ch2"><span class="side-dot" id="dot-ch2"></span>Quantum Computing Fundamentals</a></li>
+      <li><a href="#ch3" data-target="ch3"><span class="side-dot" id="dot-ch3"></span>Qubits</a></li>
+      <li><a href="#ch4" data-target="ch4"><span class="side-dot" id="dot-ch4"></span>Superposition</a></li>
+      <li><a href="#ch5" data-target="ch5"><span class="side-dot" id="dot-ch5"></span>Entanglement</a></li>
+      <li><a href="#ch6" data-target="ch6"><span class="side-dot" id="dot-ch6"></span>Quantum Advantage</a></li>
+      <li><a href="#ch7" data-target="ch7"><span class="side-dot" id="dot-ch7"></span>Real Quantum Hardware</a></li>
+      <li><a href="#final" data-target="final"><span class="side-dot" id="dot-final"></span>Module Assessment</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <div class="tut-hero reveal">
+      <div class="module-eyebrow">◆ Module 4 · Beginner</div>
+      <h1>Why Quantum Computing?</h1>
+      <p class="lede">Modules 1 through 3 built up classical machine learning. Before this course starts blending it with quantum mechanics, this module answers the question underneath everything that follows: what can a quantum computer actually do that a classical one fundamentally can't?</p>
+      <div class="chip-row">
+        <span class="chip">7 Chapters</span>
+        <span class="chip">Interactive Bloch Sphere</span>
+        <span class="chip">Live Measurement Simulations</span>
+        <span class="chip">21 Quick-Check Questions</span>
+        <span class="chip">1 Adaptive Assessment</span>
+        <span class="chip">~55 min</span>
+      </div>
+      <div class="character-card">
+        <div class="avatar-ring">A</div>
+        <div>
+          <div class="cname">Alex, crossing over</div>
+          <div class="crole">Curious Beginner · Leaving Classical Behind</div>
+          <p>Alex has spent three modules inside classical computing. Today the friend pulls out a very different kind of machine — and the rules change.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CH1: LIMITATIONS OF CLASSICAL COMPUTING -->
+    <section class="chapter reveal" id="ch1">
+      <div class="chapter-head"><div class="chapter-icon">⊘</div><div><span class="chapter-num">CHAPTER 01</span><h2>Limitations of Classical Computing</h2></div></div>
+      <div class="story-panel">"Before I show you what's different," the friend says, "let's see exactly where classical computers hit a wall — because quantum computing only matters where this wall is real."</div>
+      <p class="body-text">Every classical bit is either <b>0 or 1</b> — nothing in between. Adding one more bit doesn't just add one more possibility, it <b>doubles</b> the total number of combinations the computer might need to check. That doubling, repeated enough times, outruns any amount of raw speed.</p>
+      <div class="visual-box">
+        <div class="visual-label">State Space Explosion</div>
+        <div class="ctrl-row"><label>bits (n)</label><input type="range" id="bitSlider" min="1" max="50" value="8" step="1"><span class="ctrl-readout" id="bitVal">8</span></div>
+        <div class="center-svg"><svg viewBox="0 0 320 190" width="320" height="190" id="stateSpaceSvg"></svg></div>
+        <div class="readout-line" id="stateSpaceReadout">—</div>
+        <div class="compare-line" id="stateSpaceCompare">—</div>
+      </div>
+      <ul class="points">
+        <li><b>Classical computers check one definite combination at a time</b> — a bit string is 0110...1, full stop, never a blend of possibilities.</li>
+        <li><b>2ⁿ growth is brutal:</b> 50 bits alone already produce more combinations than a supercomputer could enumerate in the age of the universe.</li>
+        <li>Problems like simulating a moderately sized molecule or factoring a huge number have exactly this kind of exponential possibility space — which is precisely where quantum computers start to matter.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> It isn't that classical computers are slow. It's that some problems' possibility space grows faster than any amount of added speed can ever outrun.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch1">0 / 3</div></div><div id="quiz-ch1"></div><div class="chapter-status" id="status-ch1"></div></div>
+    </section>
+
+    <!-- CH2: QUANTUM COMPUTING FUNDAMENTALS -->
+    <section class="chapter reveal" id="ch2">
+      <div class="chapter-head"><div class="chapter-icon">⬡</div><div><span class="chapter-num">CHAPTER 02</span><h2>Quantum Computing Fundamentals</h2></div></div>
+      <div class="story-panel">"So a different wall needs a different kind of tool," the friend says. "Not a faster bit — a fundamentally different building block, borrowed from quantum mechanics itself."</div>
+      <p class="body-text">A <b>quantum computer</b> uses the rules of quantum mechanics — <b>superposition</b>, <b>entanglement</b>, and <b>interference</b> — to represent and process information in a way no classical machine can imitate. It is not a faster general-purpose computer; it's a specialized tool that only pulls ahead on certain kinds of problems.</p>
+      <div class="visual-box">
+        <div class="visual-label">Two Computing Paradigms
+          <span><button class="toggle-btn active" id="btnClassical" onclick="showParadigm('classical')">Classical</button> <button class="toggle-btn" id="btnQuantum" onclick="showParadigm('quantum')">Quantum</button></span>
+        </div>
+        <div class="compare-panel" id="paradigmPanel"></div>
+      </div>
+      <ul class="points">
+        <li><b>Three ingredients power this whole module:</b> superposition (Ch. 4), entanglement (Ch. 5), and the speedups they enable (Ch. 6) — each gets its own chapter, one at a time.</li>
+        <li><b>Quantum computers don't replace classical computers</b> — most everyday computing tasks get no benefit at all, and classical machines remain better for them.</li>
+        <li>The basic unit of quantum information is the <b>qubit</b> — meet it properly in the very next chapter.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Quantum computing is a specialized toolset, not a universal upgrade — the rest of this module builds up exactly which tools it adds, and why they matter.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch2">0 / 3</div></div><div id="quiz-ch2"></div><div class="chapter-status" id="status-ch2"></div></div>
+    </section>
+
+    <!-- CH3: QUBITS -->
+    <section class="chapter reveal" id="ch3">
+      <div class="chapter-head"><div class="chapter-icon">◉</div><div><span class="chapter-num">CHAPTER 03</span><h2>Qubits</h2></div></div>
+      <div class="story-panel">"Meet the basic unit itself," the friend says, sketching a sphere in the air. "A classical bit is a light switch — on or off. A qubit is this whole sphere — every point on its surface is a legal state."</div>
+      <p class="body-text">A <b>qubit</b> is a two-level quantum system whose state is written <b>α|0⟩ + β|1⟩</b>. The numbers α and β are amplitudes; squaring their size gives the probability of measuring 0 or 1. Drag the angle below and watch the state move around the <b>Bloch sphere</b> — the standard picture of a single qubit's state.</p>
+      <div class="visual-box">
+        <div class="visual-label">The Bloch Sphere (2D Slice)</div>
+        <div class="ctrl-row"><label>θ (theta)</label><input type="range" id="thetaSlider" min="0" max="180" value="0" step="1"><span class="ctrl-readout" id="thetaVal">0°</span></div>
+        <div class="center-svg"><svg viewBox="0 0 300 210" width="300" height="210" id="blochSvg"></svg></div>
+        <div class="readout-line" id="blochReadout">—</div>
+      </div>
+      <ul class="points">
+        <li><b>θ = 0°</b> is the pure state |0⟩ (north pole); <b>θ = 180°</b> is the pure state |1⟩ (south pole) — everything in between is a genuine superposition.</li>
+        <li><b>Squaring the amplitude</b> — not the amplitude itself — gives the measurement probability, which is why the readout above uses cos²(θ/2) and sin²(θ/2).</li>
+        <li>Physically, a qubit can be built from a supercooled superconducting circuit, a trapped ion, a single photon, and more — Chapter 7 compares the leading approaches.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> A qubit's state is a point on a sphere, not a switch — "somewhere between 0 and 1" is exactly as real a state as 0 or 1 themselves, right up until it's measured.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch3">0 / 3</div></div><div id="quiz-ch3"></div><div class="chapter-status" id="status-ch3"></div></div>
+    </section>
+
+    <!-- CH4: SUPERPOSITION -->
+    <section class="chapter reveal" id="ch4">
+      <div class="chapter-head"><div class="chapter-icon">∿</div><div><span class="chapter-num">CHAPTER 04</span><h2>Superposition</h2></div></div>
+      <div class="story-panel">"Now push that dial and actually watch superposition do something," the friend says. "Before you measure, both outcomes are simultaneously true — not secretly decided and just hidden from you. That's the part people usually get wrong."</div>
+      <p class="body-text">Set the split between |0⟩ and |1⟩ below, then hit measure. Every measurement forces the qubit to give one definite classical answer, chosen at random, exactly according to the probabilities you set — this is how a real qubit is read out.</p>
+      <div class="visual-box">
+        <div class="visual-label">Set a Superposition, Then Measure</div>
+        <div class="ctrl-row"><label>P(|0⟩)</label><input type="range" id="ampSlider" min="0" max="100" value="50" step="1"><span class="ctrl-readout" id="ampVal">50%</span></div>
+        <div class="readout-line" id="superReadout">—</div>
+        <div class="ctrl-row" style="justify-content:center; margin-top:12px;"><button class="toggle-btn active" onclick="runMeasurements()">▶ Measure ×20</button> <button class="toggle-btn" onclick="resetMeasurements()">↺ Reset Tally</button></div>
+        <div class="center-svg"><svg viewBox="0 0 260 170" width="260" height="170" id="measureSvg"></svg></div>
+        <div class="readout-line" id="measureReadout">No measurements yet.</div>
+      </div>
+      <ul class="points">
+        <li><b>Before measurement</b>, the qubit genuinely holds both possibilities at once — a real, testable physical fact, not just uncertainty on your part.</li>
+        <li><b>Measurement collapses the superposition</b> to one classical outcome, at random, weighted by the probabilities you set with the slider.</li>
+        <li><b>Run it many times</b> and the tally converges toward those exact probabilities — quantum algorithms are built around extracting useful answers from this kind of repeated sampling.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Superposition isn't "the computer secretly already knows the answer" — it's a real mixture of possibilities that only resolves the instant you measure.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch4">0 / 3</div></div><div id="quiz-ch4"></div><div class="chapter-status" id="status-ch4"></div></div>
+    </section>
+
+    <!-- CH5: ENTANGLEMENT -->
+    <section class="chapter reveal" id="ch5">
+      <div class="chapter-head"><div class="chapter-icon">⧉</div><div><span class="chapter-num">CHAPTER 05</span><h2>Entanglement</h2></div></div>
+      <div class="story-panel">"One qubit was interesting," the friend says. "Two entangled qubits are where it gets genuinely strange." Two qubits are prepared together so their fates are linked — measure one, and you instantly know the other, no matter how far apart they are.</div>
+      <p class="body-text">Click below to create an <b>entangled pair</b> and measure both. Each individual outcome is still perfectly random — but compare qubit A and qubit B across many trials, and a pattern that no classical coin-flipping could produce shows up immediately.</p>
+      <div class="visual-box">
+        <div class="visual-label">Create a Bell Pair &amp; Measure <button class="toggle-btn active" onclick="runEntangle()">▶ Run Trial</button></div>
+        <div class="forest-grid" id="entangleGrid"></div>
+        <div class="forest-result" id="entangleResult">Run a trial to entangle and measure a pair of qubits.</div>
+      </div>
+      <ul class="points">
+        <li><b>Entangled qubits share one joint description</b> — you cannot fully describe qubit A's state without also describing qubit B's, even before either is measured.</li>
+        <li><b>Individually, each outcome is still random</b> — the correlation is only visible when you compare the two results side by side, exactly like the trial log above.</li>
+        <li><b>No faster-than-light messaging:</b> neither side can choose which outcome they get, so entanglement can't be used to send information — but it is a real physical resource used in quantum algorithms and quantum cryptography.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Entanglement links outcomes, not information — the correlation is real and instant, but neither observer can control it, so no signal can ride along with it.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch5">0 / 3</div></div><div id="quiz-ch5"></div><div class="chapter-status" id="status-ch5"></div></div>
+    </section>
+
+    <!-- CH6: QUANTUM ADVANTAGE -->
+    <section class="chapter reveal" id="ch6">
+      <div class="chapter-head"><div class="chapter-icon">⚡</div><div><span class="chapter-num">CHAPTER 06</span><h2>Quantum Advantage</h2></div></div>
+      <div class="story-panel">"This is the payoff," the friend says. "Superposition and entanglement together let certain algorithms need dramatically fewer steps — not a small speed bump, a fundamentally different growth rate."</div>
+      <p class="body-text"><b>Grover's algorithm</b> finds a marked item in an unsorted list of N items in about <b>√N</b> steps, versus roughly N/2 steps for the best classical approach — a proven quadratic speedup. <b>Shor's algorithm</b> goes further, factoring huge numbers exponentially faster than any known classical method, which is why it matters so much for cryptography.</p>
+      <div class="visual-box">
+        <div class="visual-label">Classical Search vs. Grover's Algorithm</div>
+        <div class="ctrl-row"><label>list size</label><input type="range" id="nSlider" min="2" max="7" value="4" step="1"><span class="ctrl-readout" id="nVal">10,000</span></div>
+        <div class="center-svg"><svg viewBox="0 0 320 180" width="320" height="180" id="advSvg"></svg></div>
+        <div class="readout-line" id="advReadout">—</div>
+      </div>
+      <ul class="points">
+        <li><b>√N vs. N/2</b> — as the slider above shows, the gap between classical and Grover's search widens dramatically as the list grows.</li>
+        <li><b>Shor's algorithm</b> factors large numbers exponentially faster than classical methods, underlying much of the discussion around quantum computing and encryption.</li>
+        <li><b>Quantum advantage is task-specific:</b> for everyday computing — spreadsheets, browsing, word processing — a classical computer is just as good, or better.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> A quantum computer doesn't run everything faster — it runs a specific, well-defined class of problems fundamentally differently, and search and factoring are the two clearest proven examples.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch6">0 / 3</div></div><div id="quiz-ch6"></div><div class="chapter-status" id="status-ch6"></div></div>
+    </section>
+
+    <!-- CH7: REAL QUANTUM HARDWARE -->
+    <section class="chapter reveal" id="ch7">
+      <div class="chapter-head"><div class="chapter-icon">▣</div><div><span class="chapter-num">CHAPTER 07</span><h2>Real Quantum Hardware</h2></div></div>
+      <div class="story-panel">"None of this stays theoretical," the friend says. "Real machines exist right now, built from a handful of competing physical approaches — click through them." Numbers below are approximate and evolving quickly; the tradeoffs are the durable part.</div>
+      <p class="body-text">Today's machines are often called <b>NISQ</b> devices — Noisy, Intermediate-Scale Quantum. They're powerful research tools, but still limited by <b>noise and decoherence</b>, well short of the scale needed to run Shor's algorithm on cryptographically relevant numbers. Click each card to flip it.</p>
+      <div class="visual-box">
+        <div class="visual-label">Physical Qubit Approaches — Click to Flip</div>
+        <div class="encoding-grid" id="hardwareGrid"></div>
+      </div>
+      <ul class="points">
+        <li><b>No single approach has "won" yet</b> — superconducting, trapped-ion, photonic, and neutral-atom systems each trade off coherence time, gate speed, and scalability differently.</li>
+        <li><b>Raw qubit count is a headline number</b> — quality measures like error rate and quantum volume matter just as much for what a machine can actually compute.</li>
+        <li>Every real device built on these approaches is running exactly the physics from Chapters 3 through 5: qubits, superposition, and entanglement, just with real-world noise added in.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> The theory from Chapters 2 through 6 is running on real, imperfect, rapidly improving machines today — Module 5 opens the hood on exactly how you program one.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch7">0 / 3</div></div><div id="quiz-ch7"></div><div class="chapter-status" id="status-ch7"></div></div>
+    </section>
+
+    <!-- FINAL ASSESSMENT -->
+    <section class="chapter reveal" id="final">
+      <div class="final-assess">
+        <div class="final-head">
+          <div class="module-eyebrow">◆ Adaptive Assessment</div>
+          <h2>Module 4 Assessment</h2>
+          <p>Seven synthesis questions, one per chapter. Your result adapts to your whole session — chapters where you struggled above get flagged for review here.</p>
+        </div>
+        <div id="quiz-final"></div>
+        <div class="result-panel" id="resultPanel">
+          <div class="result-top">
+            <div><div class="result-score" id="resultScore">0%</div><div class="quiz-score" id="resultDetail">0 / 7 correct</div></div>
+            <div class="result-badge" id="resultBadge"></div>
+          </div>
+          <div id="recommendWrap"></div>
+          <div class="result-actions">
+            <a href="qml-roadmap-landing-page.html#curriculum" class="btn btn-ghost">← Back to Curriculum</a>
+            <a href="#" class="btn btn-primary" id="continueBtn">Continue to Module 5 →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="module-nav" id="moduleNav"></div>
+  </main>
+</div>
+
+<script>
+let state = { xp:0, chapters:{
+  ch1:{correct:0,total:3,done:false}, ch2:{correct:0,total:3,done:false}, ch3:{correct:0,total:3,done:false},
+  ch4:{correct:0,total:3,done:false}, ch5:{correct:0,total:3,done:false}, ch6:{correct:0,total:3,done:false},
+  ch7:{correct:0,total:3,done:false}
+}, finalDone:false };
+try{ const saved = localStorage.getItem('qml_module4_state'); if(saved) state = JSON.parse(saved); }catch(e){}
+function saveState(){ try{ localStorage.setItem('qml_module4_state', JSON.stringify(state)); }catch(e){} }
+function addXP(n){ state.xp += n; document.getElementById('xpCount').textContent = state.xp; saveState(); }
+document.getElementById('xpCount').textContent = state.xp;
+
+/* ============ CH1: exponential state space ============ */
+function drawStateSpace(n, states){
+  const svg = document.getElementById('stateSpaceSvg');
+  const logH = Math.min(150, (Math.log2(states)/50)*150);
+  const barH = Math.max(2, logH);
+  let html = '';
+  html += '<line x1="30" y1="170" x2="300" y2="170" stroke="var(--line-strong)" stroke-width="1"/>';
+  html += '<line x1="30" y1="10" x2="30" y2="170" stroke="var(--line-strong)" stroke-width="1"/>';
+  html += '<rect x="70" y="'+(160-barH)+'" width="40" height="'+barH+'" rx="4" fill="var(--cyan-dim)" stroke="var(--cyan)" stroke-width="1.4"/>';
+  html += '<text x="60" y="185" font-family="JetBrains Mono" font-size="10" fill="#5f7089">n = '+n+' bits</text>';
+  html += '<text x="45" y="4" font-family="JetBrains Mono" font-size="9" fill="#5f7089">2\u207F (log scale)</text>';
+  svg.innerHTML = html;
+}
+function updateStateSpace(){
+  const n = parseInt(document.getElementById('bitSlider').value);
+  document.getElementById('bitVal').textContent = n;
+  const states = Math.pow(2, n);
+  let statesText = states < 1e6 ? Math.round(states).toLocaleString() : states.toExponential(2);
+  document.getElementById('stateSpaceReadout').textContent = n+' bits \u2192 '+statesText+' possible states';
+  drawStateSpace(n, states);
+  let compare;
+  if(n < 10) compare = 'Small enough to brute-force in a blink.';
+  else if(n < 20) compare = 'Millions of states \u2014 still fast for a modern laptop.';
+  else if(n < 30) compare = 'Over a billion states \u2014 starting to take real, noticeable time.';
+  else if(n < 40) compare = 'Over a trillion states \u2014 hours to days of brute-force search.';
+  else compare = 'More states than atoms in a large asteroid \u2014 no computer alive could finish this search.';
+  document.getElementById('stateSpaceCompare').textContent = compare;
+}
+document.getElementById('bitSlider').addEventListener('input', updateStateSpace);
+updateStateSpace();
+
+/* ============ CH2: classical vs quantum comparison toggle ============ */
+const paradigms = {
+  classical: '<b>Classical Computer</b><ul><li>Basic unit: a <b>bit</b>, always exactly 0 or 1</li><li>Processes one definite combination at a time</li><li>Scales by raw speed \u2014 more transistors, faster clocks</li><li>Excellent at everything most software needs today</li></ul>',
+  quantum: '<b>Quantum Computer</b><ul><li>Basic unit: a <b>qubit</b>, a superposition of 0 and 1</li><li>Can hold and evolve many possibilities at once</li><li>Scales by exploiting superposition, entanglement, and interference</li><li>A specialized tool, only ahead on specific problem types</li></ul>'
+};
+function showParadigm(which){
+  document.getElementById('paradigmPanel').innerHTML = paradigms[which];
+  document.getElementById('btnClassical').classList.toggle('active', which==='classical');
+  document.getElementById('btnQuantum').classList.toggle('active', which==='quantum');
+  addXP(1);
+}
+document.getElementById('paradigmPanel').innerHTML = paradigms.classical;
+
+/* ============ CH3: Bloch sphere ============ */
+function drawBloch(thetaDeg){
+  const theta = thetaDeg * Math.PI / 180;
+  const cx = 150, cy = 105, R = 70;
+  const x2 = cx + R*Math.sin(theta);
+  const y2 = cy - R*Math.cos(theta);
+  const svg = document.getElementById('blochSvg');
+  let html = '';
+  html += '<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+R+'" ry="'+(R*0.38)+'" fill="none" stroke="var(--line-strong)" stroke-width="1" stroke-dasharray="3 3"/>';
+  html += '<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="var(--line-strong)" stroke-width="1.4"/>';
+  html += '<line x1="'+cx+'" y1="'+(cy-R)+'" x2="'+cx+'" y2="'+(cy+R)+'" stroke="var(--line)" stroke-width="1"/>';
+  html += '<text x="'+(cx-8)+'" y="'+(cy-R-10)+'" font-family="JetBrains Mono" font-size="12" fill="#5ad1e6">|0\u27E9</text>';
+  html += '<text x="'+(cx-8)+'" y="'+(cy+R+20)+'" font-family="JetBrains Mono" font-size="12" fill="#b39bff">|1\u27E9</text>';
+  html += '<line x1="'+cx+'" y1="'+cy+'" x2="'+x2+'" y2="'+y2+'" stroke="var(--amber)" stroke-width="2.4"/>';
+  html += '<circle cx="'+x2+'" cy="'+y2+'" r="6" fill="var(--amber)" filter="drop-shadow(0 0 6px var(--amber))"/>';
+  html += '<circle cx="'+cx+'" cy="'+cy+'" r="2.5" fill="var(--ink-faint)"/>';
+  svg.innerHTML = html;
+}
+function updateBloch(){
+  const thetaDeg = parseInt(document.getElementById('thetaSlider').value);
+  document.getElementById('thetaVal').textContent = thetaDeg+'\u00B0';
+  const theta = thetaDeg*Math.PI/180;
+  const p0 = Math.cos(theta/2)**2, p1 = Math.sin(theta/2)**2;
+  document.getElementById('blochReadout').textContent = 'P(|0\u27E9) = '+(p0*100).toFixed(1)+'%    P(|1\u27E9) = '+(p1*100).toFixed(1)+'%';
+  drawBloch(thetaDeg);
+}
+document.getElementById('thetaSlider').addEventListener('input', updateBloch);
+updateBloch();
+
+/* ============ CH4: superposition + measurement ============ */
+function updateSuper(){
+  const p0 = parseInt(document.getElementById('ampSlider').value);
+  document.getElementById('ampVal').textContent = p0+'%';
+  const a = Math.sqrt(p0/100), b = Math.sqrt(1-p0/100);
+  document.getElementById('superReadout').textContent = 'State: '+a.toFixed(2)+'|0\u27E9 + '+b.toFixed(2)+'|1\u27E9 \u2014 both true until measured';
+}
+document.getElementById('ampSlider').addEventListener('input', updateSuper);
+updateSuper();
+let measureCounts = {0:0,1:0};
+function drawHistogram(){
+  const total = measureCounts[0]+measureCounts[1];
+  const svg = document.getElementById('measureSvg');
+  const h0 = total ? (measureCounts[0]/total)*130 : 0;
+  const h1 = total ? (measureCounts[1]/total)*130 : 0;
+  let html = '<line x1="20" y1="150" x2="240" y2="150" stroke="var(--line-strong)" stroke-width="1"/>';
+  html += '<rect x="60" y="'+(150-h0)+'" width="46" height="'+h0+'" rx="4" fill="var(--cyan-dim)" stroke="var(--cyan)" stroke-width="1.4"/>';
+  html += '<rect x="150" y="'+(150-h1)+'" width="46" height="'+h1+'" rx="4" fill="var(--violet-dim)" stroke="var(--violet)" stroke-width="1.4"/>';
+  html += '<text x="72" y="166" font-family="JetBrains Mono" font-size="11" fill="#e9eef8">|0\u27E9</text>';
+  html += '<text x="162" y="166" font-family="JetBrains Mono" font-size="11" fill="#e9eef8">|1\u27E9</text>';
+  svg.innerHTML = html;
+  document.getElementById('measureReadout').textContent = total+' measurements \u2014 |0\u27E9: '+measureCounts[0]+'   |1\u27E9: '+measureCounts[1];
+}
+function runMeasurements(){
+  const p0 = parseInt(document.getElementById('ampSlider').value)/100;
+  for(let i=0;i<20;i++){ if(Math.random() < p0) measureCounts[0]++; else measureCounts[1]++; }
+  drawHistogram();
+  addXP(4);
+}
+function resetMeasurements(){ measureCounts = {0:0,1:0}; drawHistogram(); }
+drawHistogram();
+
+/* ============ CH5: entanglement trials ============ */
+let entangleTrials = [];
+function runEntangle(){
+  const outcome = Math.random() < 0.5 ? 0 : 1;
+  entangleTrials.push(outcome);
+  if(entangleTrials.length > 8) entangleTrials.shift();
+  renderEntangle();
+  addXP(4);
+}
+function renderEntangle(){
+  const grid = document.getElementById('entangleGrid');
+  grid.innerHTML = entangleTrials.map((o,i)=>'<div class="tree-vote"><div class="ticon">'+(o===0?'\u2B24':'\u25CB')+'</div><div class="tvote">A:'+o+' B:'+o+'</div></div>').join('');
+  document.getElementById('entangleResult').textContent = entangleTrials.length===0 ? 'Run a trial to entangle and measure a pair of qubits.' : entangleTrials.length+' trial(s) \u2014 Qubit A and Qubit B matched every single time, even though each individual outcome was random.';
+}
+renderEntangle();
+
+/* ============ CH6: quantum advantage (search) ============ */
+function updateAdvantage(){
+  const exp = parseInt(document.getElementById('nSlider').value);
+  const N = Math.pow(10, exp);
+  document.getElementById('nVal').textContent = N.toLocaleString();
+  const classical = Math.round(N/2);
+  const quantum = Math.round(Math.sqrt(N));
+  const speedup = Math.round(classical/quantum);
+  document.getElementById('advReadout').textContent = 'Classical average: ~'+classical.toLocaleString()+' checks    Grover\u2019s algorithm: ~'+quantum.toLocaleString()+' steps    ('+speedup.toLocaleString()+'\u00D7 fewer steps)';
+  const svg = document.getElementById('advSvg');
+  const maxH = 140;
+  const hClassical = maxH;
+  const hQuantum = Math.max(3, (quantum/classical)*maxH);
+  let html = '<line x1="20" y1="160" x2="300" y2="160" stroke="var(--line-strong)" stroke-width="1"/>';
+  html += '<rect x="70" y="'+(160-hClassical)+'" width="60" height="'+hClassical+'" rx="4" fill="var(--amber-dim)" stroke="var(--amber)" stroke-width="1.4"/>';
+  html += '<rect x="190" y="'+(160-hQuantum)+'" width="60" height="'+hQuantum+'" rx="4" fill="var(--cyan-dim)" stroke="var(--cyan)" stroke-width="1.4"/>';
+  html += '<text x="72" y="176" font-family="JetBrains Mono" font-size="10" fill="#e9eef8">Classical</text>';
+  html += '<text x="196" y="176" font-family="JetBrains Mono" font-size="10" fill="#e9eef8">Grover\u2019s</text>';
+  svg.innerHTML = html;
+}
+document.getElementById('nSlider').addEventListener('input', updateAdvantage);
+updateAdvantage();
+
+/* ============ CH7: hardware flip cards ============ */
+const hardwareCards = [
+  {en:'APPROACH 01', name:'Superconducting', back:'Tiny circuits cooled near absolute zero. Fast gates, mature ecosystem (IBM, Google) \u2014 but needs bulky dilution refrigerators.'},
+  {en:'APPROACH 02', name:'Trapped Ion', back:'Individual charged atoms held by electromagnetic fields. Very long coherence times and high accuracy (IonQ, Quantinuum) \u2014 slower gate speeds.'},
+  {en:'APPROACH 03', name:'Photonic', back:'Uses particles of light as qubits. Naturally resistant to some noise and works at room temperature (PsiQuantum, Xanadu) \u2014 hard to make photons interact.'},
+  {en:'APPROACH 04', name:'Neutral Atom', back:'Individual atoms trapped by laser light in flexible arrays. Highly scalable qubit layouts (QuEra, Pasqal) \u2014 a newer, fast-moving approach.'},
+  {en:'APPROACH 05', name:'Topological', back:'Aims to encode qubits in exotic states resistant to noise by design. Still largely experimental \u2014 promises fewer errors if it can be realized.'},
+  {en:'METRIC', name:'Quantum Volume', back:'A single number combining qubit count, error rates, and connectivity \u2014 often a better health check than raw qubit count alone.'}
+];
+function buildHardwareGrid(){
+  const grid = document.getElementById('hardwareGrid');
+  grid.innerHTML = hardwareCards.map((c,i)=>
+    '<div class="enc-card" id="hw-'+i+'" onclick="flipHardware('+i+')"><div class="enc-inner">'+
+    '<div class="enc-face enc-front"><div class="en">'+c.en+'</div><h6>'+c.name+'</h6></div>'+
+    '<div class="enc-face enc-back">'+c.back+'</div>'+
+    '</div></div>'
+  ).join('');
+}
+function flipHardware(i){ document.getElementById('hw-'+i).classList.toggle('flipped'); addXP(1); }
+buildHardwareGrid();
+
+/* ============ quiz data ============ */
+const quizzes = {
+  ch1: [
+    {q:"What happens to the number of possible states when you add one more classical bit?", opts:["It stays the same","It doubles","It increases by one","It decreases"], correct:1, explain:"Each extra bit doubles the total combinations \u2014 this is exactly the 2\u207F growth shown in the demo."},
+    {q:"Why can some problems become impossible for classical computers even on very fast hardware?", opts:["Classical computers can never improve","The possibility space grows exponentially, outrunning any speed increase","There is no such thing as an impossible problem","Classical bits are too large physically"], correct:1, explain:"Exponential growth eventually beats any linear speed improvement, no matter how fast the hardware gets."},
+    {q:"What did the state space slider demo show as n approached 50?", opts:["The number of states stayed small","The number of possible states exceeded astronomically large real-world comparisons","Nothing changed","The demo became a classification problem"], correct:1, explain:"At n=50, 2\u207F states surpasses comparisons like the number of atoms in a large asteroid."}
+  ],
+  ch2: [
+    {q:"What are the three quantum ingredients this module builds on?", opts:["Speed, memory, and storage","Superposition, entanglement, and interference","Bits, bytes, and registers","Clock speed, cores, and cache"], correct:1, explain:"These three ingredients get their own dedicated chapters across this module."},
+    {q:"Are quantum computers meant to replace classical computers entirely?", opts:["Yes, for every task", "No \u2014 they're a specialized tool, ahead only on certain problem types", "No, they are strictly worse at everything", "Quantum computers don't exist yet"], correct:1, explain:"Classical computers remain better for the vast majority of everyday computing tasks."},
+    {q:"What is the basic difference in the two paradigms' building blocks?", opts:["A qubit can hold a superposition of 0 and 1; a bit is always exactly one or the other","Bits and qubits are identical","A qubit is just a faster bit","A bit can be a mixture of states, a qubit cannot"], correct:0, explain:"This is exactly the contrast shown in the Classical vs Quantum comparison panel."}
+  ],
+  ch3: [
+    {q:"What determines the probability of measuring 0 versus 1 for a qubit?", opts:["The amplitude directly","The squared magnitude of the amplitude","The color of the qubit","A fixed 50/50 split always"], correct:1, explain:"Probability equals amplitude squared \u2014 exactly the cos\u00B2(\u03B8/2) and sin\u00B2(\u03B8/2) shown in the readout."},
+    {q:"What does the Bloch sphere represent?", opts:["A network diagram","The full set of possible states a single qubit can be in before measurement","A classical logic gate","A random number generator"], correct:1, explain:"Every point on the sphere's surface is a valid qubit state."},
+    {q:"What happened as you increased \u03B8 from 0\u00B0 toward 180\u00B0 in the demo?", opts:["Nothing changed","Probability shifted from |0\u27E9 toward |1\u27E9","The qubit became a classical bit","P(|0\u27E9) increased"], correct:1, explain:"\u03B8=0\u00B0 is pure |0\u27E9 and \u03B8=180\u00B0 is pure |1\u27E9, with a smooth shift between."}
+  ],
+  ch4: [
+    {q:"What is true about a qubit's state before measurement?", opts:["It has already secretly decided its value","It genuinely holds both possibilities as a real superposition","It is always exactly |0\u27E9","It doesn't exist until you look at code"], correct:1, explain:"Superposition is a real physical mixture, not hidden pre-determined information."},
+    {q:"What happens when you measure a qubit in superposition?", opts:["Nothing happens","It collapses randomly to one definite outcome, following the set probabilities","It always returns |0\u27E9","It stays in superposition forever"], correct:1, explain:"Measurement forces one classical outcome, weighted exactly by the amplitudes squared."},
+    {q:"What did running many measurements repeatedly demonstrate in the demo?", opts:["Random, meaningless results every time","The tally converged toward the probabilities set by the slider","The qubit stopped working","Results were always exactly 50/50 regardless of the slider"], correct:1, explain:"Over many trials, the histogram approaches the true underlying probabilities."}
+  ],
+  ch5: [
+    {q:"What defines entangled qubits?", opts:["They are physically touching","Their combined state can't be described independently of each other","They are both set to |0\u27E9","They must be measured at the same location"], correct:1, explain:"Entanglement is defined by this shared, joint description \u2014 not physical proximity."},
+    {q:"What did the entanglement trial demo show about qubit A and qubit B's outcomes?", opts:["They were always opposite","They always matched, despite each individual outcome being random","They were unrelated","Qubit B was always 0"], correct:1, explain:"Perfect correlation with individually random outcomes is the hallmark of entanglement."},
+    {q:"Can entanglement be used to send information faster than light?", opts:["Yes, instantly", "No \u2014 outcomes are still random and uncontrollable on each side, so no signal can be sent", "Only over short distances", "Only with more than two qubits"], correct:1, explain:"Neither side can choose their own outcome, which rules out using entanglement for signaling."}
+  ],
+  ch6: [
+    {q:"How do classical search and Grover's algorithm compare for a list of size N?", opts:["Both take about N steps","Classical takes about N/2 steps; Grover's takes about \u221AN steps","Grover's always takes more steps","Neither depends on N"], correct:1, explain:"This is exactly the gap shown by the bar chart in the demo as N grows."},
+    {q:"What does Shor's algorithm do?", opts:["Sorts lists faster","Factors large numbers exponentially faster than known classical methods","Clusters unlabeled data","Simulates classical bits"], correct:1, explain:"Shor's algorithm is the basis of much of the discussion around quantum computing and cryptography."},
+    {q:"Does every computing task get sped up on a quantum computer?", opts:["Yes, all tasks benefit equally","No \u2014 quantum advantage is specific to certain problem types","Only tasks involving text","Only tasks involving images"], correct:1, explain:"Everyday tasks like browsing or spreadsheets see no benefit from quantum hardware."}
+  ],
+  ch7: [
+    {q:"What does 'NISQ' describe?", opts:["A programming language","Noisy, Intermediate-Scale Quantum \u2014 today's generation of quantum devices","A type of classical chip","A quantum algorithm"], correct:1, explain:"NISQ describes the current era of powerful but noisy, limited-scale quantum hardware."},
+    {q:"What is true about the different physical qubit approaches covered in this chapter?", opts:["One approach has clearly won and all others are obsolete","They trade off coherence time, gate speed, and scalability differently, with no single winner yet","They are all functionally identical","None of them exist as real hardware yet"], correct:1, explain:"Superconducting, trapped-ion, photonic, and neutral-atom systems each have different strengths."},
+    {q:"Besides raw qubit count, what else matters for a quantum computer's real capability?", opts:["Nothing else matters","Error rates and quality measures like quantum volume","The color of the chip","The company's stock price"], correct:1, explain:"A high qubit count with high error rates can be less useful than fewer, higher-quality qubits."}
+  ]
+};
+const finalQuiz = [
+  {q:"Why do some problems become impossible for classical computers, no matter how fast the hardware is?", opts:["Their possibility space grows exponentially, outrunning any speed increase","Classical computers are always too slow to matter","There is no such limitation","Classical bits are physically too large"], correct:0, explain:"Chapter 1's exponential state-space demo."},
+  {q:"What is quantum computing best understood as?", opts:["A specialized tool that outperforms classical computers only on certain problem types","A universal replacement for classical computers","A faster version of every classical algorithm","A purely theoretical idea with no real machines"], correct:0, explain:"Chapter 2's classical-vs-quantum comparison panel."},
+  {q:"What does squaring a qubit's amplitude give you?", opts:["The measurement probability for that outcome","The qubit's physical temperature","Nothing meaningful","The qubit's exact classical bit value"], correct:0, explain:"Chapter 3's Bloch sphere demo, using cos\u00B2(\u03B8/2) and sin\u00B2(\u03B8/2)."},
+  {q:"What happens to a qubit in superposition when it is measured?", opts:["It collapses randomly to one definite outcome, following its set probabilities","It stays in superposition permanently","It always returns |0\u27E9","It becomes two separate qubits"], correct:0, explain:"Chapter 4's measurement histogram demo."},
+  {q:"What is the defining feature of entangled qubits?", opts:["Their combined state can't be described independently, even though each outcome is individually random","They always return the same fixed value","They must be adjacent in physical space","They stop being qubits once entangled"], correct:0, explain:"Chapter 5's Bell pair trial demo."},
+  {q:"How does Grover's algorithm compare to classical search for a list of size N?", opts:["It needs about \u221AN steps versus roughly N/2 classically","It needs more steps than classical search","It has no relationship to N","It only works for N less than 10"], correct:0, explain:"Chapter 6's classical-vs-Grover's bar chart."},
+  {q:"What best describes today's real quantum computers?", opts:["Noisy, intermediate-scale (NISQ) devices built on several competing physical qubit technologies","Perfect, error-free machines already at massive scale","Purely theoretical with no physical hardware yet built","Identical to classical supercomputers"], correct:0, explain:"Chapter 7's hardware comparison cards."}
+];
+
+function renderQuiz(containerId, items, chapterKey){
+  const container = document.getElementById(containerId);
+  items.forEach((item, idx)=>{
+    const qDiv = document.createElement('div');
+    qDiv.className = 'q-item';
+    qDiv.innerHTML = '<div class="q-text">'+(idx+1)+'. '+item.q+'</div>'
+      + '<div class="q-options">'+item.opts.map((o,i)=>'<button class="q-opt" data-i="'+i+'">'+o+'</button>').join('')+'</div>'
+      + '<div class="q-explain">'+item.explain+'</div>';
+    container.appendChild(qDiv);
+    const buttons = qDiv.querySelectorAll('.q-opt');
+    const explainEl = qDiv.querySelector('.q-explain');
+    buttons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = parseInt(btn.dataset.i);
+        buttons.forEach(b=>b.disabled = true);
+        if(i === item.correct){
+          btn.classList.add('correct');
+          if(chapterKey) onCorrect(chapterKey); else onFinalAnswer(idx, true);
+        } else {
+          btn.classList.add('incorrect');
+          buttons[item.correct].classList.add('correct');
+          if(chapterKey) onIncorrect(chapterKey); else onFinalAnswer(idx, false);
+        }
+        explainEl.classList.add('show');
+      });
+    });
+  });
+}
+Object.keys(quizzes).forEach(key=>{ renderQuiz('quiz-'+key, quizzes[key], key); updateChapterScore(key); });
+renderQuiz('quiz-final', finalQuiz, null);
+
+function updateChapterScore(key){ document.getElementById('score-'+key).textContent = state.chapters[key].correct+' / '+state.chapters[key].total; }
+function onCorrect(key){ const s=state.chapters[key]; s.correct=Math.min(s.correct+1,s.total); addXP(10); checkChapterDone(key); updateChapterScore(key); saveState(); }
+function onIncorrect(key){ state.chapters[key].hadMiss=true; checkChapterDone(key); updateChapterScore(key); saveState(); }
+let answeredCount = { ch1:0, ch2:0, ch3:0, ch4:0, ch5:0, ch6:0, ch7:0 };
+function checkChapterDone(key){
+  answeredCount[key]++;
+  const s = state.chapters[key];
+  if(answeredCount[key] >= s.total){
+    s.done = true;
+    const dot = document.getElementById('dot-'+key), statusEl = document.getElementById('status-'+key);
+    statusEl.classList.add('show');
+    if(s.hadMiss){ dot.classList.add('warn'); statusEl.classList.add('review'); statusEl.innerHTML='\u26A0 Review suggested \u2014 you missed at least one question in this chapter.'; }
+    else { dot.classList.add('done'); statusEl.classList.add('mastered'); statusEl.innerHTML='\u2713 Mastered \u2014 perfect score on this chapter.'; addXP(15); }
+    saveState();
+  }
+}
+let finalAnswers = [];
+function onFinalAnswer(idx, correct){
+  finalAnswers[idx]=correct;
+  if(finalAnswers.filter(a=>a!==undefined).length === finalQuiz.length) showFinalResult();
+}
+function showFinalResult(){
+  const correctCount = finalAnswers.filter(a=>a===true).length;
+  const pct = Math.round((correctCount/finalQuiz.length)*100);
+  document.getElementById('resultScore').textContent = pct+'%';
+  document.getElementById('resultDetail').textContent = correctCount+' / '+finalQuiz.length+' correct';
+  const badge = document.getElementById('resultBadge');
+  const pass = pct >= 70;
+  badge.textContent = pass ? 'Passed' : 'Retry Recommended';
+  badge.className = 'result-badge ' + (pass ? 'pass' : 'retry');
+  addXP(correctCount*10 + (pass?25:0));
+  const weakChapters = Object.keys(state.chapters).filter(k => state.chapters[k].hadMiss);
+  const wrap = document.getElementById('recommendWrap');
+  if(weakChapters.length === 0 && pass){
+    wrap.innerHTML = '<div class="callout" style="margin-top:4px;"><b>Great work.</b> No flagged chapters and a passing score \u2014 you are ready for Module 5: Quantum Computing Foundations.</div>';
+  } else {
+    const names = { ch1:"Limitations of Classical Computing", ch2:"Quantum Computing Fundamentals", ch3:"Qubits", ch4:"Superposition", ch5:"Entanglement", ch6:"Quantum Advantage", ch7:"Real Quantum Hardware" };
+    let html = '<div class="visual-label" style="margin-top:18px;">Recommended Review</div><ul class="recommend-list">';
+    weakChapters.forEach(k=> html += '<li>\u21BA Revisit <b>'+names[k]+'</b> \u2014 a quick-check answer there was missed.</li>');
+    if(!pass){ html += '<li>\u21BA Your assessment score was below 70% \u2014 consider re-reading the callout boxes first.</li>'; }
+    html += '</ul>';
+    wrap.innerHTML = html;
+  }
+  document.getElementById('resultPanel').classList.add('show');
+  document.getElementById('dot-final').classList.add(pass ? 'done' : 'warn');
+  state.finalDone = true;
+  saveState();
+}
+
+const sections = document.querySelectorAll('.chapter');
+const sideLinks = document.querySelectorAll('.side-list a');
+const spyObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      sideLinks.forEach(a=>a.classList.remove('active'));
+      const link = document.querySelector('.side-list a[data-target="'+entry.target.id+'"]');
+      if(link) link.classList.add('active');
+    }
+  });
+},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>spyObserver.observe(s));
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  document.getElementById('progressFill').style.width = ((h.scrollTop)/(h.scrollHeight-h.clientHeight)*100)+'%';
+});
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }); },{threshold:0.08});
+revealEls.forEach(el=>io.observe(el));
+
+(function(){
+  if(typeof qmlGetAdjacentModules !== 'function') { document.getElementById('moduleNav').style.display='none'; return; }
+  const { prev, next } = qmlGetAdjacentModules(4);
+  const wrap = document.getElementById('moduleNav');
+  function cardHTML(mod, dir){
+    if(!mod) return '<div class="mn-card disabled '+dir+'"><span class="mn-eyebrow">'+(dir==='next'?'Up Next':'Previous')+'</span><span class="mn-title">\u2014 none \u2014</span></div>';
+    const available = !!mod.file;
+    const arrow = dir==='prev' ? '\u2190 ' : ''; const arrowEnd = dir==='next' ? ' \u2192' : '';
+    const eyebrow = (dir==='prev' ? 'Previous \u2014 Module '+mod.id : 'Up Next \u2014 Module '+mod.id) + (available ? '' : ' (Coming Soon)');
+    if(available) return '<a class="mn-card enabled '+dir+'" href="'+mod.file+'"><span class="mn-eyebrow">'+eyebrow+'</span><span class="mn-title">'+arrow+mod.title+arrowEnd+'</span><span class="mn-arrow">Open tutorial</span></a>';
+    return '<div class="mn-card disabled '+dir+'"><span class="mn-eyebrow">'+eyebrow+'</span><span class="mn-title">'+mod.title+'</span><span class="mn-arrow">Not published yet</span></div>';
+  }
+  wrap.innerHTML = cardHTML(prev,'prev') + cardHTML(next,'next');
+  const continueBtn = document.getElementById('continueBtn');
+  if(continueBtn){
+    if(next && next.file){ continueBtn.href = next.file; continueBtn.textContent = 'Continue to Module '+next.id+' \u2192'; }
+    else if(next){ continueBtn.href = 'qml-roadmap-landing-page.html#curriculum'; continueBtn.textContent = 'Module '+next.id+' — Coming Soon'; continueBtn.style.opacity='0.6'; }
+  }
+})();
+</script>
+
+</body>
+</html>

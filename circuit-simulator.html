@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quantum Circuit Simulator | QML Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="modules-registry.js"></script>
+<style>
+:root{
+  --bg:#070b14; --bg-2:#0b111f; --panel:#0e1526; --panel-2:#101a2e;
+  --line:rgba(148,178,224,0.14); --line-strong:rgba(148,178,224,0.28);
+  --ink:#e9eef8; --ink-dim:#9fb0c9; --ink-faint:#5f7089;
+  --cyan:#5ad1e6; --cyan-dim:rgba(90,209,230,0.14);
+  --violet:#b39bff; --violet-dim:rgba(179,155,255,0.14);
+  --amber:#f2a341; --amber-dim:rgba(242,163,65,0.14);
+  --green:#5ee6a0; --green-dim:rgba(94,230,160,0.14);
+  --red:#f2726a; --red-dim:rgba(242,114,106,0.14);
+  --blue:#4fa3f7;
+  --serif:'Fraunces', Georgia, serif; --sans:'Inter', -apple-system, sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.6;}
+header{position:sticky; top:0; z-index:60; backdrop-filter:blur(14px); background:rgba(7,11,20,0.82); border-bottom:1px solid var(--line);}
+.nav-wrap{max-width:1280px; margin:0 auto; padding:16px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+.logo{font-family:var(--mono); font-weight:700; font-size:15px; color:var(--cyan); border:1px solid var(--line-strong); border-radius:8px; padding:6px 12px; letter-spacing:0.5px; white-space:nowrap;}
+.logo span{color:var(--ink-faint);}
+.back-link{display:flex; align-items:center; gap:8px; color:var(--ink-dim); text-decoration:none; font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; transition:color .2s;}
+.back-link:hover{color:var(--cyan);}
+.nav-cta{display:flex; align-items:center; gap:16px;}
+
+.wrap{max-width:1280px; margin:0 auto; padding:56px 32px 120px;}
+.module-eyebrow{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--cyan); background:var(--cyan-dim); margin-bottom:20px;}
+h1{font-family:var(--serif); font-weight:600; font-size:clamp(30px,4vw,44px); letter-spacing:-0.01em;}
+.lede{margin-top:12px; color:var(--ink-dim); font-size:15.5px; max-width:680px;}
+.chip-row{display:flex; gap:8px; margin-top:20px; flex-wrap:wrap;}
+.chip{font-family:var(--mono); font-size:10.5px; letter-spacing:0.04em; color:var(--ink-faint); border:1px solid var(--line); padding:5px 11px; border-radius:100px;}
+
+.panel{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:26px; margin-top:32px;}
+.panel-label{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+
+.toolbar{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:22px;}
+.qubit-select{display:flex; gap:6px; align-items:center;}
+.qubit-select label{font-family:var(--mono); font-size:11.5px; color:var(--ink-dim); margin-right:6px;}
+.qbtn{width:34px; height:34px; border-radius:8px; border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-dim); font-family:var(--mono); font-weight:700; cursor:pointer; transition:all .2s;}
+.qbtn.active{background:var(--cyan-dim); border-color:var(--cyan); color:var(--cyan);}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border-radius:9px; font-size:13px; font-weight:600; text-decoration:none; cursor:pointer; border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink); transition:transform .2s, border-color .2s;}
+.btn:hover{transform:translateY(-2px); border-color:var(--ink-dim);}
+.btn-primary{background:var(--blue); color:#04101f; border-color:transparent;}
+.btn-primary:hover{box-shadow:0 10px 26px -8px rgba(79,163,247,0.5);}
+.btn-amber{background:var(--amber-dim); border-color:var(--amber); color:var(--amber);}
+.btn-danger{background:transparent; border-color:rgba(242,114,106,0.4); color:var(--red);}
+
+/* gate palette */
+.palette{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px;}
+.gate-tile{
+  width:52px; height:52px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-weight:700; font-size:14px; cursor:grab; user-select:none;
+  background:var(--panel-2); border:1.5px solid var(--line-strong); color:var(--ink); transition:transform .15s, border-color .15s;
+}
+.gate-tile:active{cursor:grabbing;}
+.gate-tile:hover{transform:translateY(-2px); border-color:var(--cyan);}
+.gate-tile.single{color:var(--cyan); border-color:rgba(90,209,230,0.4);}
+.gate-tile.rot{color:var(--violet); border-color:rgba(179,155,255,0.4);}
+.gate-tile.multi{color:var(--amber); border-color:rgba(242,163,65,0.4);}
+.gate-tile.meas{color:var(--green); border-color:rgba(94,230,160,0.4);}
+.palette-hint{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-bottom:14px;}
+
+/* circuit grid */
+.circuit-scroll{overflow-x:auto; padding-bottom:6px;}
+.circuit-grid{display:inline-flex; flex-direction:column; gap:10px; min-width:100%;}
+.wire-row{display:flex; align-items:center; gap:0;}
+.wire-label{width:44px; flex-shrink:0; font-family:var(--mono); font-size:12px; color:var(--ink-faint); text-align:right; padding-right:10px;}
+.wire-track{position:relative; display:flex; gap:6px;}
+.cell{
+  width:56px; height:56px; border-radius:9px; border:1.5px dashed var(--line-strong); background:var(--panel-2);
+  display:flex; align-items:center; justify-content:center; position:relative; flex-shrink:0; transition:border-color .15s, background .15s;
+}
+.cell.dragover{border-color:var(--cyan); background:var(--cyan-dim);}
+.cell .wire-line{position:absolute; left:-6px; right:-6px; top:50%; height:1.5px; background:rgba(148,178,224,0.3); z-index:0;}
+.cell .placed{
+  width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-weight:700; font-size:13px; z-index:1; cursor:pointer; position:relative;
+}
+.cell .placed.single{background:var(--cyan-dim); border:1.5px solid var(--cyan); color:var(--cyan);}
+.cell .placed.rot{background:var(--violet-dim); border:1.5px solid var(--violet); color:var(--violet);}
+.cell .placed.control{background:var(--amber); border:1.5px solid var(--amber); width:14px; height:14px; border-radius:50%;}
+.cell .placed.target-x{background:transparent; border:1.5px solid var(--amber); color:var(--amber); width:34px; height:34px; border-radius:50%; font-size:16px;}
+.cell .placed.target-z{background:var(--amber); border:1.5px solid var(--amber); width:14px; height:14px; border-radius:50%;}
+.cell .placed.swap-x{background:transparent; color:var(--amber); font-size:18px; font-weight:900;}
+.cell .placed.meas{background:var(--green-dim); border:1.5px solid var(--green); color:var(--green); font-size:11px;}
+.cell .angle-tag{position:absolute; bottom:-16px; left:50%; transform:translateX(-50%); font-family:var(--mono); font-size:9px; color:var(--ink-faint); white-space:nowrap;}
+.connector{position:absolute; width:2px; background:var(--amber); left:50%; transform:translateX(-1px); z-index:0;}
+.pending-hint{font-family:var(--mono); font-size:11px; color:var(--amber); margin-top:4px;}
+
+/* results */
+.results-row{display:grid; grid-template-columns:1fr; gap:24px; margin-top:8px;}
+.bars-wrap{display:flex; align-items:flex-end; gap:6px; height:180px; overflow-x:auto; padding-top:30px; border-bottom:1px solid var(--line);}
+.abar-col{display:flex; flex-direction:column; align-items:center; flex-shrink:0; width:56px;}
+.abar{width:34px; border-radius:5px 5px 0 0; transition:height .4s ease, background .3s ease; position:relative; min-height:2px;}
+.abar-amp{font-family:var(--mono); font-size:9px; color:var(--ink-faint); margin-bottom:4px; white-space:nowrap;}
+.abar-lbl{font-family:var(--mono); font-size:10.5px; color:var(--ink-dim); margin-top:8px;}
+.abar-col.measured .abar{box-shadow:0 0 16px 2px var(--green);}
+
+.readout-row{display:flex; gap:14px; margin-top:18px; flex-wrap:wrap;}
+.readout-card{flex:1; min-width:180px; padding:14px 16px; background:var(--panel-2); border:1px solid var(--line); border-radius:10px;}
+.readout-card .rl{font-family:var(--mono); font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-faint);}
+.readout-card .rv{font-family:var(--serif); font-size:20px; color:var(--ink); margin-top:4px;}
+
+.shots-wrap{display:flex; align-items:flex-end; gap:4px; height:120px; overflow-x:auto; padding-top:10px; border-bottom:1px solid var(--line); margin-top:14px;}
+.shot-bar{width:24px; border-radius:4px 4px 0 0; background:var(--violet); flex-shrink:0; min-height:1px; transition:height .3s ease;}
+.shot-col{display:flex; flex-direction:column; align-items:center; flex-shrink:0;}
+.shot-lbl{font-family:var(--mono); font-size:8.5px; color:var(--ink-faint); margin-top:4px;}
+
+.edu-note{margin-top:28px; padding:16px 18px; border-radius:10px; border-left:3px solid var(--violet); background:var(--violet-dim); font-size:13.5px; color:var(--ink-dim);}
+.edu-note b{color:var(--ink);}
+.edu-note a{color:var(--violet);}
+
+.legend{display:flex; gap:16px; flex-wrap:wrap; margin-top:14px; font-family:var(--mono); font-size:11px; color:var(--ink-faint);}
+.legend span{display:inline-flex; align-items:center; gap:6px;}
+.legend .sw{width:10px; height:10px; border-radius:3px; display:inline-block;}
+
+footer{padding:40px 32px; border-top:1px solid var(--line); text-align:center; font-family:var(--mono); font-size:12px; color:var(--ink-faint);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-wrap">
+    <div class="logo">{TAA}<span>·QML</span></div>
+    <a class="back-link" href="qml-roadmap-landing-page.html#platform">← Back to Platform</a>
+    <div class="nav-cta">
+      <a class="back-link" href="progress-hub.html">My Progress</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="module-eyebrow">◆ Quantum Circuit Simulator</div>
+  <h1>Build a circuit. Watch the state vector move.</h1>
+  <p class="lede">Drag gates onto the wires below. Every placement runs a real complex-amplitude simulation underneath — no lookup tables, no pre-baked answers — up to 4 qubits and 8 columns deep.</p>
+  <div class="chip-row">
+    <span class="chip">1–4 Qubits</span>
+    <span class="chip">Real State-Vector Engine</span>
+    <span class="chip">Live Measurement</span>
+    <span class="chip">Shots Histogram</span>
+  </div>
+
+  <div class="panel">
+    <div class="panel-label">Controls</div>
+    <div class="toolbar">
+      <div class="qubit-select">
+        <label>Qubits:</label>
+        <button class="qbtn" data-n="1">1</button>
+        <button class="qbtn" data-n="2">2</button>
+        <button class="qbtn active" data-n="3">3</button>
+        <button class="qbtn" data-n="4">4</button>
+      </div>
+      <button class="btn btn-amber" id="loadBell">Load Bell State</button>
+      <button class="btn btn-amber" id="loadGHZ">Load GHZ State</button>
+      <button class="btn btn-amber" id="loadSuper">Load Superposition</button>
+      <button class="btn btn-danger" id="clearBtn">Clear Circuit</button>
+    </div>
+
+    <div class="panel-label">Gate Palette — Drag onto a Wire</div>
+    <div class="palette-hint">Single-qubit gates drop directly. CNOT / CZ / SWAP need two clicks: drop on the control wire, then click the target wire in the same column.</div>
+    <div class="palette" id="palette"></div>
+
+    <div class="panel-label">Circuit</div>
+    <div class="circuit-scroll">
+      <div class="circuit-grid" id="circuitGrid"></div>
+    </div>
+    <div class="pending-hint" id="pendingHint" style="display:none;"></div>
+
+    <div class="legend">
+      <span><span class="sw" style="background:var(--cyan);"></span>single-qubit gate</span>
+      <span><span class="sw" style="background:var(--violet);"></span>rotation gate</span>
+      <span><span class="sw" style="background:var(--amber);"></span>two-qubit gate</span>
+      <span><span class="sw" style="background:var(--green);"></span>measurement</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-label">Quantum State <span id="stateSummary">3 qubits · 8 basis states</span></div>
+    <div class="bars-wrap" id="barsWrap"></div>
+    <div class="legend">
+      <span><span class="sw" style="background:hsl(0,80%,60%);"></span>phase 0°</span>
+      <span><span class="sw" style="background:hsl(120,80%,60%);"></span>phase 120°</span>
+      <span><span class="sw" style="background:hsl(240,80%,60%);"></span>phase 240°</span>
+      <span>bar height = probability, color = phase</span>
+    </div>
+
+    <div class="readout-row">
+      <div class="readout-card"><div class="rl">Last Measurement</div><div class="rv" id="lastMeasure">—</div></div>
+      <div class="readout-card"><div class="rl">Total Probability</div><div class="rv" id="totalProb">1.000</div></div>
+      <div class="readout-card"><div class="rl">Most Likely Outcome</div><div class="rv" id="mostLikely">—</div></div>
+    </div>
+
+    <div class="toolbar" style="margin-top:20px; margin-bottom:0;">
+      <button class="btn btn-primary" id="measureBtn">⚡ Measure Once (Collapses State)</button>
+      <button class="btn" id="shotsBtn">▤ Run 100 Shots</button>
+      <button class="btn" id="resetStateBtn">↺ Reset to |0…0⟩</button>
+    </div>
+    <div class="shots-wrap" id="shotsWrap" style="display:none;"></div>
+  </div>
+
+  <div class="edu-note">
+    <b>New to this?</b> Angle encoding from <a href="module8-tutorial.html">Module 8</a> is exactly a single Ry(θ) gate on one qubit — try dragging one onto wire q0 and clicking it to change the angle. The full variational loop from <a href="module9-tutorial.html">Module 9</a> is this same circuit, plus a classical optimizer choosing the angles for you.
+  </div>
+</div>
+
+<footer>Quantum Circuit Simulator — part of the QML Curriculum platform.</footer>
+
+<script>
+/* ================= complex number helpers ================= */
+function cx(re, im){ return {re: re||0, im: im||0}; }
+function cAdd(a,b){ return cx(a.re+b.re, a.im+b.im); }
+function cMul(a,b){ return cx(a.re*b.re - a.im*b.im, a.re*b.im + a.im*b.re); }
+function cScale(a,s){ return cx(a.re*s, a.im*s); }
+function cAbs2(a){ return a.re*a.re + a.im*a.im; }
+function cExpI(theta){ return cx(Math.cos(theta), Math.sin(theta)); }
+
+/* ================= gate matrix builders ================= */
+const SQRT1_2 = 1/Math.sqrt(2);
+function matH(){ return [[cx(SQRT1_2,0), cx(SQRT1_2,0)], [cx(SQRT1_2,0), cx(-SQRT1_2,0)]]; }
+function matX(){ return [[cx(0,0), cx(1,0)], [cx(1,0), cx(0,0)]]; }
+function matY(){ return [[cx(0,0), cx(0,-1)], [cx(0,1), cx(0,0)]]; }
+function matZ(){ return [[cx(1,0), cx(0,0)], [cx(0,0), cx(-1,0)]]; }
+function matS(){ return [[cx(1,0), cx(0,0)], [cx(0,0), cx(0,1)]]; }
+function matT(){ return [[cx(1,0), cx(0,0)], [cx(0,0), cExpI(Math.PI/4)]]; }
+function matRx(t){ const c=Math.cos(t/2), s=Math.sin(t/2); return [[cx(c,0), cx(0,-s)], [cx(0,-s), cx(c,0)]]; }
+function matRy(t){ const c=Math.cos(t/2), s=Math.sin(t/2); return [[cx(c,0), cx(-s,0)], [cx(s,0), cx(c,0)]]; }
+function matRz(t){ return [[cExpI(-t/2), cx(0,0)], [cx(0,0), cExpI(t/2)]]; }
+
+/* ================= simulator state ================= */
+let numQubits = 3;
+let stateRe = null, stateIm = null; // parallel arrays, length 2^n
+let circuit = {}; // circuit[col][qubit] = {gate, angle, pair, role}
+let numCols = 8;
+let lastMeasuredIndex = null;
+
+function dim(){ return 1 << numQubits; }
+function initState(){
+  const d = dim();
+  stateRe = new Float64Array(d);
+  stateIm = new Float64Array(d);
+  stateRe[0] = 1;
+}
+function getBitMask(qubit){ return 1 << (numQubits - 1 - qubit); }
+
+function applySingleGate(mat, qubit){
+  const mask = getBitMask(qubit);
+  const d = dim();
+  for(let i=0;i<d;i++){
+    if((i & mask) === 0){
+      const j = i | mask;
+      const a = cx(stateRe[i], stateIm[i]);
+      const b = cx(stateRe[j], stateIm[j]);
+      const newA = cAdd(cMul(mat[0][0],a), cMul(mat[0][1],b));
+      const newB = cAdd(cMul(mat[1][0],a), cMul(mat[1][1],b));
+      stateRe[i]=newA.re; stateIm[i]=newA.im;
+      stateRe[j]=newB.re; stateIm[j]=newB.im;
+    }
+  }
+}
+function applyCNOT(control, target){
+  const cmask = getBitMask(control), tmask = getBitMask(target);
+  const d = dim();
+  for(let i=0;i<d;i++){
+    if((i & cmask) !== 0 && (i & tmask) === 0){
+      const j = i | tmask;
+      const tr=stateRe[i], ti=stateIm[i];
+      stateRe[i]=stateRe[j]; stateIm[i]=stateIm[j];
+      stateRe[j]=tr; stateIm[j]=ti;
+    }
+  }
+}
+function applyCZ(control, target){
+  const cmask = getBitMask(control), tmask = getBitMask(target);
+  const d = dim();
+  for(let i=0;i<d;i++){
+    if((i & cmask)!==0 && (i & tmask)!==0){
+      stateRe[i] = -stateRe[i]; stateIm[i] = -stateIm[i];
+    }
+  }
+}
+function applySWAP(q1, q2){
+  const m1 = getBitMask(q1), m2 = getBitMask(q2);
+  const d = dim();
+  for(let i=0;i<d;i++){
+    const b1 = (i & m1)!==0, b2 = (i & m2)!==0;
+    if(!b1 && b2){
+      const j = (i | m1) & ~m2;
+      const tr=stateRe[i], ti=stateIm[i];
+      stateRe[i]=stateRe[j]; stateIm[i]=stateIm[j];
+      stateRe[j]=tr; stateIm[j]=ti;
+    }
+  }
+}
+
+function runCircuit(){
+  initState();
+  for(let col=0; col<numCols; col++){
+    const colData = circuit[col];
+    if(!colData) continue;
+    const handledPairs = new Set();
+    for(let q=0; q<numQubits; q++){
+      const g = colData[q];
+      if(!g) continue;
+      if(g.gate==='H') applySingleGate(matH(), q);
+      else if(g.gate==='X') applySingleGate(matX(), q);
+      else if(g.gate==='Y') applySingleGate(matY(), q);
+      else if(g.gate==='Z') applySingleGate(matZ(), q);
+      else if(g.gate==='S') applySingleGate(matS(), q);
+      else if(g.gate==='T') applySingleGate(matT(), q);
+      else if(g.gate==='Rx') applySingleGate(matRx(g.angle), q);
+      else if(g.gate==='Ry') applySingleGate(matRy(g.angle), q);
+      else if(g.gate==='Rz') applySingleGate(matRz(g.angle), q);
+      else if(g.gate==='CNOT' && g.role==='control' && !handledPairs.has(q+'-'+g.pair)){
+        applyCNOT(q, g.pair); handledPairs.add(q+'-'+g.pair); handledPairs.add(g.pair+'-'+q);
+      }
+      else if(g.gate==='CZ' && g.role==='control' && !handledPairs.has(q+'-'+g.pair)){
+        applyCZ(q, g.pair); handledPairs.add(q+'-'+g.pair); handledPairs.add(g.pair+'-'+q);
+      }
+      else if(g.gate==='SWAP' && !handledPairs.has(q+'-'+g.pair)){
+        applySWAP(q, g.pair); handledPairs.add(q+'-'+g.pair); handledPairs.add(g.pair+'-'+q);
+      }
+      // measurement gates don't alter state here; handled via Measure button
+    }
+  }
+  renderResults();
+}
+
+/* ================= gate palette + circuit UI ================= */
+const gateDefs = [
+  {g:'H', cls:'single', label:'H'},
+  {g:'X', cls:'single', label:'X'},
+  {g:'Y', cls:'single', label:'Y'},
+  {g:'Z', cls:'single', label:'Z'},
+  {g:'S', cls:'single', label:'S'},
+  {g:'T', cls:'single', label:'T'},
+  {g:'Rx', cls:'rot', label:'Rx'},
+  {g:'Ry', cls:'rot', label:'Ry'},
+  {g:'Rz', cls:'rot', label:'Rz'},
+  {g:'CNOT', cls:'multi', label:'●⊕'},
+  {g:'CZ', cls:'multi', label:'●Z'},
+  {g:'SWAP', cls:'multi', label:'✕✕'},
+];
+(function(){
+  const wrap = document.getElementById('palette');
+  gateDefs.forEach(gd=>{
+    const tile = document.createElement('div');
+    tile.className = 'gate-tile '+gd.cls;
+    tile.draggable = true;
+    tile.textContent = gd.label;
+    tile.title = gd.g;
+    tile.addEventListener('dragstart', (e)=>{ e.dataTransfer.setData('gate', gd.g); });
+    wrap.appendChild(tile);
+  });
+})();
+
+let pendingTwoQubit = null; // {gate, col, qubit}
+
+function buildGrid(){
+  const grid = document.getElementById('circuitGrid');
+  grid.innerHTML = '';
+  for(let q=0; q<numQubits; q++){
+    const row = document.createElement('div');
+    row.className = 'wire-row';
+    const lbl = document.createElement('div');
+    lbl.className = 'wire-label';
+    lbl.textContent = 'q'+q;
+    row.appendChild(lbl);
+    const track = document.createElement('div');
+    track.className = 'wire-track';
+    for(let col=0; col<numCols; col++){
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.qubit = q;
+      cell.dataset.col = col;
+      const wireLine = document.createElement('div');
+      wireLine.className = 'wire-line';
+      cell.appendChild(wireLine);
+      cell.addEventListener('dragover', (e)=>{ e.preventDefault(); cell.classList.add('dragover'); });
+      cell.addEventListener('dragleave', ()=> cell.classList.remove('dragover'));
+      cell.addEventListener('drop', (e)=>{
+        e.preventDefault(); cell.classList.remove('dragover');
+        const gate = e.dataTransfer.getData('gate');
+        handleDrop(gate, q, col);
+      });
+      cell.addEventListener('click', ()=> handleCellClick(q, col));
+      track.appendChild(cell);
+    }
+    row.appendChild(track);
+    grid.appendChild(row);
+  }
+  renderCircuitGates();
+}
+
+function handleDrop(gate, qubit, col){
+  if(!gate) return;
+  if(['CNOT','CZ','SWAP'].includes(gate)){
+    // start two-qubit placement
+    pendingTwoQubit = {gate, col, qubit};
+    document.getElementById('pendingHint').style.display = 'block';
+    document.getElementById('pendingHint').textContent = gate+' placed on q'+qubit+', column '+col+'. Click another wire in the SAME column to set the second qubit.';
+    setCircuitCell(col, qubit, {gate, role:'pending'});
+    renderCircuitGates();
+    return;
+  }
+  let angle = null;
+  if(['Rx','Ry','Rz'].includes(gate)) angle = Math.PI/2;
+  setCircuitCell(col, qubit, {gate, angle});
+  runCircuit();
+  renderCircuitGates();
+}
+
+function handleCellClick(qubit, col){
+  if(pendingTwoQubit && pendingTwoQubit.col === col && pendingTwoQubit.qubit !== qubit){
+    const g = pendingTwoQubit.gate;
+    setCircuitCell(col, pendingTwoQubit.qubit, {gate:g, role:'control', pair:qubit});
+    setCircuitCell(col, qubit, {gate:g, role: g==='SWAP' ? 'swap2' : 'target', pair:pendingTwoQubit.qubit});
+    pendingTwoQubit = null;
+    document.getElementById('pendingHint').style.display = 'none';
+    runCircuit();
+    renderCircuitGates();
+    return;
+  }
+  // otherwise: click on existing gate removes it; click on parametrized gate cycles angle
+  const existing = circuit[col] && circuit[col][qubit];
+  if(!existing) return;
+  if(['Rx','Ry','Rz'].includes(existing.gate)){
+    const presets = [Math.PI/8, Math.PI/4, Math.PI/2, 3*Math.PI/4, Math.PI, -Math.PI/2];
+    let idx = presets.findIndex(p=> Math.abs(p-existing.angle) < 0.001);
+    idx = (idx+1) % presets.length;
+    existing.angle = presets[idx];
+    runCircuit();
+    renderCircuitGates();
+    return;
+  }
+  if(existing.gate==='CNOT' || existing.gate==='CZ' || existing.gate==='SWAP'){
+    const pairQ = existing.pair;
+    delete circuit[col][qubit];
+    if(circuit[col] && circuit[col][pairQ]) delete circuit[col][pairQ];
+  } else {
+    delete circuit[col][qubit];
+  }
+  runCircuit();
+  renderCircuitGates();
+}
+
+function setCircuitCell(col, qubit, data){
+  if(!circuit[col]) circuit[col] = {};
+  circuit[col][qubit] = data;
+}
+
+function renderCircuitGates(){
+  const cells = document.querySelectorAll('.cell');
+  cells.forEach(cell=>{
+    const q = parseInt(cell.dataset.qubit), col = parseInt(cell.dataset.col);
+    const existingPlaced = cell.querySelector('.placed');
+    if(existingPlaced) existingPlaced.remove();
+    const existingTag = cell.querySelector('.angle-tag');
+    if(existingTag) existingTag.remove();
+    const data = circuit[col] && circuit[col][q];
+    if(!data) return;
+    const el = document.createElement('div');
+    if(['H','X','Y','Z','S','T'].includes(data.gate)){
+      el.className = 'placed single'; el.textContent = data.gate;
+    } else if(['Rx','Ry','Rz'].includes(data.gate)){
+      el.className = 'placed rot'; el.textContent = data.gate;
+      const tag = document.createElement('div');
+      tag.className = 'angle-tag';
+      tag.textContent = (data.angle/Math.PI).toFixed(2)+'\u03C0';
+      cell.appendChild(tag);
+    } else if(data.gate==='CNOT'){
+      if(data.role==='control' || data.role==='pending'){ el.className='placed control'; }
+      else { el.className='placed target-x'; el.textContent='\u2295'; }
+    } else if(data.gate==='CZ'){
+      el.className = 'placed target-z';
+    } else if(data.gate==='SWAP'){
+      el.className = 'placed swap-x'; el.textContent='\u2715';
+    }
+    cell.appendChild(el);
+  });
+  // draw connectors for two-qubit gates
+  document.querySelectorAll('.connector').forEach(c=>c.remove());
+  for(const col in circuit){
+    const colData = circuit[col];
+    const qubits = Object.keys(colData).map(Number);
+    const pairs = new Set();
+    qubits.forEach(q=>{
+      const g = colData[q];
+      if(g && g.pair !== undefined){
+        const key = Math.min(q,g.pair)+'-'+Math.max(q,g.pair)+'-'+col;
+        if(!pairs.has(key)){
+          pairs.add(key);
+          drawConnector(Math.min(q,g.pair), Math.max(q,g.pair), parseInt(col));
+        }
+      }
+    });
+  }
+}
+function drawConnector(q1, q2, col){
+  const cell1 = document.querySelector('.cell[data-qubit="'+q1+'"][data-col="'+col+'"]');
+  const cell2 = document.querySelector('.cell[data-qubit="'+q2+'"][data-col="'+col+'"]');
+  if(!cell1 || !cell2) return;
+  const grid = document.getElementById('circuitGrid');
+  const r1 = cell1.getBoundingClientRect(), r2 = cell2.getBoundingClientRect(), rg = grid.getBoundingClientRect();
+  const line = document.createElement('div');
+  line.className = 'connector';
+  line.style.top = (r1.top - rg.top + r1.height/2) + 'px';
+  line.style.height = (r2.top - r1.top) + 'px';
+  line.style.left = (r1.left - rg.left + r1.width/2) + 'px';
+  grid.style.position = 'relative';
+  grid.appendChild(line);
+}
+
+/* ================= results rendering ================= */
+function renderResults(){
+  const d = dim();
+  const bars = document.getElementById('barsWrap');
+  bars.innerHTML = '';
+  let maxProb = 0, maxIdx = 0, totalProb = 0;
+  for(let i=0;i<d;i++){
+    const prob = stateRe[i]*stateRe[i] + stateIm[i]*stateIm[i];
+    totalProb += prob;
+    if(prob > maxProb){ maxProb = prob; maxIdx = i; }
+  }
+  for(let i=0;i<d;i++){
+    const prob = stateRe[i]*stateRe[i] + stateIm[i]*stateIm[i];
+    const phase = Math.atan2(stateIm[i], stateRe[i]) * (180/Math.PI);
+    const hue = ((phase % 360) + 360) % 360;
+    const col = document.createElement('div');
+    col.className = 'abar-col' + (lastMeasuredIndex===i ? ' measured' : '');
+    const amp = Math.sqrt(prob);
+    col.innerHTML = '<div class="abar-amp">'+amp.toFixed(2)+'</div>'
+      + '<div class="abar" style="height:'+Math.max(2,prob*150)+'px; background:hsl('+hue+',75%,58%);"></div>'
+      + '<div class="abar-lbl">|'+i.toString(2).padStart(numQubits,'0')+'\u27E9</div>';
+    bars.appendChild(col);
+  }
+  document.getElementById('stateSummary').textContent = numQubits+' qubit'+(numQubits>1?'s':'')+' \u00b7 '+d+' basis states';
+  document.getElementById('totalProb').textContent = totalProb.toFixed(3);
+  document.getElementById('mostLikely').textContent = '|'+maxIdx.toString(2).padStart(numQubits,'0')+'\u27E9 ('+(maxProb*100).toFixed(1)+'%)';
+}
+
+/* ================= measurement ================= */
+function sampleIndex(){
+  const d = dim();
+  const r = Math.random();
+  let cum = 0;
+  for(let i=0;i<d;i++){
+    const prob = stateRe[i]*stateRe[i] + stateIm[i]*stateIm[i];
+    cum += prob;
+    if(r <= cum) return i;
+  }
+  return d-1;
+}
+document.getElementById('measureBtn').addEventListener('click', ()=>{
+  const idx = sampleIndex();
+  lastMeasuredIndex = idx;
+  const d = dim();
+  for(let i=0;i<d;i++){ stateRe[i]=0; stateIm[i]=0; }
+  stateRe[idx] = 1;
+  document.getElementById('lastMeasure').textContent = '|'+idx.toString(2).padStart(numQubits,'0')+'\u27E9';
+  renderResults();
+});
+document.getElementById('resetStateBtn').addEventListener('click', ()=>{
+  lastMeasuredIndex = null;
+  document.getElementById('lastMeasure').textContent = '\u2014';
+  runCircuit();
+});
+document.getElementById('shotsBtn').addEventListener('click', ()=>{
+  const d = dim();
+  const counts = new Array(d).fill(0);
+  for(let s=0;s<100;s++){ counts[sampleIndex()]++; }
+  const wrap = document.getElementById('shotsWrap');
+  wrap.style.display = 'flex';
+  wrap.innerHTML = '';
+  const maxCount = Math.max(...counts, 1);
+  for(let i=0;i<d;i++){
+    const col = document.createElement('div');
+    col.className = 'shot-col';
+    col.innerHTML = '<div class="shot-bar" style="height:'+Math.max(1,(counts[i]/maxCount)*90)+'px;"></div><div class="shot-lbl">'+counts[i]+'</div>';
+    wrap.appendChild(col);
+  }
+});
+
+/* ================= qubit count + examples + clear ================= */
+document.querySelectorAll('.qbtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.qbtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    numQubits = parseInt(btn.dataset.n);
+    circuit = {};
+    lastMeasuredIndex = null;
+    document.getElementById('lastMeasure').textContent = '\u2014';
+    document.getElementById('shotsWrap').style.display = 'none';
+    buildGrid();
+    runCircuit();
+  });
+});
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  circuit = {};
+  lastMeasuredIndex = null;
+  document.getElementById('lastMeasure').textContent = '\u2014';
+  document.getElementById('shotsWrap').style.display = 'none';
+  buildGrid();
+  runCircuit();
+});
+function setQubitCount(n){
+  document.querySelectorAll('.qbtn').forEach(b=> b.classList.toggle('active', parseInt(b.dataset.n)===n));
+  numQubits = n;
+}
+document.getElementById('loadBell').addEventListener('click', ()=>{
+  setQubitCount(2); circuit = {};
+  setCircuitCell(0,0,{gate:'H'});
+  setCircuitCell(1,0,{gate:'CNOT', role:'control', pair:1});
+  setCircuitCell(1,1,{gate:'CNOT', role:'target', pair:0});
+  buildGrid(); runCircuit();
+});
+document.getElementById('loadGHZ').addEventListener('click', ()=>{
+  setQubitCount(3); circuit = {};
+  setCircuitCell(0,0,{gate:'H'});
+  setCircuitCell(1,0,{gate:'CNOT', role:'control', pair:1});
+  setCircuitCell(1,1,{gate:'CNOT', role:'target', pair:0});
+  setCircuitCell(2,1,{gate:'CNOT', role:'control', pair:2});
+  setCircuitCell(2,2,{gate:'CNOT', role:'target', pair:1});
+  buildGrid(); runCircuit();
+});
+document.getElementById('loadSuper').addEventListener('click', ()=>{
+  setQubitCount(3); circuit = {};
+  setCircuitCell(0,0,{gate:'H'});
+  setCircuitCell(0,1,{gate:'H'});
+  setCircuitCell(0,2,{gate:'H'});
+  buildGrid(); runCircuit();
+});
+
+/* ================= init ================= */
+buildGrid();
+runCircuit();
+</script>
+
+</body>
+</html>

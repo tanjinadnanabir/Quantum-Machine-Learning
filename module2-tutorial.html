@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 2 — Why Machine Learning? | QML Curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="modules-registry.js"></script>
+<style>
+:root{
+  --bg:#070b14; --bg-2:#0b111f; --panel:#0e1526; --panel-2:#101a2e;
+  --line:rgba(148,178,224,0.14); --line-strong:rgba(148,178,224,0.28);
+  --ink:#e9eef8; --ink-dim:#9fb0c9; --ink-faint:#5f7089;
+  --cyan:#5ad1e6; --cyan-dim:rgba(90,209,230,0.14);
+  --violet:#b39bff; --violet-dim:rgba(179,155,255,0.14);
+  --amber:#f2a341; --amber-dim:rgba(242,163,65,0.14);
+  --green:#5ee6a0; --green-dim:rgba(94,230,160,0.14);
+  --red:#f2726a; --red-dim:rgba(242,114,106,0.14);
+  --blue:#4fa3f7;
+  --serif:'Fraunces', Georgia, serif; --sans:'Inter', -apple-system, sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.7;}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto !important;}}
+.progress-rail{position:fixed; top:0; left:0; right:0; height:3px; background:var(--line); z-index:100;}
+.progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--violet),var(--amber)); transition:width .1s linear;}
+header{position:sticky; top:3px; z-index:60; backdrop-filter:blur(14px); background:rgba(7,11,20,0.82); border-bottom:1px solid var(--line);}
+.nav-wrap{max-width:1280px; margin:0 auto; padding:14px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+.back-link{display:flex; align-items:center; gap:8px; color:var(--ink-dim); text-decoration:none; font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; transition:color .2s;}
+.back-link:hover{color:var(--cyan);}
+.crumb{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); letter-spacing:0.06em; text-transform:uppercase;}
+.crumb b{color:var(--cyan);}
+.xp-badge{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12.5px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; color:var(--amber); background:var(--amber-dim);}
+.layout{max-width:1280px; margin:0 auto; padding:52px 32px 120px; display:grid; grid-template-columns:250px 1fr; gap:56px;}
+.sidebar{position:sticky; top:80px; align-self:start; height:fit-content;}
+.side-title{font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;}
+.side-list{list-style:none; display:flex; flex-direction:column; gap:2px;}
+.side-list a{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink-dim); font-size:13px; padding:9px 12px; border-radius:8px; border-left:2px solid transparent; transition:background .2s, color .2s, border-color .2s;}
+.side-list a:hover{background:var(--panel);}
+.side-list a.active{color:var(--ink); background:var(--panel); border-left-color:var(--cyan);}
+.side-dot{width:7px; height:7px; border-radius:50%; background:#2a3550; flex-shrink:0; transition:background .3s;}
+.side-dot.done{background:var(--green); box-shadow:0 0 6px var(--green);}
+.side-dot.warn{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+.tut-hero{margin-bottom:44px;}
+.module-eyebrow{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--cyan); background:var(--cyan-dim); margin-bottom:20px;}
+.tut-hero h1{font-family:var(--serif); font-weight:600; font-size:clamp(32px,4vw,46px); line-height:1.1; letter-spacing:-0.01em;}
+.tut-hero p.lede{margin-top:16px; color:var(--ink-dim); font-size:16px; max-width:660px;}
+.chip-row{display:flex; gap:8px; margin-top:22px; flex-wrap:wrap;}
+.chip{font-family:var(--mono); font-size:10.5px; letter-spacing:0.04em; color:var(--ink-faint); border:1px solid var(--line); padding:5px 11px; border-radius:100px;}
+.character-card{margin-top:28px; display:flex; gap:18px; align-items:center; padding:20px 22px; background:linear-gradient(120deg, rgba(90,209,230,0.08), rgba(179,155,255,0.05)); border:1px solid var(--line-strong); border-radius:14px;}
+.avatar-ring{width:56px; height:56px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1.5px solid var(--cyan); font-family:var(--serif); font-size:22px; color:var(--cyan);}
+.character-card .cname{font-weight:700; font-size:14.5px; color:var(--ink);}
+.character-card .crole{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:2px;}
+.character-card p{font-size:13.5px; color:var(--ink-dim); margin-top:6px;}
+.chapter{margin-bottom:80px; scroll-margin-top:90px;}
+.chapter-head{display:flex; align-items:center; gap:14px; margin-bottom:20px;}
+.chapter-icon{width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1px solid var(--line-strong); font-size:18px; color:var(--cyan); flex-shrink:0;}
+.chapter-num{font-family:var(--mono); font-size:12px; color:var(--ink-faint); letter-spacing:0.08em; display:block;}
+.chapter h2{font-family:var(--serif); font-weight:600; font-size:clamp(23px,2.8vw,30px); letter-spacing:-0.01em;}
+.story-panel{position:relative; margin:18px 0 24px; padding:20px 24px 20px 50px; border-radius:12px; background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--cyan); font-family:var(--serif); font-style:italic; font-size:15px; color:var(--ink-dim); line-height:1.7;}
+.story-panel::before{content:'\201C'; position:absolute; left:16px; top:6px; font-size:34px; color:var(--cyan); font-style:normal; opacity:0.6;}
+.story-panel b{color:var(--ink); font-style:normal;}
+.chapter > p.body-text{color:var(--ink-dim); font-size:15px; margin-bottom:16px;}
+.chapter > p.body-text b{color:var(--ink); font-weight:600;}
+.chapter ul.points{margin:16px 0 20px 0; padding-left:0; list-style:none; display:flex; flex-direction:column; gap:10px;}
+.chapter ul.points li{display:flex; gap:10px; font-size:14px; color:var(--ink-dim); padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px;}
+.chapter ul.points li::before{content:'\25C6'; color:var(--cyan); font-size:8px; margin-top:5px; flex-shrink:0;}
+.callout{margin:22px 0; padding:16px 18px; border-radius:10px; border-left:3px solid var(--violet); background:var(--violet-dim); font-size:13.5px; color:var(--ink-dim);}
+.callout b{color:var(--ink);}
+.visual-box{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:26px; margin:24px 0; overflow-x:auto;}
+.visual-label{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+
+.ctrl-row{display:flex; align-items:center; gap:16px; margin-bottom:16px; flex-wrap:wrap;}
+.ctrl-row label{font-family:var(--mono); font-size:12px; color:var(--ink-dim);}
+.ctrl-row input[type=range]{width:180px; accent-color:var(--cyan);}
+.ctrl-readout{font-family:var(--serif); font-size:16px; color:var(--cyan); min-width:32px; display:inline-block; text-align:center;}
+
+/* ladder (rule explosion) */
+.ladder{display:flex; align-items:flex-end; gap:10px; min-width:480px; height:150px; padding-top:26px;}
+.ladder-bar{flex:1; background:linear-gradient(180deg,var(--red),var(--amber)); border-radius:6px 6px 0 0; position:relative; opacity:0.85; transition:height .6s ease;}
+.ladder-bar span{position:absolute; top:-22px; left:50%; transform:translateX(-50%); font-family:var(--mono); font-size:10px; color:var(--ink-faint); white-space:nowrap;}
+.fun-fact{margin-top:16px; font-family:var(--mono); font-size:12px; color:var(--ink-faint); min-height:18px;}
+
+/* pipeline row (reused) */
+.pipeline-row{display:flex; align-items:center; gap:0; justify-content:center; flex-wrap:wrap; margin-bottom:6px;}
+.pipe-step{padding:14px 16px; background:var(--panel-2); border:1px solid var(--line-strong); border-radius:10px; text-align:center; min-width:110px;}
+.pipe-step .pn{font-family:var(--mono); font-size:9.5px; color:var(--ink-faint); text-transform:uppercase;}
+.pipe-step .pl{font-size:12px; font-weight:700; color:var(--ink); margin-top:4px;}
+.pipe-arrow{font-family:var(--mono); color:var(--cyan); font-size:15px; padding:0 6px;}
+
+/* 3-column compare */
+.compare3{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+@media (max-width:800px){.compare3{grid-template-columns:1fr;}}
+.compare3-col{padding:18px; border-radius:10px; background:var(--panel-2); border:1px solid var(--line);}
+.compare3-col h5{font-family:var(--mono); font-size:12px; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:10px; color:var(--cyan);}
+.compare3-col.b h5{color:var(--violet);}
+.compare3-col.c h5{color:var(--amber);}
+.compare3-col p{font-size:12.5px; color:var(--ink-dim); line-height:1.6;}
+
+/* flip-card grid (reused) */
+.encoding-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+.enc-card{perspective:1000px; height:120px; cursor:pointer;}
+.enc-inner{position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d;}
+.enc-card.flipped .enc-inner{transform:rotateY(180deg);}
+.enc-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:center; border:1px solid var(--line-strong);}
+.enc-front{background:var(--panel-2);}
+.enc-front .en{font-family:var(--mono); font-size:9.5px; color:var(--ink-faint); margin-bottom:4px;}
+.enc-front h6{font-size:12.5px; font-weight:700; color:var(--ink);}
+.enc-back{background:var(--panel); transform:rotateY(180deg); font-size:11px; color:var(--ink-dim); line-height:1.5;}
+@media (max-width:900px){.encoding-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:480px){.encoding-grid{grid-template-columns:1fr;}}
+
+/* quiz (shared) */
+.quiz-box{margin-top:28px; background:var(--panel); border:1px solid var(--line-strong); border-radius:14px; padding:24px;}
+.quiz-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
+.quiz-title{font-family:var(--mono); font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--cyan); display:flex; align-items:center; gap:8px;}
+.quiz-score{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);}
+.q-item{margin-bottom:22px;}
+.q-item:last-child{margin-bottom:0;}
+.q-text{font-size:14px; font-weight:600; margin-bottom:12px; color:var(--ink);}
+.q-options{display:flex; flex-direction:column; gap:8px;}
+.q-opt{text-align:left; padding:11px 14px; border-radius:9px; border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-dim); font-size:13px; cursor:pointer; transition:border-color .2s, background .2s, color .2s; font-family:var(--sans);}
+.q-opt:hover:not(:disabled){border-color:var(--ink-dim); color:var(--ink);}
+.q-opt.correct{border-color:var(--green); background:var(--green-dim); color:var(--green);}
+.q-opt.incorrect{border-color:var(--red); background:var(--red-dim); color:var(--red);}
+.q-opt:disabled{cursor:default;}
+.q-explain{margin-top:10px; font-size:12.5px; color:var(--ink-dim); padding:11px 14px; border-radius:8px; background:var(--panel-2); border-left:2px solid var(--cyan); display:none;}
+.q-explain.show{display:block;}
+.chapter-status{margin-top:16px; padding:10px 14px; border-radius:8px; font-family:var(--mono); font-size:11.5px; display:none; align-items:center; gap:8px;}
+.chapter-status.show{display:flex;}
+.chapter-status.mastered{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.35);}
+.chapter-status.review{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.35);}
+.final-assess{margin-top:20px; background:linear-gradient(180deg,var(--panel-2),var(--panel)); border:1px solid var(--line-strong); border-radius:16px; padding:34px;}
+.final-head{margin-bottom:26px;}
+.final-head .module-eyebrow{color:var(--amber); border-color:var(--line-strong); background:var(--amber-dim);}
+.final-head h2{font-family:var(--serif); font-size:clamp(26px,3vw,34px); font-weight:600;}
+.final-head p{color:var(--ink-dim); margin-top:10px; font-size:14.5px;}
+.result-panel{margin-top:28px; padding:24px; border-radius:12px; border:1px solid var(--line-strong); background:var(--bg); display:none;}
+.result-panel.show{display:block;}
+.result-top{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:18px;}
+.result-score{font-family:var(--serif); font-size:44px; font-weight:600;}
+.result-badge{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; padding:6px 14px; border-radius:100px;}
+.result-badge.pass{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.4);}
+.result-badge.retry{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.4);}
+.recommend-list{list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+.recommend-list li{font-size:13px; color:var(--ink-dim); padding:10px 12px; background:var(--panel-2); border-radius:8px; border:1px solid var(--line);}
+.result-actions{display:flex; gap:12px; margin-top:22px; flex-wrap:wrap;}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:9px; font-size:13.5px; font-weight:600; text-decoration:none; cursor:pointer; border:1px solid transparent; transition:transform .2s, box-shadow .2s;}
+.btn-primary{background:var(--blue); color:#04101f;}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 26px -8px rgba(79,163,247,0.5);}
+.btn-ghost{background:transparent; border-color:var(--line-strong); color:var(--ink);}
+.btn-ghost:hover{border-color:var(--ink-dim); transform:translateY(-2px);}
+.reveal{opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease;}
+.reveal.in{opacity:1; transform:translateY(0);}
+.module-nav{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:70px; padding-top:36px; border-top:1px solid var(--line);}
+.mn-card{display:flex; flex-direction:column; gap:6px; padding:20px 22px; border-radius:14px; background:var(--panel); border:1px solid var(--line); text-decoration:none; transition:border-color .25s, transform .25s;}
+.mn-card.enabled:hover{border-color:var(--line-strong); transform:translateY(-3px);}
+.mn-card.disabled{opacity:0.5; cursor:default;}
+.mn-card.next{align-items:flex-end; text-align:right;}
+.mn-eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint);}
+.mn-title{font-family:var(--serif); font-size:16px; font-weight:600; color:var(--ink);}
+.mn-arrow{font-family:var(--mono); font-size:12px; color:var(--cyan);}
+@media (max-width:700px){.module-nav{grid-template-columns:1fr;}}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static; display:flex; overflow-x:auto; gap:4px; padding-bottom:10px;}
+  .side-list{flex-direction:row;}
+  .side-list a{white-space:nowrap;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-rail"><div class="progress-fill" id="progressFill"></div></div>
+
+<header>
+  <div class="nav-wrap">
+    <a class="back-link" href="qml-roadmap-landing-page.html#curriculum">← Back to Curriculum</a>
+    <div class="crumb">LEVEL 1 · BEGINNER — <b>MODULE 2</b></div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a class="back-link" href="progress-hub.html">My Progress</a>
+      <div class="xp-badge">⚡ <span id="xpCount">0</span> XP</div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="side-title">Module 2 Chapters</div>
+    <ul class="side-list" id="sideList">
+      <li><a href="#ch1" data-target="ch1"><span class="side-dot" id="dot-ch1"></span>Limitations of Traditional Programming</a></li>
+      <li><a href="#ch2" data-target="ch2"><span class="side-dot" id="dot-ch2"></span>What is Machine Learning?</a></li>
+      <li><a href="#ch3" data-target="ch3"><span class="side-dot" id="dot-ch3"></span>Types of Machine Learning</a></li>
+      <li><a href="#ch4" data-target="ch4"><span class="side-dot" id="dot-ch4"></span>ML Workflow</a></li>
+      <li><a href="#ch5" data-target="ch5"><span class="side-dot" id="dot-ch5"></span>Real-World Applications</a></li>
+      <li><a href="#final" data-target="final"><span class="side-dot" id="dot-final"></span>Module Assessment</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <div class="tut-hero reveal">
+      <div class="module-eyebrow">◆ Module 2 · Beginner</div>
+      <h1>Why Machine Learning?</h1>
+      <p class="lede">Module 1 covered what AI is in general. This one answers a sharper question: why did one particular approach — learning from data instead of following fixed rules — end up taking over the field?</p>
+      <div class="chip-row">
+        <span class="chip">5 Chapters</span>
+        <span class="chip">Zero Math Required Yet</span>
+        <span class="chip">15 Quick-Check Questions</span>
+        <span class="chip">1 Adaptive Assessment</span>
+        <span class="chip">~30 min</span>
+      </div>
+      <div class="character-card">
+        <div class="avatar-ring">A</div>
+        <div>
+          <div class="cname">Alex, continued</div>
+          <div class="crole">Curious Beginner · Day Two</div>
+          <p>Alex now knows AI is a broad, shifting field. The next question is more practical: how do you actually build one of these systems? The friend's answer starts with what doesn't work anymore.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAPTER 1 -->
+    <section class="chapter reveal" id="ch1">
+      <div class="chapter-head"><div class="chapter-icon">⚠</div><div><span class="chapter-num">CHAPTER 01</span><h2>Limitations of Traditional Programming</h2></div></div>
+      <div class="story-panel">"Try writing rules for a spam filter," the friend challenges Alex. Easy at first: block emails with "FREE MONEY." Then spammers write "FR33 M0N3Y." Then "Free... Money" with a line break in between. <b>Every rule spawns three ways around it.</b></div>
+      <p class="body-text">Traditional programming means writing explicit, step-by-step instructions for every situation you can think of. This works great for tasks with clear, fixed logic — but it collapses for tasks where the "rules" are fuzzy, constantly changing, or too numerous to write by hand.</p>
+      <div class="visual-box">
+        <div class="visual-label">Rules Needed vs. Real-World Messiness</div>
+        <div class="ladder" id="ruleLadder"></div>
+        <div class="fun-fact">Every new spam trick spawns more exceptions than the last rule fixed \u2014 the list never actually finishes.</div>
+      </div>
+      <ul class="points">
+        <li><b>Rule-based systems work well</b> for tasks with fixed, well-defined logic — tax calculations, simple validation, basic automation.</li>
+        <li><b>They break down</b> for tasks like recognizing images, understanding language, or detecting fraud, where the patterns are too varied and shifting to hand-code.</li>
+        <li>This gap is exactly what motivated a different approach: instead of writing the rules yourself, let the system learn them from examples.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Machine learning was not invented because programmers got lazy — it was invented because some problems have no finite list of rules that actually works.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch1">0 / 3</div></div>
+        <div id="quiz-ch1"></div>
+        <div class="chapter-status" id="status-ch1"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 2 -->
+    <section class="chapter reveal" id="ch2">
+      <div class="chapter-head"><div class="chapter-icon">◎</div><div><span class="chapter-num">CHAPTER 02</span><h2>What is Machine Learning?</h2></div></div>
+      <div class="story-panel">"Instead of you writing the spam rules," the friend says, "show the computer ten thousand emails already marked spam or not-spam, and let it figure out the pattern itself." Alex blinks. <b>"That's it? That's the whole idea?"</b> Pretty much.</div>
+      <p class="body-text"><b>Machine Learning (ML)</b> is a branch of AI where systems learn patterns directly from data, instead of following manually-written rules. The "learning" is really a search: the system tries many internal adjustments until its predictions match the examples it was shown.</p>
+      <div class="visual-box">
+        <div class="visual-label">The Core ML Idea</div>
+        <div class="pipeline-row">
+          <div class="pipe-step"><div class="pn">Input</div><div class="pl">Labeled Examples</div></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step"><div class="pn">Step</div><div class="pl">Learning Algorithm</div></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step"><div class="pn">Result</div><div class="pl">Trained Model</div></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step"><div class="pn">Use</div><div class="pl">Predictions on New Data</div></div>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>Data replaces hand-written rules</b> — the examples themselves teach the system what patterns matter.</li>
+        <li><b>A "model"</b> is just the result of this learning process — a compact set of internal adjustments that captures the pattern found in the data.</li>
+        <li><b>Once trained</b>, a model can make predictions on brand-new examples it has never seen before, as long as they resemble the training data.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Machine learning trades "write the rules yourself" for "show enough examples and let the pattern emerge" — a simple swap with enormous consequences.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch2">0 / 3</div></div>
+        <div id="quiz-ch2"></div>
+        <div class="chapter-status" id="status-ch2"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 3 -->
+    <section class="chapter reveal" id="ch3">
+      <div class="chapter-head"><div class="chapter-icon">▦</div><div><span class="chapter-num">CHAPTER 03</span><h2>Types of Machine Learning</h2></div></div>
+      <div class="story-panel">"There isn't just one flavor of this," the friend warns. "Three, broadly — and Module 3 spends an entire module on the details. For now, just get the shape of each one."</div>
+      <p class="body-text">These three categories differ mainly in what kind of feedback the system gets while learning.</p>
+      <div class="visual-box">
+        <div class="visual-label">Three Broad Categories</div>
+        <div class="compare3">
+          <div class="compare3-col a"><h5>Supervised Learning</h5><p>Learns from labeled examples — data that already comes with the "correct answer" attached, like emails marked spam or not-spam.</p></div>
+          <div class="compare3-col b"><h5>Unsupervised Learning</h5><p>Learns from unlabeled data, finding hidden structure or groupings on its own — like noticing customers naturally cluster into a few shopping styles.</p></div>
+          <div class="compare3-col c"><h5>Reinforcement Learning</h5><p>Learns by trial and error, receiving rewards or penalties for actions taken in an environment — like a game-playing agent improving through practice.</p></div>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>Supervised learning</b> needs labeled data and is the most common starting point — covered in depth across Module 3.</li>
+        <li><b>Unsupervised learning</b> is useful exactly when you don't have labels yet, but suspect there's structure worth finding.</li>
+        <li><b>Reinforcement learning</b> fits situations with a sequence of decisions and delayed feedback, like games or robotics.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> The right category depends entirely on what kind of feedback is available — labeled answers, no labels at all, or rewards over time.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch3">0 / 3</div></div>
+        <div id="quiz-ch3"></div>
+        <div class="chapter-status" id="status-ch3"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 4 -->
+    <section class="chapter reveal" id="ch4">
+      <div class="chapter-head"><div class="chapter-icon">⟳</div><div><span class="chapter-num">CHAPTER 04</span><h2>ML Workflow</h2></div></div>
+      <div class="story-panel">"Building a model isn't just 'feed in data, get magic out,'" the friend says. "It's a real process, with steps people skip at their own risk." Alex writes down the six stages, word for word.</div>
+      <p class="body-text">Nearly every ML project — classical or quantum — follows roughly the same six-stage workflow.</p>
+      <div class="visual-box">
+        <div class="visual-label">The Six-Stage Workflow</div>
+        <div class="pipeline-row">
+          <div class="pipe-step"><div class="pn">1</div><div class="pl">Data Collection</div></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step"><div class="pn">2</div><div class="pl">Preprocessing</div></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step"><div class="pn">3</div><div class="pl">Train/Test Split</div></div>
+        </div>
+        <div class="pipeline-row" style="margin-top:10px;">
+          <div class="pipe-step"><div class="pn">4</div><div class="pl">Model Training</div></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step"><div class="pn">5</div><div class="pl">Evaluation</div></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step"><div class="pn">6</div><div class="pl">Deployment</div></div>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>Data collection &amp; preprocessing</b> often take more real-world time than the modeling itself — messy data has to be cleaned first.</li>
+        <li><b>Train/test split</b> holds back some data the model never sees during training, specifically to check if it generalizes rather than memorizes.</li>
+        <li><b>Evaluation</b> measures how well the trained model performs on that held-out test data before anyone trusts it with real decisions.</li>
+        <li><b>Deployment</b> is putting the model to work on genuinely new, real-world data — where the actual value gets delivered.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> A model is only as trustworthy as the process that produced it — skipping the train/test split is one of the most common and costly shortcuts in the field.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch4">0 / 3</div></div>
+        <div id="quiz-ch4"></div>
+        <div class="chapter-status" id="status-ch4"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 5 -->
+    <section class="chapter reveal" id="ch5">
+      <div class="chapter-head"><div class="chapter-icon">⬢</div><div><span class="chapter-num">CHAPTER 05</span><h2>Real-World Applications</h2></div></div>
+      <div class="story-panel">"Same trick as Module 1's applications chapter," the friend says, "except now you know the actual mechanism behind each one." Alex tries the exercise again — this time explaining <i>how</i>, not just <i>what</i>.</div>
+      <p class="body-text">Tap each card to see the ML pattern (supervised, unsupervised, or reinforcement) behind a familiar example.</p>
+      <div class="visual-box">
+        <div class="visual-label">The Mechanism Behind Familiar Examples</div>
+        <div class="encoding-grid" id="mlAppsGrid"></div>
+      </div>
+      <ul class="points">
+        <li><b>Recommendation systems</b> often blend supervised prediction with unsupervised pattern-finding across many users' behavior.</li>
+        <li><b>Fraud detection</b> is a classic supervised learning task — learning from many examples of known fraudulent and legitimate transactions.</li>
+        <li><b>Game-playing agents</b> (like those mastering Go or video games) are a flagship reinforcement learning success story.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Once you can name which type of learning powers an application, you've moved from "AI is magic" to "AI is a specific, understandable technique" — exactly the shift Module 3 builds on next.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch5">0 / 3</div></div>
+        <div id="quiz-ch5"></div>
+        <div class="chapter-status" id="status-ch5"></div>
+      </div>
+    </section>
+
+    <!-- FINAL ASSESSMENT -->
+    <section class="chapter reveal" id="final">
+      <div class="final-assess">
+        <div class="final-head">
+          <div class="module-eyebrow">◆ Adaptive Assessment</div>
+          <h2>Module 2 Assessment</h2>
+          <p>Five synthesis questions, one per chapter. Your result adapts to your whole session — chapters where you struggled above get flagged for review here.</p>
+        </div>
+        <div id="quiz-final"></div>
+        <div class="result-panel" id="resultPanel">
+          <div class="result-top">
+            <div><div class="result-score" id="resultScore">0%</div><div class="quiz-score" id="resultDetail">0 / 5 correct</div></div>
+            <div class="result-badge" id="resultBadge"></div>
+          </div>
+          <div id="recommendWrap"></div>
+          <div class="result-actions">
+            <a href="qml-roadmap-landing-page.html#curriculum" class="btn btn-ghost">← Back to Curriculum</a>
+            <a href="#" class="btn btn-primary" id="continueBtn">Continue to Module 3 →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="module-nav" id="moduleNav"></div>
+  </main>
+</div>
+
+<script>
+let state = { xp:0, chapters:{
+  ch1:{correct:0,total:3,done:false}, ch2:{correct:0,total:3,done:false}, ch3:{correct:0,total:3,done:false},
+  ch4:{correct:0,total:3,done:false}, ch5:{correct:0,total:3,done:false}
+}, finalDone:false };
+try{ const saved = localStorage.getItem('qml_module2_state'); if(saved) state = JSON.parse(saved); }catch(e){}
+function saveState(){ try{ localStorage.setItem('qml_module2_state', JSON.stringify(state)); }catch(e){} }
+function addXP(n){ state.xp += n; document.getElementById('xpCount').textContent = state.xp; saveState(); }
+document.getElementById('xpCount').textContent = state.xp;
+
+/* CH1: rule ladder */
+(function(){
+  const ladder = document.getElementById('ruleLadder');
+  const heights = [16, 30, 52, 80, 118];
+  const labels = ['1 rule','5 rules','20 rules','80 rules','300+ rules'];
+  heights.forEach((h,i)=>{
+    const bar = document.createElement('div');
+    bar.className = 'ladder-bar';
+    bar.style.height = h+'px';
+    bar.innerHTML = '<span>'+labels[i]+'</span>';
+    ladder.appendChild(bar);
+  });
+})();
+
+/* CH5: ML applications flip grid */
+const mlAppsData = [
+  {en:'Supervised', name:'Spam Detection', desc:'Learns from emails already labeled spam or not-spam to classify new ones.'},
+  {en:'Unsupervised', name:'Customer Segmentation', desc:'Groups customers into natural clusters based on shopping behavior, with no labels given.'},
+  {en:'Reinforcement', name:'Game-Playing Agents', desc:'Learns winning strategies through trial, error, and reward over many games played.'},
+  {en:'Supervised', name:'Fraud Detection', desc:'Learns from many examples of known fraudulent vs. legitimate transactions.'},
+  {en:'Supervised', name:'Voice Assistants', desc:'Learns to map spoken audio to text from huge labeled speech datasets.'},
+  {en:'Unsupervised', name:'Anomaly Detection', desc:'Flags unusual patterns in network traffic without needing pre-labeled examples of every attack.'},
+  {en:'Supervised', name:'Medical Diagnosis Support', desc:'Learns from labeled medical images or records to flag likely conditions.'},
+  {en:'Reinforcement', name:'Robotics Control', desc:'Learns physical movements through repeated trial and reward in simulation or the real world.'}
+];
+(function(){
+  const grid = document.getElementById('mlAppsGrid');
+  mlAppsData.forEach(e=>{
+    const card = document.createElement('div');
+    card.className = 'enc-card';
+    card.innerHTML = '<div class="enc-inner">'
+      + '<div class="enc-face enc-front"><div class="en">'+e.en+'</div><h6>'+e.name+'</h6></div>'
+      + '<div class="enc-face enc-back">'+e.desc+'</div>'
+      + '</div>';
+    card.addEventListener('click', ()=>{ card.classList.toggle('flipped'); addXP(1); });
+    grid.appendChild(card);
+  });
+})();
+
+const quizzes = {
+  ch1: [
+    {q:"Why do rule-based systems struggle with tasks like spam detection?", opts:["Rules are illegal to write","Spammers and edge cases keep multiplying faster than rules can be written to cover them","Computers cannot run rules","Rule-based systems are always faster"], correct:1, explain:"Every new rule tends to spawn new ways around it, so the rule list never actually finishes."},
+    {q:"For what kind of task do traditional rule-based programs still work well?", opts:["Tasks with fixed, well-defined logic, like tax calculations","Recognizing images","Understanding natural language","Detecting novel fraud patterns"], correct:0, explain:"Fixed, well-defined logic is exactly where traditional programming still shines."},
+    {q:"What core limitation motivated the shift toward machine learning?", opts:["Programmers wanted less work","Some problems have no finite, hand-writable list of rules that actually works","Computers became too slow for rules","Rules are more accurate than learning"], correct:1, explain:"This is the chapter's central point — not laziness, but a genuine limit of the rule-based approach."}
+  ],
+  ch2: [
+    {q:"What is the core idea behind machine learning, per this chapter?", opts:["Writing more detailed rules than before","Learning patterns directly from labeled examples instead of hand-written rules","Avoiding data entirely","Randomly guessing until correct"], correct:1, explain:"Data replaces hand-written rules as the source of the pattern the system uses."},
+    {q:"What is a 'model' in this context?", opts:["A 3D printed object","The result of the learning process — a set of internal adjustments capturing the pattern found in data","A type of computer hardware","A fixed set of manual rules"], correct:1, explain:"The pipeline diagram above shows the model as the direct output of the learning algorithm step."},
+    {q:"What can a trained model do with brand-new data it has never seen?", opts:["Nothing at all","Make predictions, as long as the new data resembles what it was trained on","Only repeat its training data exactly","Delete the new data"], correct:1, explain:"Generalizing to new, similar data is the entire point of training a model."}
+  ],
+  ch3: [
+    {q:"What kind of data does supervised learning need?", opts:["No data at all","Labeled examples that already include the correct answer","Only images","Only numbers, never text"], correct:1, explain:"Supervised learning is defined by learning from labeled input-output pairs."},
+    {q:"What does unsupervised learning do differently?", opts:["It requires more labels than supervised learning","It finds hidden structure or groupings in data that has no labels at all","It only works on labeled data","It cannot find any patterns"], correct:1, explain:"Unsupervised learning is exactly for situations without labels, finding structure on its own."},
+    {q:"What distinguishes reinforcement learning from the other two types?", opts:["It requires labeled data exclusively","It learns through trial and error, guided by rewards and penalties over a sequence of actions","It never learns anything","It is identical to supervised learning"], correct:1, explain:"Reinforcement learning is defined by this reward-driven, trial-and-error learning loop."}
+  ],
+  ch4: [
+    {q:"Why is a train/test split an important step in the ML workflow?", opts:["It is not important at all","It holds back data the model never trains on, to check if it truly generalizes rather than memorizes","It makes training faster with no other purpose","It only matters for reinforcement learning"], correct:1, explain:"Testing on unseen data is the only honest way to check if a model actually learned a generalizable pattern."},
+    {q:"What typically takes more real-world time than many people expect in an ML project?", opts:["Nothing takes any real time","Data collection and preprocessing, since real-world data is often messy","Deployment, which is instantaneous","Evaluation, which never takes any time"], correct:1, explain:"Cleaning and preparing data is often the most time-consuming part of a real project."},
+    {q:"What happens at the 'deployment' stage?", opts:["The model is deleted","The trained, evaluated model is put to use on new, real-world data","The data collection stage restarts from scratch","Nothing happens at this stage"], correct:1, explain:"Deployment is where the model actually delivers value on live, real-world data."}
+  ],
+  ch5: [
+    {q:"What type of learning powers most fraud detection systems?", opts:["Unsupervised learning exclusively","Supervised learning, using many labeled examples of fraudulent and legitimate transactions","Reinforcement learning exclusively","No learning at all"], correct:1, explain:"Fraud detection is a classic supervised classification problem."},
+    {q:"What is a flagship example of reinforcement learning success mentioned in this chapter?", opts:["Spam filters","Game-playing agents that improve through trial, error, and reward","Basic calculators","Simple thermostats"], correct:1, explain:"Game-playing agents are one of reinforcement learning's most famous real-world successes."},
+    {q:"What shift does naming the ML type behind an application represent?", opts:["No meaningful shift at all","Moving from treating AI as magic to understanding it as a specific, learnable technique","Making the application less useful","Proving AI doesn't really work"], correct:1, explain:"This is the chapter's closing point — precise understanding replaces vague amazement."}
+  ]
+};
+const finalQuiz = [
+  {q:"Why did traditional rule-based programming struggle with tasks like spam detection?", opts:["Programmers were too lazy to write rules","The real-world patterns were too varied and constantly shifting for a finite rule list to cover", "Computers couldn't run enough rules","Rules are always more accurate than learning"], correct:1, explain:"Chapter 1's central point about rule explosion."},
+  {q:"What is the core mechanism behind machine learning?", opts:["Hand-writing more detailed rules","Learning patterns from data instead of following fixed, manually-written rules","Random guessing with no structure","Ignoring all data"], correct:1, explain:"Chapter 2's definition, illustrated by the core ML pipeline."},
+  {q:"What separates supervised, unsupervised, and reinforcement learning?", opts:["Nothing, they are identical","The kind of feedback available — labeled answers, no labels, or rewards over time","Only the size of the dataset","Only which programming language is used"], correct:1, explain:"Chapter 3's three-column comparison, defined by the type of feedback each uses."},
+  {q:"Why does the ML workflow include a train/test split?", opts:["To make the code look more complex","To check whether a model truly generalizes to new data rather than just memorizing training data","It has no real purpose","Only to slow down training"], correct:1, explain:"Chapter 4's key workflow step, essential for trustworthy results."},
+  {q:"What does naming the specific ML type behind a real-world application achieve?", opts:["Nothing useful","It replaces vague 'AI is magic' thinking with precise, mechanistic understanding","It makes the application stop working","It proves AI is fake"], correct:1, explain:"Chapter 5's closing point, and the mindset this whole course is built around."}
+];
+
+function renderQuiz(containerId, items, chapterKey){
+  const container = document.getElementById(containerId);
+  items.forEach((item, idx)=>{
+    const qDiv = document.createElement('div');
+    qDiv.className = 'q-item';
+    qDiv.innerHTML = '<div class="q-text">'+(idx+1)+'. '+item.q+'</div>'
+      + '<div class="q-options">'+item.opts.map((o,i)=>'<button class="q-opt" data-i="'+i+'">'+o+'</button>').join('')+'</div>'
+      + '<div class="q-explain">'+item.explain+'</div>';
+    container.appendChild(qDiv);
+    const buttons = qDiv.querySelectorAll('.q-opt');
+    const explainEl = qDiv.querySelector('.q-explain');
+    buttons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = parseInt(btn.dataset.i);
+        buttons.forEach(b=>b.disabled = true);
+        if(i === item.correct){
+          btn.classList.add('correct');
+          if(chapterKey) onCorrect(chapterKey); else onFinalAnswer(idx, true);
+        } else {
+          btn.classList.add('incorrect');
+          buttons[item.correct].classList.add('correct');
+          if(chapterKey) onIncorrect(chapterKey); else onFinalAnswer(idx, false);
+        }
+        explainEl.classList.add('show');
+      });
+    });
+  });
+}
+Object.keys(quizzes).forEach(key=>{ renderQuiz('quiz-'+key, quizzes[key], key); updateChapterScore(key); });
+renderQuiz('quiz-final', finalQuiz, null);
+
+function updateChapterScore(key){ document.getElementById('score-'+key).textContent = state.chapters[key].correct+' / '+state.chapters[key].total; }
+function onCorrect(key){ const s=state.chapters[key]; s.correct=Math.min(s.correct+1,s.total); addXP(10); checkChapterDone(key); updateChapterScore(key); saveState(); }
+function onIncorrect(key){ state.chapters[key].hadMiss=true; checkChapterDone(key); updateChapterScore(key); saveState(); }
+let answeredCount = { ch1:0, ch2:0, ch3:0, ch4:0, ch5:0 };
+function checkChapterDone(key){
+  answeredCount[key]++;
+  const s = state.chapters[key];
+  if(answeredCount[key] >= s.total){
+    s.done = true;
+    const dot = document.getElementById('dot-'+key), statusEl = document.getElementById('status-'+key);
+    statusEl.classList.add('show');
+    if(s.hadMiss){ dot.classList.add('warn'); statusEl.classList.add('review'); statusEl.innerHTML='\u26A0 Review suggested \u2014 you missed at least one question in this chapter.'; }
+    else { dot.classList.add('done'); statusEl.classList.add('mastered'); statusEl.innerHTML='\u2713 Mastered \u2014 perfect score on this chapter.'; addXP(15); }
+    saveState();
+  }
+}
+let finalAnswers = [];
+function onFinalAnswer(idx, correct){
+  finalAnswers[idx]=correct;
+  if(finalAnswers.filter(a=>a!==undefined).length === finalQuiz.length) showFinalResult();
+}
+function showFinalResult(){
+  const correctCount = finalAnswers.filter(a=>a===true).length;
+  const pct = Math.round((correctCount/finalQuiz.length)*100);
+  document.getElementById('resultScore').textContent = pct+'%';
+  document.getElementById('resultDetail').textContent = correctCount+' / '+finalQuiz.length+' correct';
+  const badge = document.getElementById('resultBadge');
+  const pass = pct >= 70;
+  badge.textContent = pass ? 'Passed' : 'Retry Recommended';
+  badge.className = 'result-badge ' + (pass ? 'pass' : 'retry');
+  addXP(correctCount*10 + (pass?25:0));
+  const weakChapters = Object.keys(state.chapters).filter(k => state.chapters[k].hadMiss);
+  const wrap = document.getElementById('recommendWrap');
+  if(weakChapters.length === 0 && pass){
+    wrap.innerHTML = '<div class="callout" style="margin-top:4px;"><b>Great work.</b> No flagged chapters and a passing score \u2014 you are ready for Module 3: Classical Machine Learning.</div>';
+  } else {
+    const names = { ch1:"Limitations of Traditional Programming", ch2:"What is Machine Learning?", ch3:"Types of Machine Learning", ch4:"ML Workflow", ch5:"Real-World Applications" };
+    let html = '<div class="visual-label" style="margin-top:18px;">Recommended Review</div><ul class="recommend-list">';
+    weakChapters.forEach(k=> html += '<li>\u21BA Revisit <b>'+names[k]+'</b> \u2014 a quick-check answer there was missed.</li>');
+    if(!pass){ html += '<li>\u21BA Your assessment score was below 70% \u2014 consider re-reading the callout boxes first.</li>'; }
+    html += '</ul>';
+    wrap.innerHTML = html;
+  }
+  document.getElementById('resultPanel').classList.add('show');
+  document.getElementById('dot-final').classList.add(pass ? 'done' : 'warn');
+  state.finalDone = true;
+  saveState();
+}
+
+const sections = document.querySelectorAll('.chapter');
+const sideLinks = document.querySelectorAll('.side-list a');
+const spyObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      sideLinks.forEach(a=>a.classList.remove('active'));
+      const link = document.querySelector('.side-list a[data-target="'+entry.target.id+'"]');
+      if(link) link.classList.add('active');
+    }
+  });
+},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>spyObserver.observe(s));
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  document.getElementById('progressFill').style.width = ((h.scrollTop)/(h.scrollHeight-h.clientHeight)*100)+'%';
+});
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }); },{threshold:0.08});
+revealEls.forEach(el=>io.observe(el));
+
+(function(){
+  const { prev, next } = qmlGetAdjacentModules(2);
+  const wrap = document.getElementById('moduleNav');
+  function cardHTML(mod, dir){
+    if(!mod) return '<div class="mn-card disabled '+dir+'"><span class="mn-eyebrow">'+(dir==='next'?'Up Next':'Previous')+'</span><span class="mn-title">\u2014 none \u2014</span></div>';
+    const available = !!mod.file;
+    const arrow = dir==='prev' ? '\u2190 ' : ''; const arrowEnd = dir==='next' ? ' \u2192' : '';
+    const eyebrow = (dir==='prev' ? 'Previous \u2014 Module '+mod.id : 'Up Next \u2014 Module '+mod.id) + (available ? '' : ' (Coming Soon)');
+    if(available) return '<a class="mn-card enabled '+dir+'" href="'+mod.file+'"><span class="mn-eyebrow">'+eyebrow+'</span><span class="mn-title">'+arrow+mod.title+arrowEnd+'</span><span class="mn-arrow">Open tutorial</span></a>';
+    return '<div class="mn-card disabled '+dir+'"><span class="mn-eyebrow">'+eyebrow+'</span><span class="mn-title">'+mod.title+'</span><span class="mn-arrow">Not published yet</span></div>';
+  }
+  wrap.innerHTML = cardHTML(prev,'prev') + cardHTML(next,'next');
+  const continueBtn = document.getElementById('continueBtn');
+  if(continueBtn){
+    if(next && next.file){ continueBtn.href = next.file; continueBtn.textContent = 'Continue to Module '+next.id+' \u2192'; }
+    else if(next){ continueBtn.href = 'qml-roadmap-landing-page.html#curriculum'; continueBtn.textContent = 'Module '+next.id+' — Coming Soon'; continueBtn.style.opacity='0.6'; }
+  }
+})();
+</script>
+
+</body>
+</html>

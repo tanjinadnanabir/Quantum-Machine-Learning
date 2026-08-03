@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 3 — Classical Machine Learning | QML Curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="modules-registry.js"></script>
+<style>
+:root{
+  --bg:#070b14; --bg-2:#0b111f; --panel:#0e1526; --panel-2:#101a2e;
+  --line:rgba(148,178,224,0.14); --line-strong:rgba(148,178,224,0.28);
+  --ink:#e9eef8; --ink-dim:#9fb0c9; --ink-faint:#5f7089;
+  --cyan:#5ad1e6; --cyan-dim:rgba(90,209,230,0.14);
+  --violet:#b39bff; --violet-dim:rgba(179,155,255,0.14);
+  --amber:#f2a341; --amber-dim:rgba(242,163,65,0.14);
+  --green:#5ee6a0; --green-dim:rgba(94,230,160,0.14);
+  --red:#f2726a; --red-dim:rgba(242,114,106,0.14);
+  --blue:#4fa3f7;
+  --serif:'Fraunces', Georgia, serif; --sans:'Inter', -apple-system, sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.7;}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto !important;}}
+.progress-rail{position:fixed; top:0; left:0; right:0; height:3px; background:var(--line); z-index:100;}
+.progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--violet),var(--amber)); transition:width .1s linear;}
+header{position:sticky; top:3px; z-index:60; backdrop-filter:blur(14px); background:rgba(7,11,20,0.82); border-bottom:1px solid var(--line);}
+.nav-wrap{max-width:1280px; margin:0 auto; padding:14px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+.back-link{display:flex; align-items:center; gap:8px; color:var(--ink-dim); text-decoration:none; font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; transition:color .2s;}
+.back-link:hover{color:var(--cyan);}
+.crumb{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); letter-spacing:0.06em; text-transform:uppercase;}
+.crumb b{color:var(--cyan);}
+.xp-badge{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12.5px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; color:var(--amber); background:var(--amber-dim);}
+.layout{max-width:1280px; margin:0 auto; padding:52px 32px 120px; display:grid; grid-template-columns:260px 1fr; gap:56px;}
+.sidebar{position:sticky; top:80px; align-self:start; height:fit-content; max-height:calc(100vh - 100px); overflow-y:auto;}
+.side-title{font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;}
+.side-list{list-style:none; display:flex; flex-direction:column; gap:1px;}
+.side-list a{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink-dim); font-size:12.5px; padding:8px 12px; border-radius:8px; border-left:2px solid transparent; transition:background .2s, color .2s, border-color .2s;}
+.side-list a:hover{background:var(--panel);}
+.side-list a.active{color:var(--ink); background:var(--panel); border-left-color:var(--cyan);}
+.side-dot{width:7px; height:7px; border-radius:50%; background:#2a3550; flex-shrink:0; transition:background .3s;}
+.side-dot.done{background:var(--green); box-shadow:0 0 6px var(--green);}
+.side-dot.warn{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+.tut-hero{margin-bottom:44px;}
+.module-eyebrow{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--cyan); background:var(--cyan-dim); margin-bottom:20px;}
+.tut-hero h1{font-family:var(--serif); font-weight:600; font-size:clamp(30px,4vw,44px); line-height:1.1; letter-spacing:-0.01em;}
+.tut-hero p.lede{margin-top:16px; color:var(--ink-dim); font-size:16px; max-width:660px;}
+.chip-row{display:flex; gap:8px; margin-top:22px; flex-wrap:wrap;}
+.chip{font-family:var(--mono); font-size:10.5px; letter-spacing:0.04em; color:var(--ink-faint); border:1px solid var(--line); padding:5px 11px; border-radius:100px;}
+.character-card{margin-top:28px; display:flex; gap:18px; align-items:center; padding:20px 22px; background:linear-gradient(120deg, rgba(90,209,230,0.08), rgba(179,155,255,0.05)); border:1px solid var(--line-strong); border-radius:14px;}
+.avatar-ring{width:56px; height:56px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1.5px solid var(--cyan); font-family:var(--serif); font-size:22px; color:var(--cyan);}
+.character-card .cname{font-weight:700; font-size:14.5px; color:var(--ink);}
+.character-card .crole{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:2px;}
+.character-card p{font-size:13.5px; color:var(--ink-dim); margin-top:6px;}
+.chapter{margin-bottom:80px; scroll-margin-top:90px;}
+.chapter-head{display:flex; align-items:center; gap:14px; margin-bottom:20px;}
+.chapter-icon{width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1px solid var(--line-strong); font-size:18px; color:var(--cyan); flex-shrink:0;}
+.chapter-num{font-family:var(--mono); font-size:12px; color:var(--ink-faint); letter-spacing:0.08em; display:block;}
+.chapter h2{font-family:var(--serif); font-weight:600; font-size:clamp(22px,2.6vw,29px); letter-spacing:-0.01em;}
+.story-panel{position:relative; margin:16px 0 22px; padding:18px 22px 18px 48px; border-radius:12px; background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--cyan); font-family:var(--serif); font-style:italic; font-size:14.5px; color:var(--ink-dim); line-height:1.65;}
+.story-panel::before{content:'\201C'; position:absolute; left:14px; top:6px; font-size:32px; color:var(--cyan); font-style:normal; opacity:0.6;}
+.story-panel b{color:var(--ink); font-style:normal;}
+.chapter > p.body-text{color:var(--ink-dim); font-size:14.5px; margin-bottom:14px;}
+.chapter > p.body-text b{color:var(--ink); font-weight:600;}
+.chapter ul.points{margin:14px 0 18px 0; padding-left:0; list-style:none; display:flex; flex-direction:column; gap:9px;}
+.chapter ul.points li{display:flex; gap:10px; font-size:13.5px; color:var(--ink-dim); padding:11px 13px; background:var(--panel); border:1px solid var(--line); border-radius:10px;}
+.chapter ul.points li::before{content:'\25C6'; color:var(--cyan); font-size:8px; margin-top:5px; flex-shrink:0;}
+.callout{margin:18px 0; padding:14px 16px; border-radius:10px; border-left:3px solid var(--violet); background:var(--violet-dim); font-size:13px; color:var(--ink-dim);}
+.callout b{color:var(--ink);}
+.visual-box{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px; margin:20px 0; overflow-x:auto;}
+.visual-label{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+.toggle-btn{font-family:var(--mono); font-size:11px; letter-spacing:0.05em; text-transform:uppercase; padding:8px 16px; border-radius:100px; border:1px solid var(--line-strong); background:transparent; color:var(--ink-dim); cursor:pointer; transition:all .2s;}
+.toggle-btn.active{color:var(--cyan); border-color:var(--cyan); background:var(--cyan-dim);}
+.toggle-btn:disabled{opacity:0.5; cursor:default;}
+.ctrl-row{display:flex; align-items:center; gap:14px; margin-bottom:14px; flex-wrap:wrap;}
+.ctrl-row label{font-family:var(--mono); font-size:11.5px; color:var(--ink-dim); min-width:60px;}
+.ctrl-row input[type=range]{width:160px; accent-color:var(--cyan);}
+.ctrl-readout{font-family:var(--mono); font-size:12px; color:var(--cyan); min-width:40px; display:inline-block;}
+.center-svg{display:flex; justify-content:center;}
+.readout-line{text-align:center; margin-top:10px; font-family:var(--mono); font-size:12px; color:var(--ink-dim);}
+
+/* flip-card grid (reused) */
+.encoding-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+.enc-card{perspective:1000px; height:110px; cursor:pointer;}
+.enc-inner{position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d;}
+.enc-card.flipped .enc-inner{transform:rotateY(180deg);}
+.enc-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; padding:13px; display:flex; flex-direction:column; justify-content:center; border:1px solid var(--line-strong);}
+.enc-front{background:var(--panel-2);}
+.enc-front .en{font-family:var(--mono); font-size:9.5px; color:var(--ink-faint); margin-bottom:4px;}
+.enc-front h6{font-size:12px; font-weight:700; color:var(--ink);}
+.enc-back{background:var(--panel); transform:rotateY(180deg); font-size:10.5px; color:var(--ink-dim); line-height:1.5;}
+@media (max-width:760px){.encoding-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:480px){.encoding-grid{grid-template-columns:1fr;}}
+
+/* loop diagram */
+.loop-node{fill:var(--panel-2); stroke:var(--line-strong); stroke-width:1.4;}
+.loop-text{font-family:var(--mono); font-size:10.5px; fill:var(--ink-dim);}
+.loop-arrow{stroke:var(--ink-faint); stroke-width:1.4; fill:none;}
+.loop-pulse{fill:var(--cyan); filter:drop-shadow(0 0 5px var(--cyan));}
+
+/* tree diagram */
+.tree-node{fill:var(--panel-2); stroke:var(--line-strong); stroke-width:1.4;}
+.tree-node.lit{stroke:var(--cyan); fill:var(--cyan-dim);}
+.tree-edge{stroke:var(--line-strong); stroke-width:1.4;}
+.tree-edge.lit{stroke:var(--cyan); stroke-width:2;}
+.tree-btns{display:flex; gap:8px; justify-content:center; margin-bottom:14px; flex-wrap:wrap;}
+
+/* forest grid */
+.forest-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:10px;}
+@media (max-width:600px){.forest-grid{grid-template-columns:repeat(3,1fr);}}
+.tree-vote{background:var(--panel-2); border:1px solid var(--line-strong); border-radius:10px; padding:14px 8px; text-align:center;}
+.tree-vote .ticon{font-size:22px; color:var(--green);}
+.tree-vote.no .ticon{color:var(--red);}
+.tree-vote .tvote{font-family:var(--mono); font-size:10px; margin-top:6px; color:var(--ink-dim);}
+.forest-result{margin-top:14px; text-align:center; font-family:var(--mono); font-size:13px; color:var(--ink);}
+
+/* quiz (shared) */
+.quiz-box{margin-top:24px; background:var(--panel); border:1px solid var(--line-strong); border-radius:14px; padding:22px;}
+.quiz-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
+.quiz-title{font-family:var(--mono); font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--cyan); display:flex; align-items:center; gap:8px;}
+.quiz-score{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);}
+.q-item{margin-bottom:20px;}
+.q-item:last-child{margin-bottom:0;}
+.q-text{font-size:13.5px; font-weight:600; margin-bottom:10px; color:var(--ink);}
+.q-options{display:flex; flex-direction:column; gap:7px;}
+.q-opt{text-align:left; padding:10px 13px; border-radius:9px; border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-dim); font-size:12.5px; cursor:pointer; transition:border-color .2s, background .2s, color .2s; font-family:var(--sans);}
+.q-opt:hover:not(:disabled){border-color:var(--ink-dim); color:var(--ink);}
+.q-opt.correct{border-color:var(--green); background:var(--green-dim); color:var(--green);}
+.q-opt.incorrect{border-color:var(--red); background:var(--red-dim); color:var(--red);}
+.q-opt:disabled{cursor:default;}
+.q-explain{margin-top:9px; font-size:12px; color:var(--ink-dim); padding:10px 13px; border-radius:8px; background:var(--panel-2); border-left:2px solid var(--cyan); display:none;}
+.q-explain.show{display:block;}
+.chapter-status{margin-top:14px; padding:9px 13px; border-radius:8px; font-family:var(--mono); font-size:11px; display:none; align-items:center; gap:8px;}
+.chapter-status.show{display:flex;}
+.chapter-status.mastered{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.35);}
+.chapter-status.review{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.35);}
+.final-assess{margin-top:20px; background:linear-gradient(180deg,var(--panel-2),var(--panel)); border:1px solid var(--line-strong); border-radius:16px; padding:34px;}
+.final-head{margin-bottom:26px;}
+.final-head .module-eyebrow{color:var(--amber); border-color:var(--line-strong); background:var(--amber-dim);}
+.final-head h2{font-family:var(--serif); font-size:clamp(26px,3vw,34px); font-weight:600;}
+.final-head p{color:var(--ink-dim); margin-top:10px; font-size:14.5px;}
+.result-panel{margin-top:28px; padding:24px; border-radius:12px; border:1px solid var(--line-strong); background:var(--bg); display:none;}
+.result-panel.show{display:block;}
+.result-top{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:18px;}
+.result-score{font-family:var(--serif); font-size:44px; font-weight:600;}
+.result-badge{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; padding:6px 14px; border-radius:100px;}
+.result-badge.pass{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.4);}
+.result-badge.retry{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.4);}
+.recommend-list{list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+.recommend-list li{font-size:13px; color:var(--ink-dim); padding:10px 12px; background:var(--panel-2); border-radius:8px; border:1px solid var(--line);}
+.result-actions{display:flex; gap:12px; margin-top:22px; flex-wrap:wrap;}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:9px; font-size:13.5px; font-weight:600; text-decoration:none; cursor:pointer; border:1px solid transparent; transition:transform .2s, box-shadow .2s;}
+.btn-primary{background:var(--blue); color:#04101f;}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 26px -8px rgba(79,163,247,0.5);}
+.btn-ghost{background:transparent; border-color:var(--line-strong); color:var(--ink);}
+.btn-ghost:hover{border-color:var(--ink-dim); transform:translateY(-2px);}
+.reveal{opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease;}
+.reveal.in{opacity:1; transform:translateY(0);}
+.module-nav{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:70px; padding-top:36px; border-top:1px solid var(--line);}
+.mn-card{display:flex; flex-direction:column; gap:6px; padding:20px 22px; border-radius:14px; background:var(--panel); border:1px solid var(--line); text-decoration:none; transition:border-color .25s, transform .25s;}
+.mn-card.enabled:hover{border-color:var(--line-strong); transform:translateY(-3px);}
+.mn-card.disabled{opacity:0.5; cursor:default;}
+.mn-card.next{align-items:flex-end; text-align:right;}
+.mn-eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint);}
+.mn-title{font-family:var(--serif); font-size:16px; font-weight:600; color:var(--ink);}
+.mn-arrow{font-family:var(--mono); font-size:12px; color:var(--cyan);}
+@media (max-width:700px){.module-nav{grid-template-columns:1fr;}}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static; display:flex; overflow-x:auto; gap:4px; padding-bottom:10px; max-height:none;}
+  .side-list{flex-direction:row;}
+  .side-list a{white-space:nowrap;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-rail"><div class="progress-fill" id="progressFill"></div></div>
+
+<header>
+  <div class="nav-wrap">
+    <a class="back-link" href="qml-roadmap-landing-page.html#curriculum">← Back to Curriculum</a>
+    <div class="crumb">LEVEL 1 · BEGINNER — <b>MODULE 3</b></div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a class="back-link" href="progress-hub.html">My Progress</a>
+      <div class="xp-badge">⚡ <span id="xpCount">0</span> XP</div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="side-title">Module 3 Chapters</div>
+    <ul class="side-list" id="sideList">
+      <li><a href="#ch1" data-target="ch1"><span class="side-dot" id="dot-ch1"></span>Supervised Learning</a></li>
+      <li><a href="#ch2" data-target="ch2"><span class="side-dot" id="dot-ch2"></span>Unsupervised Learning</a></li>
+      <li><a href="#ch3" data-target="ch3"><span class="side-dot" id="dot-ch3"></span>Reinforcement Learning</a></li>
+      <li><a href="#ch4" data-target="ch4"><span class="side-dot" id="dot-ch4"></span>Regression</a></li>
+      <li><a href="#ch5" data-target="ch5"><span class="side-dot" id="dot-ch5"></span>Classification</a></li>
+      <li><a href="#ch6" data-target="ch6"><span class="side-dot" id="dot-ch6"></span>Decision Trees</a></li>
+      <li><a href="#ch7" data-target="ch7"><span class="side-dot" id="dot-ch7"></span>Random Forest</a></li>
+      <li><a href="#ch8" data-target="ch8"><span class="side-dot" id="dot-ch8"></span>Support Vector Machine</a></li>
+      <li><a href="#ch9" data-target="ch9"><span class="side-dot" id="dot-ch9"></span>Neural Networks</a></li>
+      <li><a href="#ch10" data-target="ch10"><span class="side-dot" id="dot-ch10"></span>Deep Learning</a></li>
+      <li><a href="#final" data-target="final"><span class="side-dot" id="dot-final"></span>Module Assessment</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <div class="tut-hero reveal">
+      <div class="module-eyebrow">◆ Module 3 · Beginner</div>
+      <h1>Classical Machine Learning</h1>
+      <p class="lede">Module 2 named the three types of learning. This module actually opens each one up — ten real techniques, from a single decision tree to deep neural networks, each with something you can click, drag, or run yourself.</p>
+      <div class="chip-row">
+        <span class="chip">10 Chapters</span>
+        <span class="chip">2 Real Computed Algorithms</span>
+        <span class="chip">30 Quick-Check Questions</span>
+        <span class="chip">1 Adaptive Assessment</span>
+        <span class="chip">~65 min</span>
+      </div>
+      <div class="character-card">
+        <div class="avatar-ring">A</div>
+        <div>
+          <div class="cname">Alex, continued</div>
+          <div class="crole">Curious Beginner · The Toolbox Opens</div>
+          <p>Alex knows the three big categories now. Today's the day each one gets a real face — starting with the most common one of all.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CH1: SUPERVISED LEARNING -->
+    <section class="chapter reveal" id="ch1">
+      <div class="chapter-head"><div class="chapter-icon">✓</div><div><span class="chapter-num">CHAPTER 01</span><h2>Supervised Learning</h2></div></div>
+      <div class="story-panel">"Most of what you'll learn in this module," the friend says, "is a flavor of supervised learning." Show the system enough examples with correct answers attached, and it learns the mapping from input to output well enough to guess correctly on new inputs.</div>
+      <p class="body-text">In supervised learning, every training example is a pair: <b>features</b> (the input data) and a <b>label</b> (the correct answer). The model's whole job during training is to get better and better at predicting the label from the features.</p>
+      <div class="visual-box">
+        <div class="visual-label">A Labeled Training Example</div>
+        <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
+          <div style="background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:14px 18px; font-family:var(--mono); font-size:12.5px;">
+            <div style="color:var(--ink-faint); font-size:10px; text-transform:uppercase;">Features</div>
+            house size: 1800 sqft<br>bedrooms: 3<br>location score: 7.2
+          </div>
+          <div style="display:flex; align-items:center; color:var(--cyan); font-size:20px;">→</div>
+          <div style="background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:14px 18px; font-family:var(--mono); font-size:12.5px;">
+            <div style="color:var(--ink-faint); font-size:10px; text-transform:uppercase;">Label</div>
+            sale price: $312,000
+          </div>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>Every supervised example</b> pairs input features with the correct output — this pairing is what "supervises" the learning.</li>
+        <li>Two main tasks fall under supervised learning, covered next: <b>regression</b> (predicting a number) and <b>classification</b> (predicting a category).</li>
+        <li>Every algorithm from Chapter 6 onward — decision trees, random forests, SVMs, neural networks — can be used in a supervised way.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> If your data comes with "correct answers" already attached, you're in supervised learning territory — the rest of this module is mostly variations on this one theme.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch1">0 / 3</div></div><div id="quiz-ch1"></div><div class="chapter-status" id="status-ch1"></div></div>
+    </section>
+
+    <!-- CH2: UNSUPERVISED LEARNING -->
+    <section class="chapter reveal" id="ch2">
+      <div class="chapter-head"><div class="chapter-icon">◈</div><div><span class="chapter-num">CHAPTER 02</span><h2>Unsupervised Learning</h2></div></div>
+      <div class="story-panel">"Now take away the labels entirely," the friend says. "No correct answers, no supervision — just a pile of data, and the question: does this data have any natural structure at all?"</div>
+      <p class="body-text">The scatter of dots below has no labels. Click the button and watch a real <b>k-means clustering</b> algorithm — the same kind used in customer segmentation — discover the groups on its own, live.</p>
+      <div class="visual-box">
+        <div class="visual-label">Live K-Means Clustering <button class="toggle-btn active" id="runClusterBtn" onclick="runClustering()">▶ Run Clustering</button></div>
+        <div class="center-svg"><svg viewBox="0 0 300 200" width="300" height="200" id="clusterSvg"></svg></div>
+        <div class="readout-line" id="clusterReadout">Ungrouped data — click Run Clustering to find structure.</div>
+      </div>
+      <ul class="points">
+        <li><b>Clustering</b> groups similar data points together based purely on their features — no labels required.</li>
+        <li>The algorithm you just ran assigns each point to its nearest cluster center, then moves each center to the average of its assigned points, repeating until stable.</li>
+        <li><b>Real use case:</b> grouping customers into natural shopping segments without anyone manually labeling a single customer.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Unsupervised learning answers a different question than supervised learning — not "what's the right answer," but "is there a pattern here at all?"</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch2">0 / 3</div></div><div id="quiz-ch2"></div><div class="chapter-status" id="status-ch2"></div></div>
+    </section>
+
+    <!-- CH3: REINFORCEMENT LEARNING -->
+    <section class="chapter reveal" id="ch3">
+      <div class="chapter-head"><div class="chapter-icon">⟲</div><div><span class="chapter-num">CHAPTER 03</span><h2>Reinforcement Learning</h2></div></div>
+      <div class="story-panel">"Neither of the first two fits a game-playing AI," the friend points out. "There's no fixed 'correct move' label, and it's not just finding clusters. It's learning by <i>doing</i> — and getting better because doing badly hurts."</div>
+      <p class="body-text">An <b>agent</b> takes actions in an <b>environment</b>, receives a <b>reward</b> (or penalty) for each action, and gradually learns which actions lead to better long-term outcomes.</p>
+      <div class="visual-box">
+        <div class="visual-label">The Agent-Environment Loop</div>
+        <div class="center-svg">
+          <svg viewBox="0 0 400 170" width="400">
+            <defs><marker id="arrow3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L6,3 L0,6 Z" fill="#5f7089"/></marker></defs>
+            <rect class="loop-node" x="20" y="60" width="120" height="50" rx="10"/>
+            <text class="loop-text" x="45" y="90">Agent</text>
+            <rect class="loop-node" x="260" y="60" width="120" height="50" rx="10"/>
+            <text class="loop-text" x="280" y="90">Environment</text>
+            <path class="loop-arrow" d="M140,75 L260,75" marker-end="url(#arrow3)"/><text class="loop-text" x="165" y="67">action</text>
+            <path class="loop-arrow" d="M260,97 L140,97" marker-end="url(#arrow3)"/><text class="loop-text" x="168" y="120">reward + new state</text>
+            <circle class="loop-pulse" r="4"><animateMotion dur="2.2s" repeatCount="indefinite" path="M140,75 L260,75"/></circle>
+            <circle class="loop-pulse" r="4"><animateMotion dur="2.2s" repeatCount="indefinite" begin="1.1s" path="M260,97 L140,97"/></circle>
+          </svg>
+        </div>
+        <div class="readout-line">Average reward per episode, over training \u2014 illustrative</div>
+        <div class="center-svg">
+          <svg viewBox="0 0 360 100" width="360" height="100">
+            <line x1="10" y1="90" x2="350" y2="90" stroke="var(--line)" stroke-width="1"/>
+            <line x1="10" y1="10" x2="10" y2="90" stroke="var(--line)" stroke-width="1"/>
+            <path d="M10,85 Q100,80 150,55 T280,20 T340,12" fill="none" stroke="var(--cyan)" stroke-width="2.2"/>
+            <text x="14" y="24" font-family="JetBrains Mono" font-size="9" fill="#5f7089">reward</text>
+            <text x="290" y="98" font-family="JetBrains Mono" font-size="9" fill="#5f7089">episodes \u2192</text>
+          </svg>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>No labels, no fixed dataset</b> — the agent generates its own experience by acting and observing what happens.</li>
+        <li><b>Reward shapes behavior</b> gradually: actions that lead to higher reward get reinforced over many repeated attempts.</li>
+        <li><b>Real use cases:</b> game-playing agents, robotics control, and resource management systems that improve through repeated trials.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Reinforcement learning trades labeled examples for lived experience — the "right answer" is discovered through consequences, not handed over in advance.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch3">0 / 3</div></div><div id="quiz-ch3"></div><div class="chapter-status" id="status-ch3"></div></div>
+    </section>
+
+    <!-- CH4: REGRESSION -->
+    <section class="chapter reveal" id="ch4">
+      <div class="chapter-head"><div class="chapter-icon">↗</div><div><span class="chapter-num">CHAPTER 04</span><h2>Regression</h2></div></div>
+      <div class="story-panel">"First real supervised technique," the friend says, sliding over a scatter of dots. "Your job: draw the line that best fits these points." Alex reaches for the sliders.</div>
+      <p class="body-text"><b>Regression</b> predicts a continuous number, like a price or a temperature. The simplest version, <b>linear regression</b>, just fits the straight line that minimizes the total prediction error across all the data points. Try it yourself, then let the computer do it properly.</p>
+      <div class="visual-box">
+        <div class="visual-label">Fit a Line to the Data</div>
+        <div class="ctrl-row">
+          <label>slope</label><input type="range" id="slopeSlider" min="-10" max="60" value="10" step="1"><span class="ctrl-readout" id="slopeVal">1.0</span>
+          <label>intercept</label><input type="range" id="interceptSlider" min="-50" max="150" value="30" step="1"><span class="ctrl-readout" id="interceptVal">3</span>
+          <button class="toggle-btn active" id="fitBestBtn" onclick="fitBestLine()">Fit Best Line</button>
+        </div>
+        <div class="center-svg"><svg viewBox="0 0 340 200" width="340" height="200" id="regressionSvg"></svg></div>
+        <div class="readout-line" id="regressionReadout">Total squared error: \u2014</div>
+      </div>
+      <ul class="points">
+        <li><b>Smaller total error means a better fit</b> — the "Fit Best Line" button uses real least-squares math to find the minimum, not a guess.</li>
+        <li><b>Regression predicts a number</b>, not a category — house prices, temperatures, stock values, exam scores.</li>
+        <li>Many algorithms later in this course (including some quantum ones in Module 9) can be used for regression, not just classification.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> "Best fit" has a precise mathematical meaning — the line that minimizes total squared error — not just a line that looks about right.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch4">0 / 3</div></div><div id="quiz-ch4"></div><div class="chapter-status" id="status-ch4"></div></div>
+    </section>
+
+    <!-- CH5: CLASSIFICATION -->
+    <section class="chapter reveal" id="ch5">
+      <div class="chapter-head"><div class="chapter-icon">◐</div><div><span class="chapter-num">CHAPTER 05</span><h2>Classification</h2></div></div>
+      <div class="story-panel">"Same setup," the friend says, "different question. Instead of predicting a number, predict which of two groups a point belongs to." Two colors of dots appear, tangled together in the middle.</div>
+      <p class="body-text"><b>Classification</b> predicts a category instead of a number — spam or not spam, cat or dog, malicious or benign. Drag the slider to move the <b>decision boundary</b> and watch accuracy change live.</p>
+      <div class="visual-box">
+        <div class="visual-label">Find the Best Decision Boundary</div>
+        <div class="ctrl-row"><label>boundary</label><input type="range" id="boundarySlider" min="0" max="100" value="50"><span class="ctrl-readout" id="boundaryVal">50</span></div>
+        <div class="center-svg"><svg viewBox="0 0 300 200" width="300" height="200" id="classifySvg"></svg></div>
+        <div class="readout-line" id="classifyReadout">Accuracy: \u2014</div>
+      </div>
+      <ul class="points">
+        <li><b>The decision boundary</b> is the line a classifier uses to separate predicted classes — everything on one side gets one label, the other side gets the other.</li>
+        <li><b>Accuracy</b> measures the percentage of points correctly classified by a given boundary position.</li>
+        <li>Real classifiers (Decision Trees, SVMs, Neural Networks — all coming up) learn this boundary automatically from training data, instead of a human dragging a slider.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Every classification algorithm in this module is, underneath, searching for a good decision boundary — they just search for it in very different ways.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch5">0 / 3</div></div><div id="quiz-ch5"></div><div class="chapter-status" id="status-ch5"></div></div>
+    </section>
+
+    <!-- CH6: DECISION TREES -->
+    <section class="chapter reveal" id="ch6">
+      <div class="chapter-head"><div class="chapter-icon">▽</div><div><span class="chapter-num">CHAPTER 06</span><h2>Decision Trees</h2></div></div>
+      <div class="story-panel">"Here's an algorithm you already use," the friend says, "every time you decide whether to bring an umbrella." A decision tree is just a flowchart of yes/no questions, learned automatically from data instead of written by hand.</div>
+      <p class="body-text">Click through the questions below and watch the path light up to a final decision.</p>
+      <div class="visual-box">
+        <div class="visual-label">Walk Through a Decision Tree</div>
+        <div class="tree-btns" id="treeBtns"></div>
+        <div class="center-svg"><svg viewBox="0 0 360 190" width="360" id="treeSvg"></svg></div>
+        <div class="readout-line" id="treeReadout">Answer the questions above to reach a decision.</div>
+      </div>
+      <ul class="points">
+        <li><b>Each internal node</b> asks a yes/no question about a feature; each <b>leaf</b> gives a final prediction.</li>
+        <li><b>Trees are trained by finding the questions</b> that best split the training data into purer, more homogeneous groups at each step.</li>
+        <li><b>Big advantage:</b> a trained tree's logic is easy for a human to read and explain, unlike many other algorithms in this module.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> A decision tree is basically a learned flowchart — readable by humans, and the building block for the more powerful technique in the next chapter.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch6">0 / 3</div></div><div id="quiz-ch6"></div><div class="chapter-status" id="status-ch6"></div></div>
+    </section>
+
+    <!-- CH7: RANDOM FOREST -->
+    <section class="chapter reveal" id="ch7">
+      <div class="chapter-head"><div class="chapter-icon">▦</div><div><span class="chapter-num">CHAPTER 07</span><h2>Random Forest</h2></div></div>
+      <div class="story-panel">"One tree can be wrong," the friend says. "Ask a hundred slightly different trees the same question and take a vote, and the mistakes tend to cancel out." That's the entire idea behind a random forest.</div>
+      <p class="body-text">A <b>random forest</b> trains many decision trees, each on a slightly different random slice of the data, then combines their predictions — typically by majority vote for classification.</p>
+      <div class="visual-box">
+        <div class="visual-label">Five Trees Vote <button class="toggle-btn active" onclick="rerollForest()">↺ Re-roll Votes</button></div>
+        <div class="forest-grid" id="forestGrid"></div>
+        <div class="forest-result" id="forestResult"></div>
+      </div>
+      <ul class="points">
+        <li><b>Diversity is the point</b> — each tree sees a different random slice of data, so their mistakes tend to be different too.</li>
+        <li><b>Majority vote (classification)</b> or <b>averaging (regression)</b> combines all the trees' outputs into one final, typically more reliable prediction.</li>
+        <li>Random forests are usually more accurate and more resistant to overfitting than any single decision tree alone.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> "Ask a crowd instead of one expert" is a surprisingly powerful and general idea — it shows up again later in this course as an ensemble technique.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch7">0 / 3</div></div><div id="quiz-ch7"></div><div class="chapter-status" id="status-ch7"></div></div>
+    </section>
+
+    <!-- CH8: SVM -->
+    <section class="chapter reveal" id="ch8">
+      <div class="chapter-head"><div class="chapter-icon">⊕</div><div><span class="chapter-num">CHAPTER 08</span><h2>Support Vector Machine</h2></div></div>
+      <div class="story-panel">"Classification chapter's slider found <i>a</i> good boundary," the friend says. "An SVM finds the boundary with maximum breathing room on both sides — the widest possible margin."</div>
+      <p class="body-text">A <b>Support Vector Machine (SVM)</b> doesn't just separate the classes — it maximizes the <b>margin</b>, the distance between the boundary and the closest point from each class. Those closest points are called <b>support vectors</b>, and they alone determine where the boundary sits.</p>
+      <div class="visual-box">
+        <div class="visual-label">Maximum Margin Boundary</div>
+        <div class="center-svg"><svg viewBox="0 0 300 200" width="300" height="200" id="svmSvg"></svg></div>
+        <div class="readout-line">Highlighted points = support vectors \u2014 they alone define the boundary's position.</div>
+      </div>
+      <ul class="points">
+        <li><b>A wider margin</b> tends to generalize better to new, unseen data than a boundary that barely squeezes between the classes.</li>
+        <li><b>Only the support vectors matter</b> for the final boundary — every other point could move slightly without changing it at all.</li>
+        <li>SVMs can also handle non-linearly-separable data using a technique called the "kernel trick" — the same underlying idea behind Module 9's quantum kernel methods.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Margin-maximizing isn't just a nice extra — it's a principled reason to prefer one valid boundary over another, and it will resurface almost word-for-word in Module 9's quantum kernel chapter.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch8">0 / 3</div></div><div id="quiz-ch8"></div><div class="chapter-status" id="status-ch8"></div></div>
+    </section>
+
+    <!-- CH9: NEURAL NETWORKS -->
+    <section class="chapter reveal" id="ch9">
+      <div class="chapter-head"><div class="chapter-icon">⌬</div><div><span class="chapter-num">CHAPTER 09</span><h2>Neural Networks</h2></div></div>
+      <div class="story-panel">"Loosely inspired by the brain," the friend says, "but don't take that too literally — it's really just layers of simple math functions, connected by adjustable numbers called weights." Click below and watch a signal move through one.</div>
+      <p class="body-text">A neural network is built from layers of <b>neurons</b>: an <b>input layer</b> (the raw features), one or more <b>hidden layers</b> (where the real computation happens), and an <b>output layer</b> (the final prediction). Every connection carries a <b>weight</b>, adjusted during training.</p>
+      <div class="visual-box">
+        <div class="visual-label">A Small Neural Network <button class="toggle-btn active" onclick="runForwardPass()">▶ Run Forward Pass</button></div>
+        <div class="center-svg"><svg viewBox="0 0 360 180" width="360" id="nnSvg"></svg></div>
+      </div>
+      <ul class="points">
+        <li><b>Weights are what gets learned</b> — training adjusts every connection's weight to reduce prediction error, usually via an algorithm called backpropagation.</li>
+        <li><b>Hidden layers</b> let the network build up increasingly abstract combinations of the input features.</li>
+        <li>Neural networks are extremely flexible and now the backbone of most modern AI — including the quantum neural networks in Module 9.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> A neural network is a general-purpose function approximator built from simple, repeated pieces — the complexity comes from how many pieces you stack, which is exactly next chapter's topic.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch9">0 / 3</div></div><div id="quiz-ch9"></div><div class="chapter-status" id="status-ch9"></div></div>
+    </section>
+
+    <!-- CH10: DEEP LEARNING -->
+    <section class="chapter reveal" id="ch10">
+      <div class="chapter-head"><div class="chapter-icon">〰</div><div><span class="chapter-num">CHAPTER 10</span><h2>Deep Learning</h2></div></div>
+      <div class="story-panel">Closing chapter. "One more slider," the friend says, "and it's the one that explains the last decade of AI progress." Drag it, and watch the network from last chapter grow noticeably deeper.</div>
+      <p class="body-text"><b>Deep learning</b> simply means a neural network with many hidden layers stacked between input and output. More layers can capture more abstract, complex patterns — at the cost of needing more data and more computing power to train well.</p>
+      <div class="visual-box">
+        <div class="visual-label">Shallow vs. Deep</div>
+        <div class="ctrl-row"><label>hidden layers</label><input type="range" id="depthSlider" min="1" max="4" value="1"><span class="ctrl-readout" id="depthVal">1</span></div>
+        <div class="center-svg"><svg viewBox="0 0 400 180" width="400" id="deepSvg"></svg></div>
+      </div>
+      <ul class="points">
+        <li><b>"Deep" just means more hidden layers</b> — not a different kind of algorithm, but a scaled-up version of last chapter's idea.</li>
+        <li><b>2012 onward</b> is when deep networks became practical, once enough labeled data and GPU computing power arrived at the same time.</li>
+        <li><b>The tradeoff:</b> deeper networks are often more powerful, but need more data, more compute, and more care to train without overfitting.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> This closes the loop on Module 1's history chapter — 2012's breakthrough was, mechanically, exactly this slider being pushed further than anyone had successfully managed before.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch10">0 / 3</div></div><div id="quiz-ch10"></div><div class="chapter-status" id="status-ch10"></div></div>
+    </section>
+
+    <!-- FINAL ASSESSMENT -->
+    <section class="chapter reveal" id="final">
+      <div class="final-assess">
+        <div class="final-head">
+          <div class="module-eyebrow">◆ Adaptive Assessment</div>
+          <h2>Module 3 Assessment</h2>
+          <p>Ten synthesis questions, one per chapter. Your result adapts to your whole session — chapters where you struggled above get flagged for review here.</p>
+        </div>
+        <div id="quiz-final"></div>
+        <div class="result-panel" id="resultPanel">
+          <div class="result-top">
+            <div><div class="result-score" id="resultScore">0%</div><div class="quiz-score" id="resultDetail">0 / 10 correct</div></div>
+            <div class="result-badge" id="resultBadge"></div>
+          </div>
+          <div id="recommendWrap"></div>
+          <div class="result-actions">
+            <a href="qml-roadmap-landing-page.html#curriculum" class="btn btn-ghost">← Back to Curriculum</a>
+            <a href="#" class="btn btn-primary" id="continueBtn">Continue to Module 4 →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="module-nav" id="moduleNav"></div>
+  </main>
+</div>
+
+<script>
+let state = { xp:0, chapters:{
+  ch1:{correct:0,total:3,done:false}, ch2:{correct:0,total:3,done:false}, ch3:{correct:0,total:3,done:false},
+  ch4:{correct:0,total:3,done:false}, ch5:{correct:0,total:3,done:false}, ch6:{correct:0,total:3,done:false},
+  ch7:{correct:0,total:3,done:false}, ch8:{correct:0,total:3,done:false}, ch9:{correct:0,total:3,done:false},
+  ch10:{correct:0,total:3,done:false}
+}, finalDone:false };
+try{ const saved = localStorage.getItem('qml_module3_state'); if(saved) state = JSON.parse(saved); }catch(e){}
+function saveState(){ try{ localStorage.setItem('qml_module3_state', JSON.stringify(state)); }catch(e){} }
+function addXP(n){ state.xp += n; document.getElementById('xpCount').textContent = state.xp; saveState(); }
+document.getElementById('xpCount').textContent = state.xp;
+
+/* ============ CH2: real k-means clustering ============ */
+const clusterPoints = [[40,40],[50,60],[30,50],[60,30],[44,56],[160,150],[170,140],[156,160],[180,130],[164,170],[36,70],[58,42],[152,148],[176,158]];
+function dist2(a,b){ return Math.sqrt((a[0]-b[0])**2+(a[1]-b[1])**2); }
+function drawClusters(assign, centroids){
+  const svg = document.getElementById('clusterSvg');
+  let html = '';
+  clusterPoints.forEach((p,i)=>{
+    const color = assign ? (assign[i]===0 ? 'var(--cyan)' : 'var(--violet)') : 'var(--ink-faint)';
+    html += '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="6" fill="'+color+'" opacity="0.85"/>';
+  });
+  if(centroids){
+    centroids.forEach((c,i)=>{
+      const color = i===0 ? 'var(--cyan)' : 'var(--violet)';
+      html += '<circle cx="'+c[0]+'" cy="'+c[1]+'" r="9" fill="none" stroke="'+color+'" stroke-width="2.5"/>';
+      html += '<line x1="'+(c[0]-6)+'" y1="'+c[1]+'" x2="'+(c[0]+6)+'" y2="'+c[1]+'" stroke="'+color+'" stroke-width="2"/>';
+      html += '<line x1="'+c[0]+'" y1="'+(c[1]-6)+'" x2="'+c[0]+'" y2="'+(c[1]+6)+'" stroke="'+color+'" stroke-width="2"/>';
+    });
+  }
+  svg.innerHTML = html;
+}
+drawClusters(null, null);
+function runClustering(){
+  const btn = document.getElementById('runClusterBtn');
+  btn.disabled = true;
+  let centroids = [[20,150],[180,30]];
+  let iter = 0;
+  function step(){
+    const assign = clusterPoints.map(p=> dist2(p,centroids[0]) < dist2(p,centroids[1]) ? 0 : 1);
+    for(let c=0;c<2;c++){
+      const grp = clusterPoints.filter((p,i)=>assign[i]===c);
+      if(grp.length) centroids[c] = [grp.reduce((s,p)=>s+p[0],0)/grp.length, grp.reduce((s,p)=>s+p[1],0)/grp.length];
+    }
+    drawClusters(assign, centroids);
+    iter++;
+    document.getElementById('clusterReadout').textContent = 'Iteration '+iter+' \u2014 centroids updating to the mean of their assigned points.';
+    if(iter < 5){ setTimeout(step, 500); }
+    else {
+      document.getElementById('clusterReadout').textContent = 'Converged after '+iter+' iterations \u2014 two clusters found with zero labels given.';
+      btn.disabled = false;
+      addXP(5);
+    }
+  }
+  step();
+}
+
+/* ============ CH4: real least-squares regression ============ */
+const regX = [1,2,3,4,5,6,7,8,9,10];
+const regY = [5.1,7.3,8.9,11.2,12.8,15.1,17.3,18.9,21.2,23.1];
+function regCoords(x,y){ return [20 + x*28, 180 - y*6.8]; }
+function drawRegression(m,b){
+  const svg = document.getElementById('regressionSvg');
+  let html = '<line x1="20" y1="180" x2="320" y2="180" stroke="var(--line-strong)" stroke-width="1"/><line x1="20" y1="10" x2="20" y2="180" stroke="var(--line-strong)" stroke-width="1"/>';
+  regX.forEach((x,i)=>{ const [px,py] = regCoords(x, regY[i]); html += '<circle cx="'+px+'" cy="'+py+'" r="4.5" fill="var(--amber)"/>'; });
+  const [x1p,y1p] = regCoords(0, b);
+  const [x2p,y2p] = regCoords(11, m*11+b);
+  html += '<line x1="'+x1p+'" y1="'+y1p+'" x2="'+x2p+'" y2="'+y2p+'" stroke="var(--cyan)" stroke-width="2.2"/>';
+  svg.innerHTML = html;
+  let sse = 0;
+  regX.forEach((x,i)=>{ const pred = m*x+b; sse += (pred-regY[i])**2; });
+  document.getElementById('regressionReadout').textContent = 'y = '+m.toFixed(2)+'x + '+b.toFixed(2)+' \u2014 total squared error: '+sse.toFixed(1);
+  return sse;
+}
+function updateRegressionFromSliders(){
+  const m = parseInt(document.getElementById('slopeSlider').value)/10;
+  const b = parseInt(document.getElementById('interceptSlider').value)/10;
+  document.getElementById('slopeVal').textContent = m.toFixed(1);
+  document.getElementById('interceptVal').textContent = b.toFixed(1);
+  drawRegression(m,b);
+}
+document.getElementById('slopeSlider').addEventListener('input', updateRegressionFromSliders);
+document.getElementById('interceptSlider').addEventListener('input', updateRegressionFromSliders);
+function fitBestLine(){
+  const n = regX.length;
+  const sx = regX.reduce((a,b)=>a+b,0), sy = regY.reduce((a,b)=>a+b,0);
+  const sxy = regX.reduce((s,x,i)=>s+x*regY[i],0), sxx = regX.reduce((s,x)=>s+x*x,0);
+  const m = (n*sxy - sx*sy) / (n*sxx - sx*sx);
+  const b = (sy - m*sx) / n;
+  document.getElementById('slopeSlider').value = Math.round(m*10);
+  document.getElementById('interceptSlider').value = Math.round(b*10);
+  document.getElementById('slopeVal').textContent = m.toFixed(2);
+  document.getElementById('interceptVal').textContent = b.toFixed(2);
+  drawRegression(m,b);
+  addXP(5);
+}
+updateRegressionFromSliders();
+
+/* ============ CH5: classification boundary ============ */
+const classPoints = [
+  [40,50,'A'],[60,40,'A'],[35,70,'A'],[55,65,'A'],[70,55,'A'],[45,80,'A'],[65,75,'A'],[50,90,'A'],
+  [200,120,'B'],[220,140,'B'],[190,150,'B'],[210,100,'B'],[230,130,'B'],[195,110,'B'],[215,155,'B'],[240,115,'B']
+];
+function drawClassify(boundaryPct){
+  const svg = document.getElementById('classifySvg');
+  const boundaryX = 20 + (boundaryPct/100)*260;
+  let html = '<line x1="'+boundaryX+'" y1="10" x2="'+boundaryX+'" y2="190" stroke="var(--cyan)" stroke-width="2" stroke-dasharray="5 4"/>';
+  let correct = 0;
+  classPoints.forEach(p=>{
+    const predictedA = p[0] < boundaryX;
+    const isCorrect = (predictedA && p[2]==='A') || (!predictedA && p[2]==='B');
+    if(isCorrect) correct++;
+    const color = p[2]==='A' ? 'var(--violet)' : 'var(--amber)';
+    html += '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="6" fill="'+color+'" opacity="'+(isCorrect?1:0.35)+'" stroke="'+(isCorrect?'none':'var(--red)')+'" stroke-width="1.5"/>';
+  });
+  svg.innerHTML = html;
+  const acc = (correct/classPoints.length*100).toFixed(0);
+  document.getElementById('classifyReadout').textContent = 'Accuracy: '+acc+'% ('+correct+' / '+classPoints.length+' correctly classified)';
+}
+document.getElementById('boundarySlider').addEventListener('input', (e)=>{
+  document.getElementById('boundaryVal').textContent = e.target.value;
+  drawClassify(parseInt(e.target.value));
+});
+drawClassify(50);
+
+/* ============ CH6: decision tree ============ */
+function buildTreeSvg(){
+  const svg = document.getElementById('treeSvg');
+  let html = '';
+  html += '<rect class="tree-node" id="tn-root" x="130" y="15" width="100" height="34" rx="8"/><text x="140" y="36" font-family="JetBrains Mono" font-size="10" fill="#e9eef8">Is it cloudy?</text>';
+  html += '<line class="tree-edge" id="te-0" x1="150" y1="49" x2="70" y2="95"/><line class="tree-edge" id="te-1" x1="210" y1="49" x2="290" y2="95"/>';
+  html += '<rect class="tree-node" id="tn-no" x="20" y="95" width="100" height="34" rx="8"/><text x="30" y="116" font-family="JetBrains Mono" font-size="10" fill="#e9eef8">No umbrella \u2601</text>';
+  html += '<rect class="tree-node" id="tn-q2" x="240" y="95" width="110" height="34" rx="8"/><text x="248" y="116" font-family="JetBrains Mono" font-size="9.5" fill="#e9eef8">High humidity?</text>';
+  html += '<line class="tree-edge" id="te-2" x1="260" y1="129" x2="230" y2="170"/><line class="tree-edge" id="te-3" x1="330" y1="129" x2="345" y2="170"/>';
+  html += '<rect class="tree-node" id="tn-yes" x="175" y="168" width="110" height="20" rx="6"/><text x="185" y="182" font-family="JetBrains Mono" font-size="9" fill="#e9eef8">Bring umbrella \u2614</text>';
+  html += '<rect class="tree-node" id="tn-maybe" x="290" y="168" width="60" height="20" rx="6"/><text x="296" y="182" font-family="JetBrains Mono" font-size="9" fill="#e9eef8">Maybe</text>';
+  svg.innerHTML = html;
+}
+buildTreeSvg();
+function treeAnswer(q, ans){
+  document.querySelectorAll('.tree-node, .tree-edge').forEach(el=>el.classList.remove('lit'));
+  document.getElementById('tn-root').classList.add('lit');
+  if(q===1){
+    if(!ans){
+      document.getElementById('te-0').classList.add('lit');
+      document.getElementById('tn-no').classList.add('lit');
+      document.getElementById('treeReadout').textContent = 'Result: No umbrella needed \u2014 reached in one question.';
+      document.getElementById('treeBtns').innerHTML = '<button class="toggle-btn active" onclick="resetTree()">↺ Try Again</button>';
+    } else {
+      document.getElementById('te-1').classList.add('lit');
+      document.getElementById('tn-q2').classList.add('lit');
+      document.getElementById('treeReadout').textContent = 'It\u2019s cloudy \u2014 one more question to go.';
+      document.getElementById('treeBtns').innerHTML = '<span style="font-family:JetBrains Mono; font-size:11.5px; color:var(--ink-dim); align-self:center;">Is humidity high?</span><button class="toggle-btn" onclick="treeAnswer(2,true)">Yes</button><button class="toggle-btn" onclick="treeAnswer(2,false)">No</button>';
+      document.getElementById('te-0').classList.remove('lit');
+    }
+  } else {
+    document.getElementById('te-1').classList.add('lit');
+    document.getElementById('tn-q2').classList.add('lit');
+    if(ans){
+      document.getElementById('te-2').classList.add('lit');
+      document.getElementById('tn-yes').classList.add('lit');
+      document.getElementById('treeReadout').textContent = 'Result: Bring an umbrella \u2014 reached in two questions.';
+    } else {
+      document.getElementById('te-3').classList.add('lit');
+      document.getElementById('tn-maybe').classList.add('lit');
+      document.getElementById('treeReadout').textContent = 'Result: Maybe \u2014 reached in two questions.';
+    }
+    document.getElementById('treeBtns').innerHTML = '<button class="toggle-btn active" onclick="resetTree()">↺ Try Again</button>';
+  }
+  addXP(2);
+}
+function resetTree(){
+  document.querySelectorAll('.tree-node, .tree-edge').forEach(el=>el.classList.remove('lit'));
+  document.getElementById('treeReadout').textContent = 'Answer the questions above to reach a decision.';
+  document.getElementById('treeBtns').innerHTML = '<span style="font-family:JetBrains Mono; font-size:11.5px; color:var(--ink-dim); align-self:center;">Is it cloudy?</span><button class="toggle-btn" onclick="treeAnswer(1,true)">Yes</button><button class="toggle-btn" onclick="treeAnswer(1,false)">No</button>';
+}
+resetTree();
+
+/* ============ CH7: random forest voting ============ */
+function rerollForest(){
+  const grid = document.getElementById('forestGrid');
+  grid.innerHTML = '';
+  let yesCount = 0;
+  for(let i=0;i<5;i++){
+    const vote = Math.random() > 0.4;
+    if(vote) yesCount++;
+    const card = document.createElement('div');
+    card.className = 'tree-vote' + (vote ? '' : ' no');
+    card.innerHTML = '<div class="ticon">\u25B3</div><div class="tvote">Tree '+(i+1)+': '+(vote?'Yes':'No')+'</div>';
+    grid.appendChild(card);
+  }
+  const final = yesCount >= 3 ? 'Yes' : 'No';
+  document.getElementById('forestResult').textContent = 'Votes: '+yesCount+' Yes / '+(5-yesCount)+' No \u2192 Forest prediction: '+final;
+  addXP(2);
+}
+rerollForest();
+
+/* ============ CH8: SVM margin ============ */
+(function(){
+  const svg = document.getElementById('svmSvg');
+  const ptsA = [[40,50],[60,40],[35,70],[55,65],[70,90],[45,110]];
+  const ptsB = [[220,120],[240,140],[210,150],[230,100],[250,160],[215,90]];
+  const supportA = [70,90], supportB = [210,150];
+  let html = '';
+  html += '<line x1="130" y1="0" x2="130" y2="200" stroke="var(--cyan)" stroke-width="2"/>';
+  html += '<line x1="105" y1="0" x2="105" y2="200" stroke="var(--cyan)" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/>';
+  html += '<line x1="155" y1="0" x2="155" y2="200" stroke="var(--cyan)" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/>';
+  ptsA.forEach(p=>{ const isSupport = p[0]===supportA[0]&&p[1]===supportA[1]; html += '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+(isSupport?8:6)+'" fill="var(--violet)" stroke="'+(isSupport?'var(--ink)':'none')+'" stroke-width="2"/>'; });
+  ptsB.forEach(p=>{ const isSupport = p[0]===supportB[0]&&p[1]===supportB[1]; html += '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+(isSupport?8:6)+'" fill="var(--amber)" stroke="'+(isSupport?'var(--ink)':'none')+'" stroke-width="2"/>'; });
+  svg.innerHTML = html;
+})();
+
+/* ============ CH9: neural network ============ */
+function buildNN(hiddenLayers, svgId){
+  const svg = document.getElementById(svgId);
+  const width = svgId==='deepSvg' ? 400 : 360;
+  const layerCounts = [3, ...Array(hiddenLayers).fill(4), 2];
+  const layerX = layerCounts.map((_,i)=> 30 + i*((width-60)/(layerCounts.length-1)));
+  let html = '';
+  const positions = [];
+  layerCounts.forEach((count,li)=>{
+    const ys = [];
+    const spacing = 150/(count+1);
+    for(let n=0;n<count;n++){ ys.push(15 + spacing*(n+1)); }
+    positions.push(ys);
+  });
+  for(let li=0; li<layerCounts.length-1; li++){
+    positions[li].forEach(y1=>{
+      positions[li+1].forEach(y2=>{
+        html += '<line x1="'+layerX[li]+'" y1="'+y1+'" x2="'+layerX[li+1]+'" y2="'+y2+'" stroke="var(--line-strong)" stroke-width="0.7" opacity="0.5" class="nn-edge"/>';
+      });
+    });
+  }
+  layerCounts.forEach((count,li)=>{
+    positions[li].forEach(y=>{
+      const isHidden = li>0 && li<layerCounts.length-1;
+      html += '<circle cx="'+layerX[li]+'" cy="'+y+'" r="8" fill="'+(isHidden?'var(--violet-dim)':'var(--cyan-dim)')+'" stroke="'+(isHidden?'var(--violet)':'var(--cyan)')+'" stroke-width="1.5"/>';
+    });
+  });
+  svg.innerHTML = html;
+  return {layerX, positions};
+}
+let nnLayout = buildNN(1, 'nnSvg');
+function runForwardPass(){
+  const svg = document.getElementById('nnSvg');
+  const edges = svg.querySelectorAll('.nn-edge');
+  edges.forEach((edge,i)=>{
+    setTimeout(()=>{
+      edge.setAttribute('stroke','var(--cyan)');
+      edge.setAttribute('opacity','0.9');
+      setTimeout(()=>{ edge.setAttribute('stroke','var(--line-strong)'); edge.setAttribute('opacity','0.5'); }, 300);
+    }, i*15);
+  });
+  addXP(3);
+}
+
+/* ============ CH10: deep learning depth slider ============ */
+buildNN(1, 'deepSvg');
+document.getElementById('depthSlider').addEventListener('input', (e)=>{
+  const n = parseInt(e.target.value);
+  document.getElementById('depthVal').textContent = n;
+  buildNN(n, 'deepSvg');
+  addXP(1);
+});
+
+/* ============ quiz data ============ */
+const quizzes = {
+  ch1: [
+    {q:"What does every supervised learning example consist of?", opts:["Only features, with no labels","Features paired with a correct label or answer","Only labels, with no features","Nothing measurable"], correct:1, explain:"The label is what 'supervises' the learning process."},
+    {q:"What are the two main supervised learning tasks?", opts:["Clustering and reward maximization","Regression (predicting numbers) and classification (predicting categories)","Only regression","Only clustering"], correct:1, explain:"These are covered in detail in Chapters 4 and 5."},
+    {q:"Which of these is a supervised learning task?", opts:["Predicting house prices from data with known sale prices attached","Grouping unlabeled customers","Learning a game with no labels, only rewards","None of these"], correct:0, explain:"Known sale prices act as the labels here — a classic supervised regression task."}
+  ],
+  ch2: [
+    {q:"What does unsupervised learning work with?", opts:["Only labeled data","Data with no labels, searching for hidden structure","No data at all","Only reward signals"], correct:1, explain:"No correct answers are given — the goal is finding structure on its own."},
+    {q:"What does the k-means clustering demo do at each step?", opts:["Deletes random points","Assigns points to the nearest cluster center, then moves each center to the mean of its assigned points","Ignores all data","Requires labels to run"], correct:1, explain:"This assign-then-update loop is exactly what you watched run live."},
+    {q:"What is a real-world use case for clustering?", opts:["Predicting an exact numeric price","Grouping customers into natural segments with no labels provided","Playing a game with rewards","None of these"], correct:1, explain:"Customer segmentation is one of clustering's most common real applications."}
+  ],
+  ch3: [
+    {q:"What does an RL agent receive after taking an action?", opts:["A fixed label","A reward (or penalty) and a new state from the environment","Nothing at all","A cluster assignment"], correct:1, explain:"This reward and new state are exactly what flows back to the agent in the loop diagram."},
+    {q:"How does an RL agent improve over time?", opts:["It never improves","By gradually favoring actions that historically led to higher reward, across many episodes","By memorizing labeled answers","By clustering its own actions"], correct:1, explain:"This is shown in the illustrative reward-over-episodes curve."},
+    {q:"What is a real-world use case for reinforcement learning?", opts:["Spam email classification","Game-playing agents and robotics control that improve through trial and error","Simple customer segmentation","None of these"], correct:1, explain:"These are flagship reinforcement learning applications."}
+  ],
+  ch4: [
+    {q:"What does a regression model predict?", opts:["A discrete category","A continuous numeric value","Nothing measurable","Only yes/no answers"], correct:1, explain:"House prices, temperatures, and similar continuous values are regression targets."},
+    {q:"What does 'best fit' mean precisely in linear regression?", opts:["Any line that looks reasonable","The line that minimizes total squared error across all data points","A randomly drawn line","A line connecting every point exactly"], correct:1, explain:"This is exactly what the 'Fit Best Line' button computed using real least-squares math."},
+    {q:"What happened when you clicked 'Fit Best Line' in the demo?", opts:["Nothing happened","The slope and intercept sliders moved to the mathematically optimal values","The data points were deleted","The chart was replaced with text"], correct:1, explain:"Real least-squares formulas computed the optimal slope and intercept directly."}
+  ],
+  ch5: [
+    {q:"What does a classification model predict?", opts:["A continuous number","A discrete category or class label","Nothing at all","Only numbers between 0 and 1"], correct:1, explain:"Spam/not-spam, cat/dog, and similar categories are classification targets."},
+    {q:"What is a decision boundary?", opts:["A physical wall","The line or surface a classifier uses to separate predicted classes","A type of neural network only","An unrelated statistical test"], correct:1, explain:"You dragged exactly this boundary in the interactive demo above."},
+    {q:"What happened to accuracy as you moved the boundary away from its best position?", opts:["Accuracy always stayed the same","Accuracy generally dropped as more points ended up on the wrong side","Accuracy always increased","Accuracy has nothing to do with boundary position"], correct:1, explain:"The live accuracy readout demonstrated this relationship directly."}
+  ],
+  ch6: [
+    {q:"How does a decision tree reach a prediction?", opts:["By randomly guessing","By following a sequence of yes/no questions from root to a leaf","By clustering with no questions asked","By ignoring the input entirely"], correct:1, explain:"This is exactly the path you clicked through in the umbrella example."},
+    {q:"What is a 'leaf' in a decision tree?", opts:["A literal plant part","A final endpoint of the tree that gives the predicted outcome","The very first question asked","A training error"], correct:1, explain:"'No umbrella,' 'Bring umbrella,' and 'Maybe' were all leaves in the demo."},
+    {q:"What is a key advantage of decision trees mentioned in this chapter?", opts:["They are impossible to understand","Their yes/no logic is easy for humans to read and explain","They require no data at all","They only work on images"], correct:1, explain:"Readability is one of decision trees' biggest practical advantages."}
+  ],
+  ch7: [
+    {q:"What is a random forest?", opts:["A single decision tree","An ensemble of many decision trees whose predictions are combined, typically by majority vote","An unsupervised clustering method","A type of neural network layer"], correct:1, explain:"The voting demo above showed exactly this majority-vote combination."},
+    {q:"Why does combining many trees often help accuracy?", opts:["It makes no difference","Different trees tend to make different mistakes, which cancel out when combined","More trees always means slower with no other effect","A single tree is always more accurate"], correct:1, explain:"Diversity among trees is the entire point of the ensemble approach."},
+    {q:"What typically determines a random forest's final classification prediction?", opts:["The first tree's answer only","The majority vote across all individual trees","A coin flip unrelated to the trees","The last tree trained, ignoring the rest"], correct:1, explain:"This is exactly how the forest result was computed in the demo."}
+  ],
+  ch8: [
+    {q:"What does a Support Vector Machine try to maximize?", opts:["The number of training examples","The margin between the decision boundary and the closest points from each class","The number of features","Nothing in particular"], correct:1, explain:"Maximum margin is the defining idea behind SVMs, shown in the visual above."},
+    {q:"What are 'support vectors'?", opts:["Random data points","The specific points closest to the boundary that define the margin's position","Every point in the dataset equally","A type of neural network layer"], correct:1, explain:"These were the highlighted points in the SVM visual — the only ones that actually matter for the boundary's position."},
+    {q:"Why might a wider margin be desirable?", opts:["It never matters","A wider margin often generalizes better to new, unseen data","It always causes overfitting","It has no relationship to generalization"], correct:1, explain:"More breathing room between classes tends to be more robust to new data."}
+  ],
+  ch9: [
+    {q:"What are the basic units of a neural network called?", opts:["Leaves","Neurons (or nodes), arranged in layers","Branches","Clusters"], correct:1, explain:"Neurons connected across layers are the network's basic building blocks."},
+    {q:"What does a connection between two neurons carry?", opts:["Nothing at all","A weight, adjusted during training to reduce prediction error","A fixed, unchangeable number","A random color value"], correct:1, explain:"Weights are exactly what gets tuned when a neural network learns."},
+    {q:"What are the three basic layer types in a simple neural network?", opts:["Input, hidden, and output layers","Only input and output layers","Only decision layers","Only clustering layers"], correct:0, explain:"This structure is exactly what the network diagram above showed."}
+  ],
+  ch10: [
+    {q:"What makes a neural network 'deep'?", opts:["Using more data only, with no structural change","Having multiple hidden layers stacked between input and output","Running faster than other networks","Having no layers at all"], correct:1, explain:"The depth slider demo showed exactly this — more hidden layers stacked in sequence."},
+    {q:"Why did deep learning become practical mainly after 2012?", opts:["It was invented in exactly 2012 with no prior history","Enough labeled data and GPU computing power became available to train deep networks effectively","Deep learning has nothing to do with data or compute","Shallow networks were banned"], correct:1, explain:"This connects directly back to Module 1's history chapter."},
+    {q:"What is a tradeoff of deeper networks mentioned in this chapter?", opts:["No tradeoffs exist at all","They can be more powerful but need more data and compute to train well","They are always strictly worse than shallow networks","They eliminate the need for any training data"], correct:1, explain:"More capacity comes with more resource requirements — a real practical tradeoff."}
+  ]
+};
+const finalQuiz = [
+  {q:"What defines supervised learning?", opts:["Learning from labeled data with known correct answers","No feedback of any kind","Only clustering, never prediction","Only reward signals"], correct:0, explain:"Chapter 1's foundational definition, built on throughout the module."},
+  {q:"What is the goal of unsupervised learning?", opts:["Finding hidden structure in unlabeled data","Only predicting numbers","Requiring labels for every single point","Ignoring all data entirely"], correct:0, explain:"Demonstrated live by the k-means clustering demo in Chapter 2."},
+  {q:"What drives reinforcement learning?", opts:["Rewards and penalties received from actions taken in an environment","Labeled datasets only","No data of any kind","Pure random guessing with no learning involved"], correct:0, explain:"The agent-environment loop from Chapter 3."},
+  {q:"What does regression predict?", opts:["A continuous numeric value","Only discrete categories","Nothing measurable","Only image data"], correct:0, explain:"Chapter 4's least-squares line-fitting demo."},
+  {q:"What does classification predict?", opts:["A discrete category or class label","Only continuous numbers","Nothing at all","Only clusters with no labels"], correct:0, explain:"Chapter 5's decision-boundary demo."},
+  {q:"How does a decision tree reach a prediction?", opts:["By following a sequence of yes/no questions down to a leaf","By random guessing with no structure","By ignoring the input entirely","By clustering with no questions"], correct:0, explain:"The umbrella-decision walkthrough in Chapter 6."},
+  {q:"Why do random forests often outperform a single decision tree?", opts:["Combining many trees' votes reduces the impact of any one tree's mistakes","A single tree is always better in every case","More trees always means slower with no benefit","Random forests use no trees at all"], correct:0, explain:"Chapter 7's five-tree voting demo."},
+  {q:"What does an SVM try to maximize between classes?", opts:["The margin between the decision boundary and the nearest points from each class","The number of features used","The dataset size only","Nothing in particular"], correct:0, explain:"Chapter 8's maximum-margin visual, with support vectors highlighted."},
+  {q:"What are neural networks built from?", opts:["Layers of connected neurons with adjustable weights","Decision trees exclusively","Clusters exclusively","Fixed, unchangeable rules"], correct:0, explain:"Chapter 9's layered network diagram and forward-pass demo."},
+  {q:"What defines 'deep' in deep learning?", opts:["Multiple stacked hidden layers between input and output","Any single-layer network","Only classical rule-based systems","The complete absence of any layers"], correct:0, explain:"Chapter 10's depth slider, growing the same network from Chapter 9."}
+];
+
+function renderQuiz(containerId, items, chapterKey){
+  const container = document.getElementById(containerId);
+  items.forEach((item, idx)=>{
+    const qDiv = document.createElement('div');
+    qDiv.className = 'q-item';
+    qDiv.innerHTML = '<div class="q-text">'+(idx+1)+'. '+item.q+'</div>'
+      + '<div class="q-options">'+item.opts.map((o,i)=>'<button class="q-opt" data-i="'+i+'">'+o+'</button>').join('')+'</div>'
+      + '<div class="q-explain">'+item.explain+'</div>';
+    container.appendChild(qDiv);
+    const buttons = qDiv.querySelectorAll('.q-opt');
+    const explainEl = qDiv.querySelector('.q-explain');
+    buttons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = parseInt(btn.dataset.i);
+        buttons.forEach(b=>b.disabled = true);
+        if(i === item.correct){
+          btn.classList.add('correct');
+          if(chapterKey) onCorrect(chapterKey); else onFinalAnswer(idx, true);
+        } else {
+          btn.classList.add('incorrect');
+          buttons[item.correct].classList.add('correct');
+          if(chapterKey) onIncorrect(chapterKey); else onFinalAnswer(idx, false);
+        }
+        explainEl.classList.add('show');
+      });
+    });
+  });
+}
+Object.keys(quizzes).forEach(key=>{ renderQuiz('quiz-'+key, quizzes[key], key); updateChapterScore(key); });
+renderQuiz('quiz-final', finalQuiz, null);
+
+function updateChapterScore(key){ document.getElementById('score-'+key).textContent = state.chapters[key].correct+' / '+state.chapters[key].total; }
+function onCorrect(key){ const s=state.chapters[key]; s.correct=Math.min(s.correct+1,s.total); addXP(10); checkChapterDone(key); updateChapterScore(key); saveState(); }
+function onIncorrect(key){ state.chapters[key].hadMiss=true; checkChapterDone(key); updateChapterScore(key); saveState(); }
+let answeredCount = { ch1:0, ch2:0, ch3:0, ch4:0, ch5:0, ch6:0, ch7:0, ch8:0, ch9:0, ch10:0 };
+function checkChapterDone(key){
+  answeredCount[key]++;
+  const s = state.chapters[key];
+  if(answeredCount[key] >= s.total){
+    s.done = true;
+    const dot = document.getElementById('dot-'+key), statusEl = document.getElementById('status-'+key);
+    statusEl.classList.add('show');
+    if(s.hadMiss){ dot.classList.add('warn'); statusEl.classList.add('review'); statusEl.innerHTML='\u26A0 Review suggested \u2014 you missed at least one question in this chapter.'; }
+    else { dot.classList.add('done'); statusEl.classList.add('mastered'); statusEl.innerHTML='\u2713 Mastered \u2014 perfect score on this chapter.'; addXP(15); }
+    saveState();
+  }
+}
+let finalAnswers = [];
+function onFinalAnswer(idx, correct){
+  finalAnswers[idx]=correct;
+  if(finalAnswers.filter(a=>a!==undefined).length === finalQuiz.length) showFinalResult();
+}
+function showFinalResult(){
+  const correctCount = finalAnswers.filter(a=>a===true).length;
+  const pct = Math.round((correctCount/finalQuiz.length)*100);
+  document.getElementById('resultScore').textContent = pct+'%';
+  document.getElementById('resultDetail').textContent = correctCount+' / '+finalQuiz.length+' correct';
+  const badge = document.getElementById('resultBadge');
+  const pass = pct >= 70;
+  badge.textContent = pass ? 'Passed' : 'Retry Recommended';
+  badge.className = 'result-badge ' + (pass ? 'pass' : 'retry');
+  addXP(correctCount*10 + (pass?25:0));
+  const weakChapters = Object.keys(state.chapters).filter(k => state.chapters[k].hadMiss);
+  const wrap = document.getElementById('recommendWrap');
+  if(weakChapters.length === 0 && pass){
+    wrap.innerHTML = '<div class="callout" style="margin-top:4px;"><b>Great work.</b> No flagged chapters and a passing score \u2014 you are ready for Module 4: Why Quantum Computing?</div>';
+  } else {
+    const names = { ch1:"Supervised Learning", ch2:"Unsupervised Learning", ch3:"Reinforcement Learning", ch4:"Regression", ch5:"Classification", ch6:"Decision Trees", ch7:"Random Forest", ch8:"Support Vector Machine", ch9:"Neural Networks", ch10:"Deep Learning" };
+    let html = '<div class="visual-label" style="margin-top:18px;">Recommended Review</div><ul class="recommend-list">';
+    weakChapters.forEach(k=> html += '<li>\u21BA Revisit <b>'+names[k]+'</b> \u2014 a quick-check answer there was missed.</li>');
+    if(!pass){ html += '<li>\u21BA Your assessment score was below 70% \u2014 consider re-reading the callout boxes first.</li>'; }
+    html += '</ul>';
+    wrap.innerHTML = html;
+  }
+  document.getElementById('resultPanel').classList.add('show');
+  document.getElementById('dot-final').classList.add(pass ? 'done' : 'warn');
+  state.finalDone = true;
+  saveState();
+}
+
+const sections = document.querySelectorAll('.chapter');
+const sideLinks = document.querySelectorAll('.side-list a');
+const spyObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      sideLinks.forEach(a=>a.classList.remove('active'));
+      const link = document.querySelector('.side-list a[data-target="'+entry.target.id+'"]');
+      if(link) link.classList.add('active');
+    }
+  });
+},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>spyObserver.observe(s));
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  document.getElementById('progressFill').style.width = ((h.scrollTop)/(h.scrollHeight-h.clientHeight)*100)+'%';
+});
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }); },{threshold:0.08});
+revealEls.forEach(el=>io.observe(el));
+
+(function(){
+  const { prev, next } = qmlGetAdjacentModules(3);
+  const wrap = document.getElementById('moduleNav');
+  function cardHTML(mod, dir){
+    if(!mod) return '<div class="mn-card disabled '+dir+'"><span class="mn-eyebrow">'+(dir==='next'?'Up Next':'Previous')+'</span><span class="mn-title">\u2014 none \u2014</span></div>';
+    const available = !!mod.file;
+    const arrow = dir==='prev' ? '\u2190 ' : ''; const arrowEnd = dir==='next' ? ' \u2192' : '';
+    const eyebrow = (dir==='prev' ? 'Previous \u2014 Module '+mod.id : 'Up Next \u2014 Module '+mod.id) + (available ? '' : ' (Coming Soon)');
+    if(available) return '<a class="mn-card enabled '+dir+'" href="'+mod.file+'"><span class="mn-eyebrow">'+eyebrow+'</span><span class="mn-title">'+arrow+mod.title+arrowEnd+'</span><span class="mn-arrow">Open tutorial</span></a>';
+    return '<div class="mn-card disabled '+dir+'"><span class="mn-eyebrow">'+eyebrow+'</span><span class="mn-title">'+mod.title+'</span><span class="mn-arrow">Not published yet</span></div>';
+  }
+  wrap.innerHTML = cardHTML(prev,'prev') + cardHTML(next,'next');
+  const continueBtn = document.getElementById('continueBtn');
+  if(continueBtn){
+    if(next && next.file){ continueBtn.href = next.file; continueBtn.textContent = 'Continue to Module '+next.id+' \u2192'; }
+    else if(next){ continueBtn.href = 'qml-roadmap-landing-page.html#curriculum'; continueBtn.textContent = 'Module '+next.id+' — Coming Soon'; continueBtn.style.opacity='0.6'; }
+  }
+})();
+</script>
+
+</body>
+</html>

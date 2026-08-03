@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Quantum Visualizations — Bloch Sphere Explorer | QML Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="modules-registry.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{
+  --bg:#070b14; --bg-2:#0b111f; --panel:#0e1526; --panel-2:#101a2e;
+  --line:rgba(148,178,224,0.14); --line-strong:rgba(148,178,224,0.28);
+  --ink:#e9eef8; --ink-dim:#9fb0c9; --ink-faint:#5f7089;
+  --cyan:#5ad1e6; --cyan-dim:rgba(90,209,230,0.14);
+  --violet:#b39bff; --violet-dim:rgba(179,155,255,0.14);
+  --amber:#f2a341; --amber-dim:rgba(242,163,65,0.14);
+  --green:#5ee6a0; --green-dim:rgba(94,230,160,0.14);
+  --red:#f2726a; --red-dim:rgba(242,114,106,0.14);
+  --blue:#4fa3f7;
+  --serif:'Fraunces', Georgia, serif; --sans:'Inter', -apple-system, sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.6;}
+header{position:sticky; top:0; z-index:60; backdrop-filter:blur(14px); background:rgba(7,11,20,0.82); border-bottom:1px solid var(--line);}
+.nav-wrap{max-width:1280px; margin:0 auto; padding:16px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+.logo{font-family:var(--mono); font-weight:700; font-size:15px; color:var(--cyan); border:1px solid var(--line-strong); border-radius:8px; padding:6px 12px; letter-spacing:0.5px; white-space:nowrap;}
+.logo span{color:var(--ink-faint);}
+.back-link{display:flex; align-items:center; gap:8px; color:var(--ink-dim); text-decoration:none; font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; transition:color .2s;}
+.back-link:hover{color:var(--cyan);}
+
+.wrap{max-width:1280px; margin:0 auto; padding:56px 32px 120px;}
+.module-eyebrow{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--violet); background:var(--violet-dim); margin-bottom:20px;}
+h1{font-family:var(--serif); font-weight:600; font-size:clamp(30px,4vw,44px); letter-spacing:-0.01em;}
+.lede{margin-top:12px; color:var(--ink-dim); font-size:15.5px; max-width:680px;}
+.chip-row{display:flex; gap:8px; margin-top:20px; flex-wrap:wrap;}
+.chip{font-family:var(--mono); font-size:10.5px; letter-spacing:0.04em; color:var(--ink-faint); border:1px solid var(--line); padding:5px 11px; border-radius:100px;}
+
+.panel{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:26px; margin-top:32px;}
+.panel-label{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+
+.explorer-grid{display:grid; grid-template-columns:1fr 320px; gap:28px;}
+@media (max-width:900px){.explorer-grid{grid-template-columns:1fr;}}
+
+.canvas-wrap{background:radial-gradient(circle at 50% 40%, rgba(90,209,230,0.06), transparent 65%), var(--bg-2); border-radius:14px; border:1px solid var(--line); position:relative; overflow:hidden; touch-action:none; cursor:grab;}
+.canvas-wrap:active{cursor:grabbing;}
+.canvas-hint{position:absolute; bottom:10px; left:12px; font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); pointer-events:none;}
+.state-readout{position:absolute; top:12px; left:12px; font-family:var(--mono); font-size:11.5px; color:var(--cyan); background:rgba(7,11,20,0.6); padding:6px 10px; border-radius:8px; pointer-events:none;}
+
+.gate-btns{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;}
+.gbtn{padding:10px 14px; border-radius:9px; border:1px solid var(--line-strong); background:var(--panel-2); color:var(--cyan); font-family:var(--mono); font-weight:700; font-size:13px; cursor:pointer; transition:all .2s;}
+.gbtn:hover{border-color:var(--cyan); transform:translateY(-2px);}
+.gbtn.rot{color:var(--violet);}
+.gbtn.preset{color:var(--amber);}
+
+.side-section{margin-bottom:24px;}
+.side-section h4{font-family:var(--mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:10px;}
+.ctrl-row{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+.ctrl-row label{font-family:var(--mono); font-size:11.5px; color:var(--ink-dim); min-width:60px;}
+.ctrl-row input[type=range]{flex:1; accent-color:var(--violet);}
+.ctrl-readout{font-family:var(--mono); font-size:11.5px; color:var(--violet); min-width:44px; text-align:right;}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:9px 16px; border-radius:9px; font-size:12.5px; font-weight:600; cursor:pointer; border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink); transition:transform .2s;}
+.btn:hover{transform:translateY(-2px);}
+
+.dual-wrap{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:8px;}
+@media (max-width:640px){.dual-wrap{grid-template-columns:1fr;}}
+.dual-canvas{background:radial-gradient(circle at 50% 40%, rgba(179,155,255,0.06), transparent 65%), var(--bg-2); border-radius:12px; border:1px solid var(--line); height:220px; position:relative;}
+.dual-label{position:absolute; top:8px; left:10px; font-family:var(--mono); font-size:10.5px; color:var(--ink-faint);}
+.purity-readout{position:absolute; bottom:8px; left:10px; font-family:var(--mono); font-size:10.5px; color:var(--cyan);}
+
+.edu-note{margin-top:28px; padding:16px 18px; border-radius:10px; border-left:3px solid var(--cyan); background:var(--cyan-dim); font-size:13.5px; color:var(--ink-dim);}
+.edu-note b{color:var(--ink);}
+.edu-note a{color:var(--cyan);}
+.edu-note.warn{border-left-color:var(--amber); background:var(--amber-dim);}
+
+footer{padding:40px 32px; border-top:1px solid var(--line); text-align:center; font-family:var(--mono); font-size:12px; color:var(--ink-faint);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-wrap">
+    <div class="logo">{TAA}<span>·QML</span></div>
+    <a class="back-link" href="qml-roadmap-landing-page.html#platform">← Back to Platform</a>
+    <a class="back-link" href="progress-hub.html">My Progress</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="module-eyebrow">◆ 3D Quantum Visualizations</div>
+  <h1>The Bloch Sphere Explorer</h1>
+  <p class="lede">Drag to rotate. Apply a gate and watch the state vector actually turn — every rotation below is computed live with real 3D rotation math, not a pre-rendered animation.</p>
+  <div class="chip-row">
+    <span class="chip">Real-Time 3D · Three.js</span>
+    <span class="chip">Drag to Rotate</span>
+    <span class="chip">Live Gate Animation</span>
+    <span class="chip">Entanglement Demo</span>
+  </div>
+
+  <div class="panel">
+    <div class="panel-label">Single-Qubit Explorer</div>
+    <div class="explorer-grid">
+      <div class="canvas-wrap" id="mainCanvasWrap" style="height:420px;">
+        <div class="state-readout" id="mainReadout">|0⟩</div>
+        <div class="canvas-hint">drag to orbit</div>
+      </div>
+      <div>
+        <div class="side-section">
+          <h4>Pauli &amp; Clifford Gates</h4>
+          <div class="gate-btns">
+            <button class="gbtn" data-gate="H">H</button>
+            <button class="gbtn" data-gate="X">X</button>
+            <button class="gbtn" data-gate="Y">Y</button>
+            <button class="gbtn" data-gate="Z">Z</button>
+            <button class="gbtn" data-gate="S">S</button>
+            <button class="gbtn" data-gate="Sdg">S†</button>
+            <button class="gbtn" data-gate="T">T</button>
+            <button class="gbtn" data-gate="Tdg">T†</button>
+          </div>
+        </div>
+        <div class="side-section">
+          <h4>Rotation Gates</h4>
+          <div class="ctrl-row"><label>angle</label><input type="range" id="rotAngle" min="1" max="180" value="45"><span class="ctrl-readout" id="rotAngleVal">45°</span></div>
+          <div class="gate-btns">
+            <button class="gbtn rot" data-rot="x">Rx(θ)</button>
+            <button class="gbtn rot" data-rot="y">Ry(θ)</button>
+            <button class="gbtn rot" data-rot="z">Rz(θ)</button>
+          </div>
+        </div>
+        <div class="side-section">
+          <h4>Preset States</h4>
+          <div class="gate-btns">
+            <button class="gbtn preset" data-preset="0">|0⟩</button>
+            <button class="gbtn preset" data-preset="1">|1⟩</button>
+            <button class="gbtn preset" data-preset="+">|+⟩</button>
+            <button class="gbtn preset" data-preset="-">|−⟩</button>
+            <button class="gbtn preset" data-preset="+i">|+i⟩</button>
+            <button class="gbtn preset" data-preset="-i">|−i⟩</button>
+          </div>
+        </div>
+        <button class="btn" id="resetMain">↺ Reset to |0⟩</button>
+      </div>
+    </div>
+    <div class="edu-note"><b>Try this:</b> click H, then S, then look at where the vector ends up versus a plain H. This is the exact geometric picture behind the angle-encoding dial in <a href="module8-tutorial.html">Module 8</a>.</div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-label">Entanglement Visualization — Two Qubits</div>
+    <p style="color:var(--ink-dim); font-size:14px; margin-bottom:6px;">This isn't a metaphor — both spheres below are driven by a real 2-qubit, 4-amplitude simulation. The slider applies <b>Ry(θ)</b> to qubit A, then <b>CNOT(A→B)</b>, and each sphere shows that qubit's true reduced state after tracing out the other.</p>
+    <div class="ctrl-row" style="margin-top:16px;">
+      <label>entangle</label>
+      <input type="range" id="entangleSlider" min="0" max="100" value="0">
+      <span class="ctrl-readout" id="entangleVal">0%</span>
+    </div>
+    <div class="dual-wrap">
+      <div class="dual-canvas" id="qubitACanvas">
+        <div class="dual-label">Qubit A</div>
+        <div class="purity-readout" id="purityA">|vector| = 1.00 (pure)</div>
+      </div>
+      <div class="dual-canvas" id="qubitBCanvas">
+        <div class="dual-label">Qubit B</div>
+        <div class="purity-readout" id="purityB">|vector| = 1.00 (pure)</div>
+      </div>
+    </div>
+    <div class="edu-note warn"><b>What you're seeing:</b> as entanglement increases, each qubit's <i>individual</i> Bloch vector shrinks toward the center. At 100%, both qubits are maximally entangled (a Bell state) — each one alone looks completely random, even though together they're in a precise, well-defined state. This is exactly the correlation Module 6's "hybrid quantum-classical computing" and Module 9's kernel chapters lean on.</div>
+  </div>
+</div>
+
+<footer>3D Quantum Visualizations — part of the QML Curriculum platform. Rendered live with Three.js.</footer>
+
+<script>
+/* ================= 3D vector math ================= */
+function vAdd(a,b){ return [a[0]+b[0],a[1]+b[1],a[2]+b[2]]; }
+function vScale(a,s){ return [a[0]*s,a[1]*s,a[2]*s]; }
+function vDot(a,b){ return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; }
+function vCross(a,b){ return [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]]; }
+function vNorm(a){ const l=Math.sqrt(vDot(a,a))||1; return [a[0]/l,a[1]/l,a[2]/l]; }
+// Rodrigues rotation: rotate vector v by angle around unit axis
+function rotateVec(v, axis, angle){
+  const k = vNorm(axis);
+  const term1 = vScale(v, Math.cos(angle));
+  const term2 = vScale(vCross(k, v), Math.sin(angle));
+  const term3 = vScale(k, vDot(k,v)*(1-Math.cos(angle)));
+  return vAdd(vAdd(term1, term2), term3);
+}
+
+/* gate -> {axis, angle} on the Bloch sphere (up to global phase) */
+const SQ = 1/Math.sqrt(2);
+function gateRotation(gate, customAngle){
+  switch(gate){
+    case 'H': return {axis:[SQ,0,SQ], angle:Math.PI};
+    case 'X': return {axis:[1,0,0], angle:Math.PI};
+    case 'Y': return {axis:[0,1,0], angle:Math.PI};
+    case 'Z': return {axis:[0,0,1], angle:Math.PI};
+    case 'S': return {axis:[0,0,1], angle:Math.PI/2};
+    case 'Sdg': return {axis:[0,0,1], angle:-Math.PI/2};
+    case 'T': return {axis:[0,0,1], angle:Math.PI/4};
+    case 'Tdg': return {axis:[0,0,1], angle:-Math.PI/4};
+    case 'Rx': return {axis:[1,0,0], angle:customAngle};
+    case 'Ry': return {axis:[0,1,0], angle:customAngle};
+    case 'Rz': return {axis:[0,0,1], angle:customAngle};
+  }
+  return {axis:[0,0,1], angle:0};
+}
+
+/* ================= reusable Bloch scene builder ================= */
+function makeTextSprite(text, colorHex){
+  const canvas = document.createElement('canvas');
+  canvas.width = 128; canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  ctx.font = '44px JetBrains Mono, monospace';
+  ctx.fillStyle = colorHex;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 64, 32);
+  const tex = new THREE.CanvasTexture(canvas);
+  const mat = new THREE.SpriteMaterial({map:tex, transparent:true, depthTest:false});
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(0.5,0.25,1);
+  return sprite;
+}
+
+function createBlochScene(containerEl){
+  const width = containerEl.clientWidth, height = containerEl.clientHeight;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, width/height, 0.1, 100);
+  camera.position.set(0,0,4.2);
+  const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  containerEl.appendChild(renderer.domElement);
+
+  const group = new THREE.Group();
+  scene.add(group);
+
+  // sphere (translucent solid + wireframe)
+  const sphereGeo = new THREE.SphereGeometry(1.4, 24, 18);
+  const sphereMat = new THREE.MeshPhongMaterial({color:0x5ad1e6, transparent:true, opacity:0.08, shininess:10});
+  const sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
+  group.add(sphereMesh);
+  const wireGeo = new THREE.SphereGeometry(1.401, 16, 12);
+  const wireMat = new THREE.MeshBasicMaterial({color:0x5ad1e6, wireframe:true, transparent:true, opacity:0.18});
+  group.add(new THREE.Mesh(wireGeo, wireMat));
+
+  // axes
+  function addAxisLine(dir, color){
+    const points = [new THREE.Vector3(-dir[0]*1.4,-dir[1]*1.4,-dir[2]*1.4), new THREE.Vector3(dir[0]*1.4,dir[1]*1.4,dir[2]*1.4)];
+    const geo = new THREE.BufferGeometry().setFromPoints(points);
+    const mat = new THREE.LineBasicMaterial({color:color, transparent:true, opacity:0.35});
+    group.add(new THREE.Line(geo, mat));
+  }
+  addAxisLine([1,0,0], 0xf2a341);
+  addAxisLine([0,1,0], 0xb39bff);
+  addAxisLine([0,0,1], 0x5ad1e6);
+
+  // labels
+  const lblZtop = makeTextSprite('|0>', '#5ad1e6'); lblZtop.position.set(0,0,1.75); group.add(lblZtop);
+  const lblZbot = makeTextSprite('|1>', '#5ad1e6'); lblZbot.position.set(0,0,-1.75); group.add(lblZbot);
+  const lblXpos = makeTextSprite('+', '#f2a341'); lblXpos.position.set(1.75,0,0); group.add(lblXpos);
+  const lblXneg = makeTextSprite('-', '#f2a341'); lblXneg.position.set(-1.75,0,0); group.add(lblXneg);
+  const lblYpos = makeTextSprite('+i', '#b39bff'); lblYpos.position.set(0,1.75,0); group.add(lblYpos);
+  const lblYneg = makeTextSprite('-i', '#b39bff'); lblYneg.position.set(0,-1.75,0); group.add(lblYneg);
+
+  // vector arrow
+  let arrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1.4, 0x5ee6a0, 0.28, 0.14);
+  group.add(arrow);
+
+  // lights
+  scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+  const dl = new THREE.DirectionalLight(0xffffff, 0.6);
+  dl.position.set(3,3,5);
+  scene.add(dl);
+
+  // note: three.js Bloch coords (x,y,z) here map z=up (|0> at +z)
+  function setVector(v){
+    const dir = new THREE.Vector3(v[0], v[2], v[1]); // remap so bloch-z -> three-y is avoided; keep z as three z
+    // Use direct mapping: bloch x->three x, bloch y->three y, bloch z->three z (z is "up" axis of sphere visually via camera angle)
+    const d = new THREE.Vector3(v[0], v[1], v[2]);
+    const len = d.length();
+    if(len < 0.001){ arrow.visible = false; return; }
+    arrow.visible = true;
+    arrow.setDirection(d.clone().normalize());
+    arrow.setLength(Math.max(0.15, len*1.4), 0.26*Math.max(0.3,len), 0.13*Math.max(0.3,len));
+  }
+
+  // drag to rotate
+  let isDragging = false, lastX = 0, lastY = 0;
+  containerEl.addEventListener('pointerdown', (e)=>{ isDragging = true; lastX = e.clientX; lastY = e.clientY; });
+  window.addEventListener('pointerup', ()=>{ isDragging = false; });
+  window.addEventListener('pointermove', (e)=>{
+    if(!isDragging) return;
+    const dx = e.clientX - lastX, dy = e.clientY - lastY;
+    lastX = e.clientX; lastY = e.clientY;
+    group.rotation.y += dx*0.008;
+    group.rotation.x += dy*0.008;
+    group.rotation.x = Math.max(-1.4, Math.min(1.4, group.rotation.x));
+  });
+
+  function render(){ renderer.render(scene, camera); }
+  function animateLoop(){ render(); requestAnimationFrame(animateLoop); }
+  animateLoop();
+
+  function resize(){
+    const w = containerEl.clientWidth, h = containerEl.clientHeight;
+    camera.aspect = w/h; camera.updateProjectionMatrix();
+    renderer.setSize(w,h);
+  }
+  window.addEventListener('resize', resize);
+
+  return {setVector, group, camera, renderer};
+}
+
+/* ================= main single-qubit explorer ================= */
+const mainCanvasWrap = document.getElementById('mainCanvasWrap');
+const mainScene = createBlochScene(mainCanvasWrap);
+let mainVec = [0,0,1];
+mainScene.setVector(mainVec);
+mainScene.group.rotation.x = -0.35;
+mainScene.group.rotation.y = 0.6;
+
+function animateMainTo(axis, angle){
+  const start = mainVec.slice();
+  const duration = 550;
+  const t0 = performance.now();
+  function step(now){
+    const t = Math.min(1, (now-t0)/duration);
+    const eased = t<0.5 ? 2*t*t : -1+(4-2*t)*t;
+    const v = rotateVec(start, axis, eased*angle);
+    mainScene.setVector(v);
+    updateMainReadout(v);
+    if(t<1) requestAnimationFrame(step);
+    else { mainVec = rotateVec(start, axis, angle); mainScene.setVector(mainVec); updateMainReadout(mainVec); }
+  }
+  requestAnimationFrame(step);
+}
+function updateMainReadout(v){
+  const readout = document.getElementById('mainReadout');
+  readout.textContent = 'x='+v[0].toFixed(2)+' y='+v[1].toFixed(2)+' z='+v[2].toFixed(2);
+}
+updateMainReadout(mainVec);
+
+document.querySelectorAll('.gbtn[data-gate]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const r = gateRotation(btn.dataset.gate);
+    animateMainTo(r.axis, r.angle);
+  });
+});
+document.querySelectorAll('.gbtn[data-rot]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const angleDeg = parseInt(document.getElementById('rotAngle').value);
+    const angleRad = angleDeg * Math.PI/180;
+    const axisMap = {x:[1,0,0], y:[0,1,0], z:[0,0,1]};
+    animateMainTo(axisMap[btn.dataset.rot], angleRad);
+  });
+});
+document.getElementById('rotAngle').addEventListener('input', (e)=>{
+  document.getElementById('rotAngleVal').textContent = e.target.value+'\u00B0';
+});
+document.querySelectorAll('.gbtn[data-preset]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const presets = {
+      '0':[0,0,1], '1':[0,0,-1], '+':[1,0,0], '-':[-1,0,0], '+i':[0,1,0], '-i':[0,-1,0]
+    };
+    const target = presets[btn.dataset.preset];
+    const start = mainVec.slice();
+    const duration = 500;
+    const t0 = performance.now();
+    function step(now){
+      const t = Math.min(1, (now-t0)/duration);
+      const eased = t<0.5 ? 2*t*t : -1+(4-2*t)*t;
+      const v = [
+        start[0]+(target[0]-start[0])*eased,
+        start[1]+(target[1]-start[1])*eased,
+        start[2]+(target[2]-start[2])*eased
+      ];
+      mainScene.setVector(v);
+      updateMainReadout(v);
+      if(t<1) requestAnimationFrame(step);
+      else { mainVec = target.slice(); mainScene.setVector(mainVec); updateMainReadout(mainVec); }
+    }
+    requestAnimationFrame(step);
+  });
+});
+document.getElementById('resetMain').addEventListener('click', ()=>{
+  mainVec = [0,0,1];
+  mainScene.setVector(mainVec);
+  updateMainReadout(mainVec);
+});
+
+/* ================= entanglement dual-sphere demo ================= */
+const canvasA = document.getElementById('qubitACanvas');
+const canvasB = document.getElementById('qubitBCanvas');
+const sceneA = createBlochScene(canvasA);
+const sceneB = createBlochScene(canvasB);
+sceneA.group.rotation.x = -0.3; sceneA.group.rotation.y = 0.5;
+sceneB.group.rotation.x = -0.3; sceneB.group.rotation.y = 0.5;
+
+/* real 2-qubit simulation: Ry(theta) on qubit A, then CNOT(A->B) */
+function cx(re,im){ return {re:re||0, im:im||0}; }
+function cMul(a,b){ return cx(a.re*b.re-a.im*b.im, a.re*b.im+a.im*b.re); }
+function cConj(a){ return cx(a.re, -a.im); }
+
+function computeEntangledBloch(theta){
+  // 2-qubit state, index = q0*2+q1, start |00>
+  let psi = [cx(1,0), cx(0,0), cx(0,0), cx(0,0)];
+  // Ry(theta) on qubit0 (index bit0): basis pairs (00,10) and (01,11)
+  const c = Math.cos(theta/2), s = Math.sin(theta/2);
+  function applyRyQ0(state){
+    const out = [cx(0,0),cx(0,0),cx(0,0),cx(0,0)];
+    // qubit0 is the more significant bit: index = q0*2+q1
+    // pairs: (q0=0,q1=0)=0 & (q0=1,q1=0)=2 ; (q0=0,q1=1)=1 & (q0=1,q1=1)=3
+    [[0,2],[1,3]].forEach(([i,j])=>{
+      const a = state[i], b = state[j];
+      out[i] = cx(c*a.re - s*b.re, c*a.im - s*b.im);
+      out[j] = cx(s*a.re + c*b.re, s*a.im + c*b.im);
+    });
+    return out;
+  }
+  psi = applyRyQ0(psi);
+  // CNOT control=q0 target=q1: swap amplitudes of (10)<->(11) i.e. indices 2 and 3
+  const tmp = psi[2]; psi[2] = psi[3]; psi[3] = tmp;
+
+  // reduced density matrix for qubit A (trace out qubit B): indices grouped by q0
+  // rho_A[a][a'] = sum_b psi[a,b]*conj(psi[a',b]),  index(a,b)=a*2+b
+  function reduced(forQubitA){
+    // returns 2x2 rho as {00,01,10,11} complex, tracing out the OTHER qubit
+    const rho = [[cx(0,0),cx(0,0)],[cx(0,0),cx(0,0)]];
+    for(let a=0;a<2;a++){
+      for(let ap=0; ap<2; ap++){
+        let sum = cx(0,0);
+        for(let b=0;b<2;b++){
+          let ia, iap;
+          if(forQubitA){ ia = a*2+b; iap = ap*2+b; }
+          else { ia = b*2+a; iap = b*2+ap; }
+          const term = cMul(psi[ia], cConj(psi[iap]));
+          sum = cx(sum.re+term.re, sum.im+term.im);
+        }
+        rho[a][ap] = sum;
+      }
+    }
+    return rho;
+  }
+  function blochFromRho(rho){
+    const x = 2*rho[0][1].re;
+    const y = -2*rho[0][1].im;
+    const z = rho[0][0].re - rho[1][1].re;
+    return [x,y,z];
+  }
+  const rhoA = reduced(true);
+  const rhoB = reduced(false);
+  return { a: blochFromRho(rhoA), b: blochFromRho(rhoB) };
+}
+
+function updateEntanglement(pct){
+  const theta = (pct/100) * (Math.PI/2); // 0 -> no rotation (product |00>), pi/2 -> full Bell-like entanglement
+  const res = computeEntangledBloch(theta);
+  sceneA.setVector(res.a);
+  sceneB.setVector(res.b);
+  const lenA = Math.sqrt(res.a[0]**2+res.a[1]**2+res.a[2]**2);
+  const lenB = Math.sqrt(res.b[0]**2+res.b[1]**2+res.b[2]**2);
+  document.getElementById('purityA').textContent = '|vector| = '+lenA.toFixed(2)+(lenA<0.15?' (maximally mixed)':lenA>0.9?' (pure)':' (partially mixed)');
+  document.getElementById('purityB').textContent = '|vector| = '+lenB.toFixed(2)+(lenB<0.15?' (maximally mixed)':lenB>0.9?' (pure)':' (partially mixed)');
+}
+document.getElementById('entangleSlider').addEventListener('input', (e)=>{
+  const pct = parseInt(e.target.value);
+  document.getElementById('entangleVal').textContent = pct+'%';
+  updateEntanglement(pct);
+});
+updateEntanglement(0);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 6 — Intersection Between ML and Quantum Computing | QML Curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="modules-registry.js"></script>
+<style>
+:root{
+  --bg:#070b14; --bg-2:#0b111f; --panel:#0e1526; --panel-2:#101a2e;
+  --line:rgba(148,178,224,0.14); --line-strong:rgba(148,178,224,0.28);
+  --ink:#e9eef8; --ink-dim:#9fb0c9; --ink-faint:#5f7089;
+  --cyan:#5ad1e6; --cyan-dim:rgba(90,209,230,0.14);
+  --violet:#b39bff; --violet-dim:rgba(179,155,255,0.14);
+  --amber:#f2a341; --amber-dim:rgba(242,163,65,0.14);
+  --green:#5ee6a0; --green-dim:rgba(94,230,160,0.14);
+  --red:#f2726a; --red-dim:rgba(242,114,106,0.14);
+  --blue:#4fa3f7;
+  --serif:'Fraunces', Georgia, serif; --sans:'Inter', -apple-system, sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.7;}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto !important;}}
+
+/* top progress bar */
+.progress-rail{position:fixed; top:0; left:0; right:0; height:3px; background:var(--line); z-index:100;}
+.progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--violet),var(--amber)); transition:width .1s linear;}
+
+header{
+  position:sticky; top:3px; z-index:60; backdrop-filter:blur(14px);
+  background:rgba(7,11,20,0.82); border-bottom:1px solid var(--line);
+}
+.nav-wrap{max-width:1280px; margin:0 auto; padding:14px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+.back-link{
+  display:flex; align-items:center; gap:8px; color:var(--ink-dim); text-decoration:none;
+  font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; transition:color .2s;
+}
+.back-link:hover{color:var(--cyan);}
+.crumb{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); letter-spacing:0.06em; text-transform:uppercase;}
+.crumb b{color:var(--violet);}
+.xp-badge{
+  display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12.5px;
+  border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; color:var(--amber);
+  background:var(--amber-dim);
+}
+
+/* layout */
+.layout{max-width:1280px; margin:0 auto; padding:52px 32px 120px; display:grid; grid-template-columns:250px 1fr; gap:56px;}
+.sidebar{position:sticky; top:80px; align-self:start; height:fit-content;}
+.side-title{font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;}
+.side-list{list-style:none; display:flex; flex-direction:column; gap:2px;}
+.side-list a{
+  display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink-dim);
+  font-size:13px; padding:9px 12px; border-radius:8px; border-left:2px solid transparent;
+  transition:background .2s, color .2s, border-color .2s;
+}
+.side-list a:hover{background:var(--panel);}
+.side-list a.active{color:var(--ink); background:var(--panel); border-left-color:var(--cyan);}
+.side-dot{width:7px; height:7px; border-radius:50%; background:#2a3550; flex-shrink:0; transition:background .3s;}
+.side-dot.done{background:var(--green); box-shadow:0 0 6px var(--green);}
+.side-dot.warn{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+
+/* hero of the tutorial */
+.tut-hero{margin-bottom:56px;}
+.module-eyebrow{
+  display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-strong); border-radius:100px;
+  padding:7px 16px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase;
+  color:var(--violet); background:var(--violet-dim); margin-bottom:20px;
+}
+.tut-hero h1{font-family:var(--serif); font-weight:600; font-size:clamp(32px,4vw,46px); line-height:1.1; letter-spacing:-0.01em;}
+.tut-hero p.lede{margin-top:16px; color:var(--ink-dim); font-size:16px; max-width:640px;}
+.chip-row{display:flex; gap:8px; margin-top:22px; flex-wrap:wrap;}
+.chip{font-family:var(--mono); font-size:10.5px; letter-spacing:0.04em; color:var(--ink-faint); border:1px solid var(--line); padding:5px 11px; border-radius:100px;}
+
+/* chapters */
+.chapter{margin-bottom:78px; scroll-margin-top:90px;}
+.chapter-head{display:flex; align-items:baseline; gap:14px; margin-bottom:18px;}
+.chapter-num{font-family:var(--mono); font-size:13px; color:var(--cyan); letter-spacing:0.08em;}
+.chapter h2{font-family:var(--serif); font-weight:600; font-size:clamp(24px,3vw,32px); letter-spacing:-0.01em;}
+.chapter > p{color:var(--ink-dim); font-size:15.5px; margin-bottom:16px;}
+.chapter > p b{color:var(--ink); font-weight:600;}
+.chapter ul.points{margin:16px 0 20px 0; padding-left:0; list-style:none; display:flex; flex-direction:column; gap:10px;}
+.chapter ul.points li{
+  display:flex; gap:10px; font-size:14.5px; color:var(--ink-dim); padding:12px 14px;
+  background:var(--panel); border:1px solid var(--line); border-radius:10px;
+}
+.chapter ul.points li::before{content:'◆'; color:var(--violet); font-size:8px; margin-top:5px; flex-shrink:0;}
+.callout{
+  margin:22px 0; padding:16px 18px; border-radius:10px; border-left:3px solid var(--cyan);
+  background:var(--cyan-dim); font-size:14px; color:var(--ink-dim);
+}
+.callout b{color:var(--ink);}
+
+/* visuals */
+.visual-box{
+  background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:26px;
+  margin:24px 0; overflow-x:auto;
+}
+.visual-label{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;}
+
+/* timeline (chapter 1) */
+.timeline{display:flex; gap:0; min-width:640px; position:relative; padding-top:10px;}
+.timeline::before{content:''; position:absolute; top:26px; left:0; right:0; height:2px; background:var(--line);}
+.tl-item{flex:1; text-align:center; position:relative; padding-top:0;}
+.tl-dot{width:14px; height:14px; border-radius:50%; background:var(--panel); border:2px solid var(--cyan); margin:0 auto 14px; position:relative; z-index:2;}
+.tl-item:nth-child(even) .tl-dot{border-color:var(--violet);}
+.tl-year{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-bottom:4px;}
+.tl-label{font-size:12.5px; color:var(--ink-dim); max-width:120px; margin:0 auto;}
+
+/* two column compare (chapter 2) */
+.compare{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+.compare-col{padding:18px; border-radius:10px; background:var(--panel-2); border:1px solid var(--line);}
+.compare-col h5{font-family:var(--mono); font-size:12px; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:10px;}
+.compare-col.q4ml h5{color:var(--cyan);}
+.compare-col.ml4q h5{color:var(--amber);}
+.compare-col ul{list-style:none; display:flex; flex-direction:column; gap:8px;}
+.compare-col li{font-size:13.5px; color:var(--ink-dim); padding-left:16px; position:relative;}
+.compare-col li::before{content:'→'; position:absolute; left:0; color:var(--ink-faint);}
+@media (max-width:700px){.compare{grid-template-columns:1fr;}}
+
+/* hybrid loop (chapter 3) */
+.loop-wrap{display:flex; justify-content:center;}
+.loop-wrap svg{max-width:100%; height:auto;}
+.loop-node{fill:var(--panel-2); stroke:var(--line-strong); stroke-width:1.4;}
+.loop-text{font-family:var(--mono); font-size:11px; fill:var(--ink-dim);}
+.loop-arrow{stroke:var(--ink-faint); stroke-width:1.4; fill:none; marker-end:url(#arrow);}
+.loop-pulse{fill:var(--cyan); filter:drop-shadow(0 0 5px var(--cyan));}
+
+/* research grid (chapter 4) */
+.research-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+.research-card{padding:16px; border-radius:10px; background:var(--panel-2); border:1px solid var(--line);}
+.research-card h6{font-size:13px; font-weight:700; margin-bottom:6px; color:var(--ink);}
+.research-card p{font-size:12px; color:var(--ink-faint); line-height:1.5;}
+@media (max-width:700px){.research-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:480px){.research-grid{grid-template-columns:1fr;}}
+
+/* opp/challenge toggle (chapter 5) */
+.toggle-row{display:flex; gap:8px; margin-bottom:16px;}
+.toggle-btn{
+  font-family:var(--mono); font-size:11.5px; letter-spacing:0.05em; text-transform:uppercase;
+  padding:8px 16px; border-radius:100px; border:1px solid var(--line-strong); background:transparent;
+  color:var(--ink-dim); cursor:pointer; transition:all .2s;
+}
+.toggle-btn.active.opp{color:var(--green); border-color:var(--green); background:var(--green-dim);}
+.toggle-btn.active.chal{color:var(--red); border-color:var(--red); background:var(--red-dim);}
+.oc-panel{display:none;}
+.oc-panel.show{display:block;}
+.oc-panel ul{list-style:none; display:flex; flex-direction:column; gap:10px;}
+.oc-panel li{font-size:14px; color:var(--ink-dim); padding:12px 14px; background:var(--panel-2); border:1px solid var(--line); border-radius:10px;}
+
+/* quiz */
+.quiz-box{
+  margin-top:28px; background:var(--panel); border:1px solid var(--line-strong); border-radius:14px; padding:24px;
+}
+.quiz-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
+.quiz-title{font-family:var(--mono); font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--cyan); display:flex; align-items:center; gap:8px;}
+.quiz-score{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);}
+.q-item{margin-bottom:22px;}
+.q-item:last-child{margin-bottom:0;}
+.q-text{font-size:14.5px; font-weight:600; margin-bottom:12px; color:var(--ink);}
+.q-options{display:flex; flex-direction:column; gap:8px;}
+.q-opt{
+  text-align:left; padding:11px 14px; border-radius:9px; border:1px solid var(--line-strong);
+  background:var(--panel-2); color:var(--ink-dim); font-size:13.5px; cursor:pointer;
+  transition:border-color .2s, background .2s, color .2s; font-family:var(--sans);
+}
+.q-opt:hover:not(:disabled){border-color:var(--ink-dim); color:var(--ink);}
+.q-opt.correct{border-color:var(--green); background:var(--green-dim); color:var(--green);}
+.q-opt.incorrect{border-color:var(--red); background:var(--red-dim); color:var(--red);}
+.q-opt:disabled{cursor:default;}
+.q-explain{
+  margin-top:10px; font-size:13px; color:var(--ink-dim); padding:11px 14px; border-radius:8px;
+  background:var(--panel-2); border-left:2px solid var(--cyan); display:none;
+}
+.q-explain.show{display:block;}
+.chapter-status{
+  margin-top:16px; padding:10px 14px; border-radius:8px; font-family:var(--mono); font-size:11.5px;
+  display:none; align-items:center; gap:8px;
+}
+.chapter-status.show{display:flex;}
+.chapter-status.mastered{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.35);}
+.chapter-status.review{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.35);}
+
+/* final assessment */
+.final-assess{
+  margin-top:20px; background:linear-gradient(180deg,var(--panel-2),var(--panel)); border:1px solid var(--line-strong);
+  border-radius:16px; padding:34px;
+}
+.final-head{margin-bottom:26px;}
+.final-head .module-eyebrow{color:var(--amber); border-color:var(--line-strong); background:var(--amber-dim);}
+.final-head h2{font-family:var(--serif); font-size:clamp(26px,3vw,34px); font-weight:600;}
+.final-head p{color:var(--ink-dim); margin-top:10px; font-size:14.5px;}
+.result-panel{
+  margin-top:28px; padding:24px; border-radius:12px; border:1px solid var(--line-strong); background:var(--bg);
+  display:none;
+}
+.result-panel.show{display:block;}
+.result-top{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:18px;}
+.result-score{font-family:var(--serif); font-size:44px; font-weight:600;}
+.result-badge{
+  font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; padding:6px 14px;
+  border-radius:100px;
+}
+.result-badge.pass{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.4);}
+.result-badge.retry{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.4);}
+.recommend-list{list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+.recommend-list li{font-size:13.5px; color:var(--ink-dim); padding:10px 12px; background:var(--panel-2); border-radius:8px; border:1px solid var(--line);}
+.result-actions{display:flex; gap:12px; margin-top:22px; flex-wrap:wrap;}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:9px; font-size:13.5px; font-weight:600; text-decoration:none; cursor:pointer; border:1px solid transparent; transition:transform .2s, box-shadow .2s;}
+.btn-primary{background:var(--blue); color:#04101f;}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 26px -8px rgba(79,163,247,0.5);}
+.btn-ghost{background:transparent; border-color:var(--line-strong); color:var(--ink);}
+.btn-ghost:hover{border-color:var(--ink-dim); transform:translateY(-2px);}
+
+.reveal{opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease;}
+.reveal.in{opacity:1; transform:translateY(0);}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static; display:flex; overflow-x:auto; gap:4px; padding-bottom:10px;}
+  .side-list{flex-direction:row;}
+  .side-list a{white-space:nowrap;}
+}
+
+/* module-to-module nav footer, generated from modules-registry.js */
+.module-nav{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:70px; padding-top:36px; border-top:1px solid var(--line);}
+.mn-card{
+  display:flex; flex-direction:column; gap:6px; padding:20px 22px; border-radius:14px;
+  background:var(--panel); border:1px solid var(--line); text-decoration:none; transition:border-color .25s, transform .25s;
+}
+.mn-card.enabled:hover{border-color:var(--line-strong); transform:translateY(-3px);}
+.mn-card.disabled{opacity:0.5; cursor:default;}
+.mn-card.next{align-items:flex-end; text-align:right;}
+.mn-eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint);}
+.mn-title{font-family:var(--serif); font-size:17px; font-weight:600; color:var(--ink);}
+.mn-arrow{font-family:var(--mono); font-size:12px; color:var(--cyan);}
+@media (max-width:700px){.module-nav{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="progress-rail"><div class="progress-fill" id="progressFill"></div></div>
+
+<header>
+  <div class="nav-wrap">
+    <a class="back-link" href="qml-roadmap-landing-page.html#curriculum">← Back to Curriculum</a>
+    <div class="crumb">LEVEL 2 · INTERMEDIATE — <b>MODULE 6</b></div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a class="back-link" href="progress-hub.html">My Progress</a>
+      <div class="xp-badge">⚡ <span id="xpCount">0</span> XP</div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="side-title">Module 6 Chapters</div>
+    <ul class="side-list" id="sideList">
+      <li><a href="#ch1" data-target="ch1"><span class="side-dot" id="dot-ch1"></span>Evolution of AI &amp; QC</a></li>
+      <li><a href="#ch2" data-target="ch2"><span class="side-dot" id="dot-ch2"></span>Why Combine ML &amp; Quantum?</a></li>
+      <li><a href="#ch3" data-target="ch3"><span class="side-dot" id="dot-ch3"></span>Hybrid Quantum-Classical Computing</a></li>
+      <li><a href="#ch4" data-target="ch4"><span class="side-dot" id="dot-ch4"></span>Current Research Landscape</a></li>
+      <li><a href="#ch5" data-target="ch5"><span class="side-dot" id="dot-ch5"></span>Opportunities &amp; Challenges</a></li>
+      <li><a href="#final" data-target="final"><span class="side-dot" id="dot-final"></span>Module Assessment</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <div class="tut-hero reveal">
+      <div class="module-eyebrow">◆ Module 6 · Intermediate</div>
+      <h1>Intersection Between Machine Learning and Quantum Computing</h1>
+      <p class="lede">Two fields that grew up separately — one from computer science, one from physics — are now converging. This module maps how that convergence happened, what it actually buys us, and where it still falls short.</p>
+      <div class="chip-row">
+        <span class="chip">5 Chapters</span>
+        <span class="chip">15 Quick-Check Questions</span>
+        <span class="chip">1 Adaptive Assessment</span>
+        <span class="chip">~35 min</span>
+      </div>
+    </div>
+
+    <!-- CHAPTER 1 -->
+    <section class="chapter reveal" id="ch1">
+      <div class="chapter-head"><span class="chapter-num">01</span><h2>Evolution of AI and Quantum Computing</h2></div>
+      <p>Artificial intelligence and quantum computing come from almost opposite corners of science. AI grew out of logic, computer science, and cognitive theory — Turing's 1950 question of whether machines can think, symbolic reasoning in the 1960s–70s, expert systems in the 1980s, and then the deep learning wave that took off after 2012, when backpropagation-trained neural networks started beating hand-engineered systems at scale.</p>
+      <p>Quantum computing, meanwhile, grew out of physics. <b>Richard Feynman's 1981 observation</b> that simulating quantum systems on a classical computer scales exponentially badly — and that a computer built from quantum mechanics itself might not have that problem — is usually treated as the field's conceptual starting point. David Deutsch formalized the idea of a universal quantum computer in 1985, and algorithms like Shor's (1994) and Grover's (1996) proved that, for specific problems, quantum computers could offer real theoretical speedups.</p>
+      <div class="visual-box">
+        <div class="visual-label">Two Timelines, One Convergence Point</div>
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">1950</div><div class="tl-label">Turing's "Can machines think?"</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">1981</div><div class="tl-label">Feynman proposes quantum simulation</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">1985</div><div class="tl-label">Deutsch's universal quantum computer</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">1994–96</div><div class="tl-label">Shor's &amp; Grover's algorithms</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2012</div><div class="tl-label">Deep learning breaks through</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2016+</div><div class="tl-label">Cloud-accessible NISQ hardware</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2018+</div><div class="tl-label">QML emerges as its own field</div></div>
+        </div>
+      </div>
+      <p>The two fields didn't really have a reason to talk to each other until quantum hardware became something you could actually run code on. Once cloud platforms opened access to real (if small and noisy) quantum processors around 2016–2018, and once deep learning had matured into a toolbox of well-understood, differentiable techniques, researchers on both sides started asking the same question from opposite directions: <i>can these help each other?</i></p>
+      <div class="callout"><b>Takeaway:</b> QML isn't a sudden invention — it's the point where a 40-year-old physics idea and a resurgent computer science field finally had the shared infrastructure to meet.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch1">0 / 3</div></div>
+        <div id="quiz-ch1"></div>
+        <div class="chapter-status" id="status-ch1"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 2 -->
+    <section class="chapter reveal" id="ch2">
+      <div class="chapter-head"><span class="chapter-num">02</span><h2>Why Combine ML and Quantum?</h2></div>
+      <p>Once both fields had working infrastructure, the combination started moving in <b>two directions at once</b> — and it's worth keeping them separate in your head, because they solve different problems.</p>
+      <div class="visual-box">
+        <div class="visual-label">Two Directions of Combination</div>
+        <div class="compare">
+          <div class="compare-col q4ml">
+            <h5>Quantum → for ML</h5>
+            <ul>
+              <li>Encode data into high-dimensional Hilbert spaces that are hard to represent classically</li>
+              <li>Use quantum circuits as trainable models (QNNs, VQCs)</li>
+              <li>Exploit quantum kernels for classification</li>
+              <li>Chase potential speedups in specific linear-algebra subroutines</li>
+            </ul>
+          </div>
+          <div class="compare-col ml4q">
+            <h5>ML → for Quantum</h5>
+            <ul>
+              <li>Use ML to design better quantum circuit architectures</li>
+              <li>Use ML to mitigate and predict hardware noise</li>
+              <li>Use ML to calibrate and control real qubits</li>
+              <li>Use ML to discover new quantum algorithms</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <p>The first direction — quantum for ML — is what most people mean by "QML" day to day, and it's what the rest of this curriculum focuses on. The second direction is just as active a research area, but it's more accurately described as "AI for quantum engineering." Knowing which direction a paper or tool is coming from will save you a lot of confusion later.</p>
+      <div class="callout"><b>Takeaway:</b> "Combining ML and quantum" isn't one idea — it's two related but distinct research programs, running in opposite directions.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch2">0 / 3</div></div>
+        <div id="quiz-ch2"></div>
+        <div class="chapter-status" id="status-ch2"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 3 -->
+    <section class="chapter reveal" id="ch3">
+      <div class="chapter-head"><span class="chapter-num">03</span><h2>Hybrid Quantum-Classical Computing</h2></div>
+      <p>Today's quantum processors are what's called <b>NISQ</b> — Noisy Intermediate-Scale Quantum. Few qubits, short coherence times, and no error correction. That rules out running a large algorithm entirely on quantum hardware for almost any practical task right now.</p>
+      <p>The workaround that makes QML possible today is the <b>hybrid loop</b>: a classical computer handles everything that classical computers are already good at — optimization, bookkeeping, control flow — while the quantum processor is called only for the specific subroutine where it might offer an edge, typically evaluating a parameterized circuit and returning a measurement.</p>
+      <div class="visual-box">
+        <div class="visual-label">The Variational Hybrid Loop</div>
+        <div class="loop-wrap">
+          <svg viewBox="0 0 460 200" width="460">
+            <defs>
+              <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L6,3 L0,6 Z" fill="#5f7089"/>
+              </marker>
+            </defs>
+            <rect class="loop-node" x="30" y="70" width="150" height="60" rx="10"/>
+            <text class="loop-text" x="55" y="95">Classical</text>
+            <text class="loop-text" x="55" y="112">Optimizer</text>
+            <rect class="loop-node" x="280" y="70" width="150" height="60" rx="10"/>
+            <text class="loop-text" x="305" y="95">Quantum</text>
+            <text class="loop-text" x="305" y="112">Circuit Eval</text>
+            <path class="loop-arrow" d="M180,88 C 220,70 240,70 280,88"/>
+            <text class="loop-text" x="200" y="66">parameters θ</text>
+            <path class="loop-arrow" d="M280,112 C 240,130 220,130 180,112"/>
+            <text class="loop-text" x="205" y="150">expectation value</text>
+            <circle class="loop-pulse" r="4"><animateMotion dur="2.6s" repeatCount="indefinite" path="M180,88 C 220,70 240,70 280,88"/></circle>
+            <circle class="loop-pulse" r="4"><animateMotion dur="2.6s" repeatCount="indefinite" begin="1.3s" path="M280,112 C 240,130 220,130 180,112"/></circle>
+          </svg>
+        </div>
+      </div>
+      <p>The classical optimizer proposes a set of circuit parameters. The quantum processor runs the circuit with those parameters and returns a measured expectation value. The classical side uses that result to propose better parameters, and the loop repeats until the result converges. This exact pattern is what powers VQE, QAOA, and the variational quantum classifiers you'll meet properly in Module 9 — so it's worth internalizing now.</p>
+      <div class="callout"><b>Takeaway:</b> "Hybrid" isn't a compromise — on NISQ hardware, it's currently the <i>only</i> way QML works at all.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch3">0 / 3</div></div>
+        <div id="quiz-ch3"></div>
+        <div class="chapter-status" id="status-ch3"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 4 -->
+    <section class="chapter reveal" id="ch4">
+      <div class="chapter-head"><span class="chapter-num">04</span><h2>Current Research Landscape</h2></div>
+      <p>QML research right now spreads across a handful of active clusters. Knowing the map helps you find where your own interests — like cybersecurity or chemistry — actually fit.</p>
+      <div class="visual-box">
+        <div class="visual-label">Active Research Clusters</div>
+        <div class="research-grid">
+          <div class="research-card"><h6>Quantum Advantage Scrutiny</h6><p>Claims like Google's Sycamore result are actively re-benchmarked against improved classical methods.</p></div>
+          <div class="research-card"><h6>Differentiable Quantum Programming</h6><p>Frameworks like PennyLane and TensorFlow Quantum make circuits trainable like neural networks.</p></div>
+          <div class="research-card"><h6>NISQ Algorithm Design</h6><p>Research into barren plateaus, trainability, and circuit architectures that survive real noise.</p></div>
+          <div class="research-card"><h6>Industry Hardware Platforms</h6><p>IBM, Google, IonQ, Rigetti, and cloud providers like Amazon Braket compete on qubit quality and access.</p></div>
+          <div class="research-card"><h6>Domain-Specific QML</h6><p>Applied tracks in chemistry, finance, and cybersecurity — covered in Module 10.</p></div>
+          <div class="research-card"><h6>Benchmarks &amp; Datasets</h6><p>An emerging effort to standardize how QML models are fairly compared to classical baselines.</p></div>
+        </div>
+      </div>
+      <p>None of these clusters are settled science — this is a field where the open questions are often more interesting than the answers. That's part of why Module 12 later in this course is built entirely around reading and evaluating current research rather than treating any single result as final.</p>
+      <div class="callout"><b>Takeaway:</b> The field is active and contested — following <i>where the disagreements are</i> tells you more than following any single headline result.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch4">0 / 3</div></div>
+        <div id="quiz-ch4"></div>
+        <div class="chapter-status" id="status-ch4"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 5 -->
+    <section class="chapter reveal" id="ch5">
+      <div class="chapter-head"><span class="chapter-num">05</span><h2>Opportunities and Challenges</h2></div>
+      <p>It's easy to find QML content that leans entirely optimistic or entirely dismissive. Neither is accurate. Toggle between the two views below — you'll need both to reason about the field honestly.</p>
+      <div class="visual-box">
+        <div class="visual-label">Toggle View</div>
+        <div class="toggle-row">
+          <button class="toggle-btn active opp" id="btnOpp" onclick="showOC('opp')">Opportunities</button>
+          <button class="toggle-btn chal" id="btnChal" onclick="showOC('chal')">Challenges</button>
+        </div>
+        <div class="oc-panel show" id="panelOpp">
+          <ul>
+            <li>Access to feature spaces and correlations that are exponentially expensive to represent classically</li>
+            <li>Naturally suited to quantum-native data — molecular and material simulation especially</li>
+            <li>A genuinely interdisciplinary career path combining physics, CS, and ML</li>
+            <li>Early-mover advantage: the tooling and best practices are still being written</li>
+          </ul>
+        </div>
+        <div class="oc-panel" id="panelChal">
+          <ul>
+            <li>Barren plateaus — gradients vanishing as circuits and qubit counts grow (you'll experience this directly in Module 11)</li>
+            <li>Noise and decoherence limiting circuit depth on real hardware</li>
+            <li>Small qubit counts relative to the size of most practical ML problems</li>
+            <li>No agreed-upon, standardized benchmarks for fairly comparing quantum vs. classical models</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout"><b>Takeaway:</b> The honest position on QML today is "promising and unresolved" — not "revolutionary" and not "hopeless."</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch5">0 / 3</div></div>
+        <div id="quiz-ch5"></div>
+        <div class="chapter-status" id="status-ch5"></div>
+      </div>
+    </section>
+
+    <!-- FINAL ASSESSMENT -->
+    <section class="chapter reveal" id="final">
+      <div class="final-assess">
+        <div class="final-head">
+          <div class="module-eyebrow">◆ Adaptive Assessment</div>
+          <h2>Module 6 Assessment</h2>
+          <p>Five synthesis questions across all five chapters. Your result adapts to what you missed above — chapters where you struggled in the quick checks will be flagged for review, regardless of how you do here.</p>
+        </div>
+        <div id="quiz-final"></div>
+        <div class="result-panel" id="resultPanel">
+          <div class="result-top">
+            <div>
+              <div class="result-score" id="resultScore">0%</div>
+              <div class="quiz-score" id="resultDetail">0 / 5 correct</div>
+            </div>
+            <div class="result-badge" id="resultBadge"></div>
+          </div>
+          <div id="recommendWrap"></div>
+          <div class="result-actions">
+            <a href="qml-roadmap-landing-page.html#curriculum" class="btn btn-ghost">← Back to Curriculum</a>
+            <a href="#" class="btn btn-primary" id="continueBtn">Continue to Module 7 →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="module-nav" id="moduleNav"></div>
+
+  </main>
+</div>
+
+<script>
+/* ---------------- state ---------------- */
+let state = { xp:0, chapters:{ ch1:{correct:0,total:3,done:false}, ch2:{correct:0,total:3,done:false}, ch3:{correct:0,total:3,done:false}, ch4:{correct:0,total:3,done:false}, ch5:{correct:0,total:3,done:false} }, finalDone:false };
+try{
+  const saved = localStorage.getItem('qml_module6_state');
+  if(saved) state = JSON.parse(saved);
+}catch(e){}
+
+function saveState(){
+  try{ localStorage.setItem('qml_module6_state', JSON.stringify(state)); }catch(e){}
+}
+function addXP(n){ state.xp += n; document.getElementById('xpCount').textContent = state.xp; saveState(); }
+document.getElementById('xpCount').textContent = state.xp;
+
+/* ---------------- quiz data ---------------- */
+const quizzes = {
+  ch1: [
+    {q:"What year did Feynman propose that quantum systems could simulate physics more naturally than classical computers?", opts:["1975","1981","1994","2001"], correct:1, explain:"Feynman's 1981 talk, 'Simulating Physics with Computers,' is treated as the conceptual origin of quantum computing."},
+    {q:"Which breakthrough triggered the deep learning boom that eventually intersected with quantum computing?", opts:["Expert systems in the 1980s","Backpropagation-trained deep networks after 2012","The 1950 Turing Test","Symbolic logic programming"], correct:1, explain:"Deep networks trained with backpropagation started outperforming hand-engineered systems at scale after 2012, reviving AI broadly."},
+    {q:"What made the 2010s–2020s the point where AI and quantum computing could realistically intersect?", opts:["Quantum computers became fault-tolerant","Cloud access to real quantum hardware arrived alongside mature deep learning tools","Classical computers became obsolete","Governments restricted classical ML research"], correct:1, explain:"Cloud-accessible NISQ hardware (2016+) combined with mature, differentiable ML tooling created the shared infrastructure QML needed."}
+  ],
+  ch2: [
+    {q:"'Quantum for ML' primarily refers to:", opts:["Using classical ML to fix quantum hardware bugs","Using quantum circuits to represent or process data for learning tasks","Using quantum computers to browse the internet faster","Replacing GPUs with CPUs"], correct:1, explain:"This is the direction most people mean by 'QML' — quantum circuits acting as the model or feature map."},
+    {q:"'ML for Quantum' primarily refers to:", opts:["Training quantum computers to do arithmetic","Using machine learning to design circuits, mitigate noise, or calibrate hardware","Using ML to replace physicists","Removing the need for qubits"], correct:1, explain:"This is 'AI for quantum engineering' — ML applied to improve the quantum hardware and software stack itself."},
+    {q:"Which is a genuine claimed benefit of quantum-enhanced ML?", opts:["Guaranteed exponential speedup on all ML tasks","Access to feature spaces that are hard to represent classically","Elimination of the need for training data","Zero energy consumption"], correct:1, explain:"The realistic claim is about access to high-dimensional representations — not blanket speedups on every task."}
+  ],
+  ch3: [
+    {q:"Why is hybrid quantum-classical computing the dominant pattern today?", opts:["Classical computers look better in diagrams","NISQ hardware is small and noisy, so classical resources handle optimization while quantum handles specific subroutines","Quantum computers cannot be programmed at all","It's cheaper for marketing purposes"], correct:1, explain:"Current NISQ hardware can't run full algorithms alone — hybrid loops route only the useful subroutine to the quantum processor."},
+    {q:"In the classical-quantum loop, what does the classical side typically do?", opts:["Executes the quantum gates directly", "Proposes and updates circuit parameters based on measured results", "Cools the quantum processor", "Stores the qubits"], correct:1, explain:"The classical optimizer proposes parameters, then updates them based on what the quantum circuit measures."},
+    {q:"What does the quantum processor contribute in this loop?", opts:["Final decision-making logic","Evaluating the circuit and returning a measurement or expectation value","Writing the optimizer's code","Nothing — it's purely illustrative"], correct:1, explain:"The quantum device's job is narrow: evaluate the parameterized circuit and hand back a measurement."}
+  ],
+  ch4: [
+    {q:"What is a major ongoing debate in current QML research?", opts:["Whether qubits exist","Whether claimed 'quantum advantage' results hold up under classical benchmarking scrutiny","Whether Python is a good language","Whether AI is useful"], correct:1, explain:"Advantage claims (like Google's Sycamore) are routinely re-tested against improved classical algorithms."},
+    {q:"Which of these is a differentiable quantum programming framework mentioned in this course?", opts:["Microsoft Excel","PennyLane","Photoshop","WordPress"], correct:1, explain:"PennyLane (along with tools like TensorFlow Quantum) lets you train quantum circuits the way you'd train a neural network."},
+    {q:"Why do industry players like IBM, Google, and IonQ matter to QML research?", opts:["They provide cloud access to real quantum hardware researchers rely on","They only make consumer laptops","They have no connection to quantum computing","They regulate global AI ethics policy"], correct:0, explain:"Most published QML experiments run on hardware or simulators provided by these platforms."}
+  ],
+  ch5: [
+    {q:"Which is a genuine current challenge for QML, not just a limitation of imagination?", opts:["Barren plateaus making gradients vanish in large variational circuits","Too many qubits are available","Quantum computers are too fast","Classical computers no longer exist"], correct:0, explain:"Barren plateaus are a real, actively-researched obstacle to training larger variational circuits — you'll dig into this in Module 11."},
+    {q:"What skill combination does original QML work typically require?", opts:["Only classical programming","Only quantum physics","A mix of quantum mechanics, computer science, and machine learning","Only marketing skills"], correct:2, explain:"QML sits at a genuine three-way intersection — most strong practitioners are cross-trained, not specialists in just one area."},
+    {q:"What's a genuine opportunity in QML today, rather than hype?", opts:["Guaranteed replacement of all classical ML by 2027","Exploring quantum-native data, like molecular simulation, where quantum representations are natural","Eliminating the need for data entirely","Fault tolerance has already been achieved"], correct:1, explain:"Domains where the underlying data is itself quantum mechanical (chemistry, materials) are where near-term advantage is most plausible."}
+  ]
+};
+const finalQuiz = [
+  {q:"Which best describes the overall thesis of Module 6?", opts:["AI and quantum computing are unrelated fields with no future overlap","AI/ML and quantum computing evolved separately but are now converging into hybrid systems with real opportunities and real technical challenges","Quantum computing has already replaced classical ML entirely","Machine learning has no role in quantum hardware design"], correct:1, explain:"That's the throughline of every chapter in this module — convergence, not replacement, with genuine tradeoffs on both sides."},
+  {q:"A classical optimizer updates circuit parameters while a quantum processor evaluates the circuit and returns expectation values. This describes:", opts:["A fully classical algorithm","A hybrid quantum-classical variational loop","A quantum-only algorithm","A random number generator"], correct:1, explain:"This is exactly the loop from Chapter 3 — the pattern behind VQE, QAOA, and variational classifiers."},
+  {q:"True or False: current quantum advantage claims are universally accepted without scrutiny in the research community.", opts:["True","False"], correct:1, explain:"False — advantage claims are actively re-benchmarked against improved classical methods, as covered in Chapter 4."},
+  {q:"Which pairing correctly matches the two directions of combination from Chapter 2?", opts:["'ML for Quantum' = using ML to mitigate hardware noise; 'Quantum for ML' = using quantum circuits for data representation","'ML for Quantum' = playing music; 'Quantum for ML' = cooling qubits","Both directions are identical","Neither direction exists in current research"], correct:0, explain:"Correct — ML-for-Quantum improves the hardware/software stack; Quantum-for-ML uses circuits as the learning model itself."},
+  {q:"What is the single biggest technical obstacle to large-scale QML deployment discussed in this module?", opts:["Lack of interest from students","NISQ-era hardware limitations — noise, small qubit counts, and vanishing gradients (barren plateaus)","Overabundance of computing power","Absence of any programming languages"], correct:1, explain:"Chapter 5's honest-challenges list centers on exactly this — hardware limits and trainability, not lack of interest or tooling."}
+];
+
+/* ---------------- render quizzes ---------------- */
+function renderQuiz(containerId, items, chapterKey){
+  const container = document.getElementById(containerId);
+  items.forEach((item, idx)=>{
+    const qDiv = document.createElement('div');
+    qDiv.className = 'q-item';
+    qDiv.innerHTML = `
+      <div class="q-text">${idx+1}. ${item.q}</div>
+      <div class="q-options">${item.opts.map((o,i)=>`<button class="q-opt" data-i="${i}">${o}</button>`).join('')}</div>
+      <div class="q-explain">${item.explain}</div>
+    `;
+    container.appendChild(qDiv);
+    const buttons = qDiv.querySelectorAll('.q-opt');
+    const explainEl = qDiv.querySelector('.q-explain');
+    buttons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = parseInt(btn.dataset.i);
+        buttons.forEach(b=>b.disabled = true);
+        if(i === item.correct){
+          btn.classList.add('correct');
+          if(chapterKey) onCorrect(chapterKey);
+          else onFinalAnswer(idx, true);
+        } else {
+          btn.classList.add('incorrect');
+          buttons[item.correct].classList.add('correct');
+          if(chapterKey) onIncorrect(chapterKey);
+          else onFinalAnswer(idx, false);
+        }
+        explainEl.classList.add('show');
+      });
+    });
+  });
+}
+
+Object.keys(quizzes).forEach(key=>{
+  renderQuiz('quiz-'+key, quizzes[key], key);
+  updateChapterScore(key);
+});
+renderQuiz('quiz-final', finalQuiz, null);
+
+/* ---------------- chapter scoring ---------------- */
+function updateChapterScore(key){
+  const s = state.chapters[key];
+  document.getElementById('score-'+key).textContent = s.correct+' / '+s.total;
+}
+function onCorrect(key){
+  const s = state.chapters[key];
+  s.correct = Math.min(s.correct+1, s.total);
+  addXP(10);
+  checkChapterDone(key);
+  updateChapterScore(key);
+  saveState();
+}
+function onIncorrect(key){
+  const s = state.chapters[key];
+  s.hadMiss = true;
+  checkChapterDone(key);
+  updateChapterScore(key);
+  saveState();
+}
+let answeredCount = { ch1:0, ch2:0, ch3:0, ch4:0, ch5:0 };
+function checkChapterDone(key){
+  answeredCount[key]++;
+  const s = state.chapters[key];
+  if(answeredCount[key] >= s.total){
+    s.done = true;
+    const dot = document.getElementById('dot-'+key);
+    const statusEl = document.getElementById('status-'+key);
+    statusEl.classList.add('show');
+    if(s.hadMiss){
+      dot.classList.add('warn');
+      statusEl.classList.add('review');
+      statusEl.innerHTML = '⚠ Review suggested — you missed at least one question in this chapter.';
+    } else {
+      dot.classList.add('done');
+      statusEl.classList.add('mastered');
+      statusEl.innerHTML = '✓ Mastered — perfect score on this chapter.';
+      addXP(15);
+    }
+    saveState();
+  }
+}
+
+/* ---------------- final assessment ---------------- */
+let finalAnswers = [];
+function onFinalAnswer(idx, correct){
+  finalAnswers[idx] = correct;
+  if(finalAnswers.filter(a=>a!==undefined).length === finalQuiz.length){
+    showFinalResult();
+  }
+}
+function showFinalResult(){
+  const correctCount = finalAnswers.filter(a=>a===true).length;
+  const pct = Math.round((correctCount/finalQuiz.length)*100);
+  document.getElementById('resultScore').textContent = pct+'%';
+  document.getElementById('resultDetail').textContent = correctCount+' / '+finalQuiz.length+' correct';
+  const badge = document.getElementById('resultBadge');
+  const pass = pct >= 70;
+  badge.textContent = pass ? 'Passed' : 'Retry Recommended';
+  badge.className = 'result-badge ' + (pass ? 'pass' : 'retry');
+  addXP(correctCount*10 + (pass?25:0));
+
+  // adaptive recommendations based on ALL session performance, not just final quiz
+  const weakChapters = Object.keys(state.chapters).filter(k => state.chapters[k].hadMiss);
+  const wrap = document.getElementById('recommendWrap');
+  if(weakChapters.length === 0 && pass){
+    wrap.innerHTML = '<div class="callout" style="margin-top:4px;"><b>Great work.</b> No flagged chapters and a passing assessment score — you are ready for Module 7: Why Quantum Machine Learning?</div>';
+  } else {
+    const names = { ch1:"Evolution of AI & Quantum Computing", ch2:"Why Combine ML and Quantum?", ch3:"Hybrid Quantum-Classical Computing", ch4:"Current Research Landscape", ch5:"Opportunities and Challenges" };
+    let html = '<div class="visual-label" style="margin-top:18px;">Recommended Review</div><ul class="recommend-list">';
+    if(weakChapters.length){
+      weakChapters.forEach(k=> html += `<li>↺ Revisit <b>${names[k]}</b> — a quick-check answer there was missed.</li>`);
+    }
+    if(!pass){
+      html += `<li>↺ Your assessment score was below 70% — consider re-reading the callout boxes at the end of each chapter before continuing.</li>`;
+    }
+    html += '</ul>';
+    wrap.innerHTML = html;
+  }
+  document.getElementById('resultPanel').classList.add('show');
+  document.getElementById('dot-final').classList.add(pass ? 'done' : 'warn');
+  state.finalDone = true;
+  saveState();
+}
+
+/* ---------------- opportunities/challenges toggle ---------------- */
+function showOC(which){
+  document.getElementById('panelOpp').classList.toggle('show', which==='opp');
+  document.getElementById('panelChal').classList.toggle('show', which==='chal');
+  document.getElementById('btnOpp').classList.toggle('active', which==='opp');
+  document.getElementById('btnChal').classList.toggle('active', which==='chal');
+}
+
+/* ---------------- scrollspy + progress bar ---------------- */
+const sections = document.querySelectorAll('.chapter');
+const sideLinks = document.querySelectorAll('.side-list a');
+const spyObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      sideLinks.forEach(a=>a.classList.remove('active'));
+      const link = document.querySelector(`.side-list a[data-target="${entry.target.id}"]`);
+      if(link) link.classList.add('active');
+    }
+  });
+},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>spyObserver.observe(s));
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+  document.getElementById('progressFill').style.width = scrolled+'%';
+});
+
+/* ---------------- reveal on scroll ---------------- */
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+},{threshold:0.08});
+revealEls.forEach(el=>io.observe(el));
+
+/* ---------------- prev/next module nav, from the shared registry ---------------- */
+(function(){
+  const { prev, next } = qmlGetAdjacentModules(6);
+  const wrap = document.getElementById('moduleNav');
+  function cardHTML(mod, dir){
+    if(!mod){
+      return '<div class="mn-card disabled '+dir+'"><span class="mn-eyebrow">'+(dir==='next'?'Up Next':'Previous')+'</span><span class="mn-title">\u2014 none \u2014</span></div>';
+    }
+    const available = !!mod.file;
+    const arrow = dir==='prev' ? '\u2190 ' : '';
+    const arrowEnd = dir==='next' ? ' \u2192' : '';
+    const eyebrow = (dir==='prev' ? 'Previous \u2014 Module '+mod.id : 'Up Next \u2014 Module '+mod.id) + (available ? '' : ' (Coming Soon)');
+    if(available){
+      return '<a class="mn-card enabled '+dir+'" href="'+mod.file+'">'
+        + '<span class="mn-eyebrow">'+eyebrow+'</span>'
+        + '<span class="mn-title">'+arrow+mod.title+arrowEnd+'</span>'
+        + '<span class="mn-arrow">Open tutorial</span>'
+        + '</a>';
+    }
+    return '<div class="mn-card disabled '+dir+'">'
+      + '<span class="mn-eyebrow">'+eyebrow+'</span>'
+      + '<span class="mn-title">'+mod.title+'</span>'
+      + '<span class="mn-arrow">Not published yet</span>'
+      + '</div>';
+  }
+  wrap.innerHTML = cardHTML(prev,'prev') + cardHTML(next,'next');
+
+  const continueBtn = document.getElementById('continueBtn');
+  if(continueBtn){
+    if(next && next.file){
+      continueBtn.href = next.file;
+      continueBtn.textContent = 'Continue to Module '+next.id+' \u2192';
+    } else if(next){
+      continueBtn.href = 'qml-roadmap-landing-page.html#curriculum';
+      continueBtn.textContent = 'Module '+next.id+' — Coming Soon';
+      continueBtn.style.opacity = '0.6';
+    }
+  }
+})();
+</script>
+
+</body>
+</html>

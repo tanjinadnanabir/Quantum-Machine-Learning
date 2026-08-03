@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 7 — Why Quantum Machine Learning? | QML Curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="modules-registry.js"></script>
+<style>
+:root{
+  --bg:#070b14; --bg-2:#0b111f; --panel:#0e1526; --panel-2:#101a2e;
+  --line:rgba(148,178,224,0.14); --line-strong:rgba(148,178,224,0.28);
+  --ink:#e9eef8; --ink-dim:#9fb0c9; --ink-faint:#5f7089;
+  --cyan:#5ad1e6; --cyan-dim:rgba(90,209,230,0.14);
+  --violet:#b39bff; --violet-dim:rgba(179,155,255,0.14);
+  --amber:#f2a341; --amber-dim:rgba(242,163,65,0.14);
+  --green:#5ee6a0; --green-dim:rgba(94,230,160,0.14);
+  --red:#f2726a; --red-dim:rgba(242,114,106,0.14);
+  --blue:#4fa3f7;
+  --serif:'Fraunces', Georgia, serif; --sans:'Inter', -apple-system, sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.7;}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto !important;}}
+
+.progress-rail{position:fixed; top:0; left:0; right:0; height:3px; background:var(--line); z-index:100;}
+.progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--violet),var(--amber)); transition:width .1s linear;}
+
+header{position:sticky; top:3px; z-index:60; backdrop-filter:blur(14px); background:rgba(7,11,20,0.82); border-bottom:1px solid var(--line);}
+.nav-wrap{max-width:1280px; margin:0 auto; padding:14px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+.back-link{display:flex; align-items:center; gap:8px; color:var(--ink-dim); text-decoration:none; font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; transition:color .2s;}
+.back-link:hover{color:var(--cyan);}
+.crumb{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); letter-spacing:0.06em; text-transform:uppercase;}
+.crumb b{color:var(--violet);}
+.xp-badge{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12.5px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; color:var(--amber); background:var(--amber-dim);}
+
+.layout{max-width:1280px; margin:0 auto; padding:52px 32px 120px; display:grid; grid-template-columns:250px 1fr; gap:56px;}
+.sidebar{position:sticky; top:80px; align-self:start; height:fit-content;}
+.side-title{font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;}
+.side-list{list-style:none; display:flex; flex-direction:column; gap:2px;}
+.side-list a{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink-dim); font-size:13px; padding:9px 12px; border-radius:8px; border-left:2px solid transparent; transition:background .2s, color .2s, border-color .2s;}
+.side-list a:hover{background:var(--panel);}
+.side-list a.active{color:var(--ink); background:var(--panel); border-left-color:var(--cyan);}
+.side-dot{width:7px; height:7px; border-radius:50%; background:#2a3550; flex-shrink:0; transition:background .3s;}
+.side-dot.done{background:var(--green); box-shadow:0 0 6px var(--green);}
+.side-dot.warn{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+
+.tut-hero{margin-bottom:44px;}
+.module-eyebrow{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--violet); background:var(--violet-dim); margin-bottom:20px;}
+.tut-hero h1{font-family:var(--serif); font-weight:600; font-size:clamp(32px,4vw,46px); line-height:1.1; letter-spacing:-0.01em;}
+.tut-hero p.lede{margin-top:16px; color:var(--ink-dim); font-size:16px; max-width:660px;}
+.chip-row{display:flex; gap:8px; margin-top:22px; flex-wrap:wrap;}
+.chip{font-family:var(--mono); font-size:10.5px; letter-spacing:0.04em; color:var(--ink-faint); border:1px solid var(--line); padding:5px 11px; border-radius:100px;}
+
+/* meet the character */
+.character-card{
+  margin-top:28px; display:flex; gap:18px; align-items:center; padding:20px 22px;
+  background:linear-gradient(120deg, rgba(179,155,255,0.08), rgba(90,209,230,0.05));
+  border:1px solid var(--line-strong); border-radius:14px;
+}
+.avatar-ring{
+  width:56px; height:56px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+  background:var(--panel); border:1.5px solid var(--violet); font-family:var(--serif); font-size:22px; color:var(--violet);
+}
+.character-card .cname{font-weight:700; font-size:14.5px; color:var(--ink);}
+.character-card .crole{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:2px;}
+.character-card p{font-size:13.5px; color:var(--ink-dim); margin-top:6px;}
+
+.chapter{margin-bottom:84px; scroll-margin-top:90px;}
+.chapter-head{display:flex; align-items:center; gap:14px; margin-bottom:20px;}
+.chapter-icon{
+  width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+  background:var(--panel); border:1px solid var(--line-strong); font-size:19px; color:var(--cyan); flex-shrink:0;
+}
+.chapter-num{font-family:var(--mono); font-size:12px; color:var(--ink-faint); letter-spacing:0.08em; display:block;}
+.chapter h2{font-family:var(--serif); font-weight:600; font-size:clamp(24px,3vw,32px); letter-spacing:-0.01em;}
+
+/* story panel */
+.story-panel{
+  position:relative; margin:18px 0 24px; padding:22px 26px 22px 52px; border-radius:12px;
+  background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--violet);
+  font-family:var(--serif); font-style:italic; font-size:16px; color:var(--ink-dim); line-height:1.75;
+}
+.story-panel::before{content:'“'; position:absolute; left:16px; top:8px; font-size:38px; color:var(--violet); font-style:normal; opacity:0.6;}
+.story-panel b{color:var(--ink); font-style:normal;}
+
+.chapter > p.body-text{color:var(--ink-dim); font-size:15.5px; margin-bottom:16px;}
+.chapter > p.body-text b{color:var(--ink); font-weight:600;}
+.chapter ul.points{margin:16px 0 20px 0; padding-left:0; list-style:none; display:flex; flex-direction:column; gap:10px;}
+.chapter ul.points li{display:flex; gap:10px; font-size:14.5px; color:var(--ink-dim); padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px;}
+.chapter ul.points li::before{content:'◆'; color:var(--violet); font-size:8px; margin-top:5px; flex-shrink:0;}
+.callout{margin:22px 0; padding:16px 18px; border-radius:10px; border-left:3px solid var(--cyan); background:var(--cyan-dim); font-size:14px; color:var(--ink-dim);}
+.callout b{color:var(--ink);}
+
+/* platform feature spotlight */
+.spotlight{
+  display:flex; align-items:center; gap:14px; margin:22px 0; padding:16px 18px; border-radius:12px;
+  background:var(--amber-dim); border:1px solid rgba(242,163,65,0.35);
+}
+.spotlight .sicon{font-size:20px; color:var(--amber); flex-shrink:0;}
+.spotlight .stext{font-size:13px; color:var(--ink-dim);}
+.spotlight .stext b{color:var(--amber); font-family:var(--mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; display:block; margin-bottom:3px;}
+
+.visual-box{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:26px; margin:24px 0; overflow-x:auto;}
+.visual-label{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px; display:flex; align-items:center; justify-content:space-between;}
+
+/* Ch1: ceiling ladder */
+.ladder{display:flex; align-items:flex-end; gap:10px; min-width:520px; height:140px; padding-top:10px;}
+.ladder-bar{flex:1; background:linear-gradient(180deg,var(--violet),var(--cyan)); border-radius:6px 6px 0 0; position:relative; opacity:0.85; transition:height .6s ease;}
+.ladder-bar span{position:absolute; top:-22px; left:50%; transform:translateX(-50%); font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); white-space:nowrap;}
+.ladder-wall{
+  position:relative; width:6px; background:repeating-linear-gradient(45deg, var(--red), var(--red) 4px, transparent 4px, transparent 8px);
+  border-radius:4px; opacity:0.7;
+}
+
+/* Ch2: complexity explorer */
+.explorer-controls{display:flex; align-items:center; gap:16px; margin-bottom:20px; flex-wrap:wrap;}
+.explorer-controls label{font-family:var(--mono); font-size:12px; color:var(--ink-dim);}
+.explorer-controls input[type=range]{width:220px; accent-color:var(--cyan);}
+.explorer-n{font-family:var(--serif); font-size:20px; color:var(--cyan); min-width:28px; display:inline-block; text-align:center;}
+.explorer-rows{display:flex; flex-direction:column; gap:14px;}
+.exp-row{display:grid; grid-template-columns:110px 1fr 140px; align-items:center; gap:14px;}
+.exp-row .exp-label{font-family:var(--mono); font-size:11.5px; color:var(--ink-dim);}
+.exp-track{height:10px; background:var(--panel-2); border-radius:6px; overflow:hidden; border:1px solid var(--line);}
+.exp-fill{height:100%; border-radius:6px; transition:width .4s ease; width:1%;}
+.exp-fill.linear{background:var(--green);}
+.exp-fill.poly{background:var(--amber);}
+.exp-fill.exp{background:var(--red);}
+.exp-val{font-family:var(--mono); font-size:12px; color:var(--ink); text-align:right;}
+.fun-fact{margin-top:16px; font-size:12.5px; color:var(--ink-faint); font-family:var(--mono); min-height:18px;}
+
+/* Ch3: dimension toggle */
+.dim-toggle-row{display:flex; gap:8px; margin-bottom:18px;}
+.dim-canvas-wrap{display:flex; justify-content:center;}
+.dot-2d, .dot-hd{transition: cx 0.7s cubic-bezier(.4,0,.2,1), cy 0.7s cubic-bezier(.4,0,.2,1), fill 0.4s ease;}
+
+/* Ch4: parallel universes */
+.parallel-wrap{display:flex; justify-content:center;}
+.pbranch{stroke-width:2; fill:none; opacity:0.35; transition:opacity .4s;}
+.pbranch.lit{opacity:1;}
+
+/* Ch5: hype cards */
+.hype-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+.hype-card{
+  perspective:1000px; height:150px; cursor:pointer;
+}
+.hype-inner{position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d;}
+.hype-card.flipped .hype-inner{transform:rotateY(180deg);}
+.hype-face{
+  position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; padding:16px;
+  display:flex; flex-direction:column; justify-content:center; border:1px solid var(--line-strong);
+}
+.hype-front{background:var(--panel-2);}
+.hype-front h6{font-size:13.5px; font-weight:700; color:var(--ink); margin-bottom:8px;}
+.hype-tag{font-family:var(--mono); font-size:9.5px; letter-spacing:0.06em; text-transform:uppercase; padding:3px 8px; border-radius:100px; display:inline-block; width:fit-content;}
+.hype-tag.proven{background:var(--green-dim); color:var(--green);}
+.hype-tag.plausible{background:var(--cyan-dim); color:var(--cyan);}
+.hype-tag.speculative{background:var(--amber-dim); color:var(--amber);}
+.hype-tag.myth{background:var(--red-dim); color:var(--red);}
+.hype-back{background:var(--panel); transform:rotateY(180deg); font-size:12px; color:var(--ink-dim); line-height:1.5;}
+.hype-hint{font-family:var(--mono); font-size:9.5px; color:var(--ink-faint); margin-top:auto;}
+@media (max-width:760px){.hype-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:480px){.hype-grid{grid-template-columns:1fr;}}
+
+/* Ch6: challenge bars */
+.chal-bars{display:flex; flex-direction:column; gap:16px;}
+.cbar-row{display:grid; grid-template-columns:180px 1fr 90px; align-items:center; gap:14px;}
+.cbar-label{font-size:13px; color:var(--ink-dim);}
+.cbar-track{height:9px; background:var(--panel-2); border-radius:6px; overflow:hidden; border:1px solid var(--line);}
+.cbar-fill{height:100%; border-radius:6px; background:linear-gradient(90deg,var(--red),var(--amber)); width:0%; transition:width 1s ease;}
+.cbar-status{font-family:var(--mono); font-size:11px; text-align:right; color:var(--ink-faint);}
+
+/* AI tutor widget */
+.tutor-widget{background:var(--panel); border:1px solid var(--line-strong); border-radius:14px; padding:22px; margin:24px 0;}
+.tutor-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+.tutor-avatar{width:32px; height:32px; border-radius:9px; background:var(--violet-dim); color:var(--violet); display:flex; align-items:center; justify-content:center; font-size:15px;}
+.tutor-title{font-family:var(--mono); font-size:12px; letter-spacing:0.04em; color:var(--ink);}
+.tutor-note{font-size:11.5px; color:var(--ink-faint); margin-bottom:16px;}
+.tutor-questions{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;}
+.tutor-q-btn{
+  font-family:var(--sans); font-size:12.5px; padding:9px 14px; border-radius:100px; border:1px solid var(--line-strong);
+  background:var(--panel-2); color:var(--ink-dim); cursor:pointer; transition:all .2s;
+}
+.tutor-q-btn:hover{border-color:var(--violet); color:var(--ink);}
+.tutor-answer{
+  display:none; padding:14px 16px; border-radius:10px; background:var(--panel-2); border-left:3px solid var(--violet);
+  font-size:13.5px; color:var(--ink-dim); line-height:1.6;
+}
+.tutor-answer.show{display:block; animation:fadein .3s ease;}
+@keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+/* quiz (shared with module 6 pattern) */
+.quiz-box{margin-top:28px; background:var(--panel); border:1px solid var(--line-strong); border-radius:14px; padding:24px;}
+.quiz-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
+.quiz-title{font-family:var(--mono); font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--cyan); display:flex; align-items:center; gap:8px;}
+.quiz-score{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);}
+.q-item{margin-bottom:22px;}
+.q-item:last-child{margin-bottom:0;}
+.q-text{font-size:14.5px; font-weight:600; margin-bottom:12px; color:var(--ink);}
+.q-options{display:flex; flex-direction:column; gap:8px;}
+.q-opt{text-align:left; padding:11px 14px; border-radius:9px; border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-dim); font-size:13.5px; cursor:pointer; transition:border-color .2s, background .2s, color .2s; font-family:var(--sans);}
+.q-opt:hover:not(:disabled){border-color:var(--ink-dim); color:var(--ink);}
+.q-opt.correct{border-color:var(--green); background:var(--green-dim); color:var(--green);}
+.q-opt.incorrect{border-color:var(--red); background:var(--red-dim); color:var(--red);}
+.q-opt:disabled{cursor:default;}
+.q-explain{margin-top:10px; font-size:13px; color:var(--ink-dim); padding:11px 14px; border-radius:8px; background:var(--panel-2); border-left:2px solid var(--cyan); display:none;}
+.q-explain.show{display:block;}
+.chapter-status{margin-top:16px; padding:10px 14px; border-radius:8px; font-family:var(--mono); font-size:11.5px; display:none; align-items:center; gap:8px;}
+.chapter-status.show{display:flex;}
+.chapter-status.mastered{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.35);}
+.chapter-status.review{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.35);}
+
+.final-assess{margin-top:20px; background:linear-gradient(180deg,var(--panel-2),var(--panel)); border:1px solid var(--line-strong); border-radius:16px; padding:34px;}
+.final-head{margin-bottom:26px;}
+.final-head .module-eyebrow{color:var(--amber); border-color:var(--line-strong); background:var(--amber-dim);}
+.final-head h2{font-family:var(--serif); font-size:clamp(26px,3vw,34px); font-weight:600;}
+.final-head p{color:var(--ink-dim); margin-top:10px; font-size:14.5px;}
+.result-panel{margin-top:28px; padding:24px; border-radius:12px; border:1px solid var(--line-strong); background:var(--bg); display:none;}
+.result-panel.show{display:block;}
+.result-top{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:18px;}
+.result-score{font-family:var(--serif); font-size:44px; font-weight:600;}
+.result-badge{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; padding:6px 14px; border-radius:100px;}
+.result-badge.pass{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.4);}
+.result-badge.retry{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.4);}
+.recommend-list{list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+.recommend-list li{font-size:13.5px; color:var(--ink-dim); padding:10px 12px; background:var(--panel-2); border-radius:8px; border:1px solid var(--line);}
+.result-actions{display:flex; gap:12px; margin-top:22px; flex-wrap:wrap;}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:9px; font-size:13.5px; font-weight:600; text-decoration:none; cursor:pointer; border:1px solid transparent; transition:transform .2s, box-shadow .2s;}
+.btn-primary{background:var(--blue); color:#04101f;}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 26px -8px rgba(79,163,247,0.5);}
+.btn-ghost{background:transparent; border-color:var(--line-strong); color:var(--ink);}
+.btn-ghost:hover{border-color:var(--ink-dim); transform:translateY(-2px);}
+.toggle-btn{font-family:var(--mono); font-size:11.5px; letter-spacing:0.05em; text-transform:uppercase; padding:8px 16px; border-radius:100px; border:1px solid var(--line-strong); background:transparent; color:var(--ink-dim); cursor:pointer; transition:all .2s;}
+.toggle-btn.active{color:var(--cyan); border-color:var(--cyan); background:var(--cyan-dim);}
+
+.reveal{opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease;}
+.reveal.in{opacity:1; transform:translateY(0);}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static; display:flex; overflow-x:auto; gap:4px; padding-bottom:10px;}
+  .side-list{flex-direction:row;}
+  .side-list a{white-space:nowrap;}
+}
+
+/* module-to-module nav footer, generated from modules-registry.js */
+.module-nav{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:70px; padding-top:36px; border-top:1px solid var(--line);}
+.mn-card{display:flex; flex-direction:column; gap:6px; padding:20px 22px; border-radius:14px; background:var(--panel); border:1px solid var(--line); text-decoration:none; transition:border-color .25s, transform .25s;}
+.mn-card.enabled:hover{border-color:var(--line-strong); transform:translateY(-3px);}
+.mn-card.disabled{opacity:0.5; cursor:default;}
+.mn-card.next{align-items:flex-end; text-align:right;}
+.mn-eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint);}
+.mn-title{font-family:var(--serif); font-size:17px; font-weight:600; color:var(--ink);}
+.mn-arrow{font-family:var(--mono); font-size:12px; color:var(--cyan);}
+@media (max-width:700px){.module-nav{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="progress-rail"><div class="progress-fill" id="progressFill"></div></div>
+
+<header>
+  <div class="nav-wrap">
+    <a class="back-link" href="qml-roadmap-landing-page.html#curriculum">← Back to Curriculum</a>
+    <div class="crumb">LEVEL 2 · INTERMEDIATE — <b>MODULE 7</b></div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a class="back-link" href="progress-hub.html">My Progress</a>
+      <div class="xp-badge">⚡ <span id="xpCount">0</span> XP</div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="side-title">Module 7 Chapters</div>
+    <ul class="side-list" id="sideList">
+      <li><a href="#ch1" data-target="ch1"><span class="side-dot" id="dot-ch1"></span>Limitations of Classical ML</a></li>
+      <li><a href="#ch2" data-target="ch2"><span class="side-dot" id="dot-ch2"></span>Computational Complexity</a></li>
+      <li><a href="#ch3" data-target="ch3"><span class="side-dot" id="dot-ch3"></span>High-Dimensional Feature Spaces</a></li>
+      <li><a href="#ch4" data-target="ch4"><span class="side-dot" id="dot-ch4"></span>Quantum Parallelism</a></li>
+      <li><a href="#ch5" data-target="ch5"><span class="side-dot" id="dot-ch5"></span>Potential Quantum Advantage</a></li>
+      <li><a href="#ch6" data-target="ch6"><span class="side-dot" id="dot-ch6"></span>Current Challenges</a></li>
+      <li><a href="#final" data-target="final"><span class="side-dot" id="dot-final"></span>Module Assessment</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <div class="tut-hero reveal">
+      <div class="module-eyebrow">◆ Module 7 · Intermediate</div>
+      <h1>Why Quantum Machine Learning?</h1>
+      <p class="lede">Not "quantum computers are magic" — a real, honest answer. This module follows one engineer's problem from a wall she hits in Chapter 1 to the actual reasons quantum computing might (and might not) help, by Chapter 6.</p>
+      <div class="chip-row">
+        <span class="chip">6 Chapters</span>
+        <span class="chip">18 Quick-Check Questions</span>
+        <span class="chip">1 Adaptive Assessment</span>
+        <span class="chip">~45 min</span>
+      </div>
+      <div class="character-card">
+        <div class="avatar-ring">M</div>
+        <div>
+          <div class="cname">Meet Maya</div>
+          <div class="crole">Classical ML Engineer · Drug Discovery Team</div>
+          <p>Maya spends her days training models to predict which molecules might become new medicines. She's good at her job — and about to run headfirst into the exact wall this module is about.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAPTER 1 -->
+    <section class="chapter reveal" id="ch1">
+      <div class="chapter-head"><div class="chapter-icon">▽</div><div><span class="chapter-num">CHAPTER 01</span><h2>Limitations of Classical ML</h2></div></div>
+      <div class="story-panel">Maya's model works beautifully on small molecules — a handful of atoms, a clean decision boundary. Then her team scales up to real drug candidates: hundreds of atoms, thousands of possible electron arrangements. Her laptop fan screams. Training time balloons from minutes to days. Accuracy quietly drops. She adds more features, hoping that helps. <b>It doesn't.</b> Somewhere between "toy dataset" and "real chemistry," her model hit a wall — and it wasn't a bug.</div>
+      <p class="body-text">That wall is real, and it isn't unique to Maya. Classical machine learning is extraordinary at finding patterns in data — but it runs into structural limits that no amount of clever engineering fully removes:</p>
+      <ul class="points">
+        <li><b>Feature engineering hits a ceiling.</b> Hand-crafting or even learning good features gets exponentially harder as the underlying phenomenon gets more complex.</li>
+        <li><b>Some data is fundamentally quantum mechanical.</b> Electron configurations, molecular bonding, and material properties are governed by quantum physics — squeezing them into classical bits is an approximation, not a natural fit.</li>
+        <li><b>Training cost grows steeply.</b> Bigger, messier, higher-dimensional datasets don't just need more compute — they often need <i>disproportionately</i> more.</li>
+        <li><b>Some combinatorial problems are practically unsolvable by brute force</b> — not because we haven't optimized enough, but because the search space itself grows faster than any computer can keep up with. (More on exactly how fast, next chapter.)</li>
+      </ul>
+      <div class="visual-box">
+        <div class="visual-label">Maya's Difficulty Ceiling <span>molecule complexity →</span></div>
+        <div class="ladder" id="ladder"></div>
+      </div>
+      <div class="callout"><b>Takeaway:</b> Classical ML isn't broken — it's just approximating a world that, at its smallest scales, doesn't play by classical rules.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch1">0 / 3</div></div>
+        <div id="quiz-ch1"></div>
+        <div class="chapter-status" id="status-ch1"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 2 -->
+    <section class="chapter reveal" id="ch2">
+      <div class="chapter-head"><div class="chapter-icon">∞</div><div><span class="chapter-num">CHAPTER 02</span><h2>Computational Complexity</h2></div></div>
+      <div class="story-panel">Maya's mentor, <b>Dr. Okafor</b>, tells her an old story. A king, delighted by a new game of chess, offers its inventor any reward. The inventor asks for rice: one grain on the first square of the chessboard, two on the second, four on the third — doubling every square, all 64 of them. The king laughs at how modest that sounds. <b>He shouldn't have.</b> By the last square alone, the grains of rice would outnumber every grain ever harvested in human history. "That," Dr. Okafor says, "is what your molecule search is doing to your laptop."</div>
+      <p class="body-text">This is <b>exponential growth</b>, and it's the real villain behind Maya's wall. Computer scientists describe how an algorithm's workload grows using informal shorthand: constant time barely grows at all; linear time grows steadily; and exponential time — roughly <b>2ⁿ</b> for a problem with <i>n</i> variables — grows so fast that even modest values of <i>n</i> become impossible for any computer, classical or otherwise, to brute-force.</p>
+      <div class="spotlight">
+        <div class="sicon">▤</div>
+        <div class="stext"><b>Platform Feature Spotlight — QML Playground</b>Drag the slider below to feel exponential growth for yourself. This is a simplified preview of the full QML Playground, where you'll benchmark real classical vs. quantum models later in the course.</div>
+      </div>
+      <div class="visual-box">
+        <div class="visual-label">Complexity Explorer</div>
+        <div class="explorer-controls">
+          <label for="nSlider">Problem size (n) =</label>
+          <input type="range" id="nSlider" min="1" max="40" value="10">
+          <span class="explorer-n" id="nValue">10</span>
+        </div>
+        <div class="explorer-rows">
+          <div class="exp-row"><span class="exp-label">Linear · n</span><div class="exp-track"><div class="exp-fill linear" id="fillLinear"></div></div><span class="exp-val" id="valLinear">10</span></div>
+          <div class="exp-row"><span class="exp-label">Polynomial · n²</span><div class="exp-track"><div class="exp-fill poly" id="fillPoly"></div></div><span class="exp-val" id="valPoly">100</span></div>
+          <div class="exp-row"><span class="exp-label">Exponential · 2ⁿ</span><div class="exp-track"><div class="exp-fill exp" id="fillExp"></div></div><span class="exp-val" id="valExp">1,024</span></div>
+        </div>
+        <div class="fun-fact" id="funFact"></div>
+      </div>
+      <p class="body-text">Notice something important: this chart isn't an argument <i>for</i> quantum computers. It's the reason we need to be careful and specific about <b>which</b> problems quantum computing might help with — because quantum computers don't magically dodge exponential growth either. They only help when there's a clever trick (interference, which you'll meet in Chapter 4) available for that specific problem.</p>
+      <div class="callout"><b>Takeaway:</b> Exponential growth is quiet at first and catastrophic later. It's the mathematical reason "just add more compute" eventually stops working.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch2">0 / 3</div></div>
+        <div id="quiz-ch2"></div>
+        <div class="chapter-status" id="status-ch2"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 3 -->
+    <section class="chapter reveal" id="ch3">
+      <div class="chapter-head"><div class="chapter-icon">▦</div><div><span class="chapter-num">CHAPTER 03</span><h2>High-Dimensional Feature Spaces</h2></div></div>
+      <div class="story-panel">Frustrated, Maya plots her molecules on a simple graph — size on one axis, weight on the other. The "binds to protein" and "doesn't bind" points are hopelessly tangled together, like two colors of marbles shaken into the same jar. Dr. Okafor doesn't tell her to get a bigger graph. He tells her to <b>add more axes.</b> Polarity. Charge distribution. Bond angles. Suddenly, in this richer space, the tangled marbles pull apart into two clean, separate clusters.</div>
+      <p class="body-text">This is one of the oldest tricks in machine learning: data that looks hopelessly mixed in a low number of dimensions can become <i>separable</i> once you view it in more of them. It's the intuition behind kernel methods and the "kernel trick" in classical ML — and it's also, not coincidentally, one of the most promising doors into quantum machine learning.</p>
+      <ul class="points">
+        <li><b>Low-dimensional data is often not separable</b> — real patterns can hide behind overlap that a simple plot can't resolve.</li>
+        <li><b>Classical ML lifts data into higher dimensions</b> through feature engineering or kernel functions to make patterns visible.</li>
+        <li><b>But higher dimensions cut both ways</b> — the "curse of dimensionality" means data can become sparse and models can overfit if you add dimensions carelessly.</li>
+        <li><b>A system of <i>n</i> qubits naturally lives in a 2ⁿ-dimensional space</b> — a feature space so large that even 50 qubits describe more dimensions than there are atoms on Earth, and it comes "for free" from the physics, not from engineering.</li>
+      </ul>
+      <div class="spotlight">
+        <div class="sicon">◐</div>
+        <div class="stext"><b>Platform Feature Spotlight — 3D Quantum Visualizations</b>The toggle below is a simplified taste of the full 3D Visualization suite (Bloch Sphere Explorer, entanglement views) you'll use hands-on starting in Module 8.</div>
+      </div>
+      <div class="visual-box">
+        <div class="visual-label">Watch the Same Data Become Separable</div>
+        <div class="dim-toggle-row">
+          <button class="toggle-btn active" id="btn2d" onclick="setDim('2d')">2D View (Tangled)</button>
+          <button class="toggle-btn" id="btnhd" onclick="setDim('hd')">Higher-D View (Separated)</button>
+        </div>
+        <div class="dim-canvas-wrap">
+          <svg viewBox="0 0 420 220" width="420" height="220" id="dimSvg"></svg>
+        </div>
+      </div>
+      <div class="callout"><b>Takeaway:</b> The whole game of "separate the data" often comes down to finding the right space to look at it in — and quantum systems hand you an enormous one by default.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch3">0 / 3</div></div>
+        <div id="quiz-ch3"></div>
+        <div class="chapter-status" id="status-ch3"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 4 -->
+    <section class="chapter reveal" id="ch4">
+      <div class="chapter-head"><div class="chapter-icon">❈</div><div><span class="chapter-num">CHAPTER 04</span><h2>Quantum Parallelism</h2></div></div>
+      <div class="story-panel">That night, Maya dreams of a bakery with infinite ovens — one for every possible variation of a recipe, baking simultaneously in parallel kitchens. Wake up, she thinks, and just walk in and take the best cake! In the morning she asks Dr. Okafor if that's really how quantum computers work. He smiles. <b>"Half right,"</b> he says. "You can bake all the variations at once. But when you open the oven door, you only get to taste <i>one</i> cake — and you don't get to pick which."</div>
+      <p class="body-text">This is the single most misunderstood idea in quantum computing, so let's be precise. A system of <i>n</i> qubits in <b>superposition</b> does represent a combination of all 2ⁿ possible states at once — that part of Maya's dream is real. But <b>measurement collapses</b> that superposition down to just one outcome, chosen probabilistically. If every outcome were equally likely, parallelism would be useless — you'd just get a random cake.</p>
+      <div class="visual-box">
+        <div class="visual-label">Many Branches, One Measurement <button class="toggle-btn active" id="playBtn" onclick="playParallel()" style="float:right;">▶ Run</button></div>
+        <div class="parallel-wrap">
+          <svg viewBox="0 0 460 200" width="460" id="parallelSvg">
+            <text x="10" y="14" class="q-item" font-family="JetBrains Mono" font-size="10" fill="#5f7089">superposition</text>
+            <text x="380" y="14" font-family="JetBrains Mono" font-size="10" fill="#5f7089">measured</text>
+          </svg>
+        </div>
+      </div>
+      <p class="body-text">The real engine behind quantum speedups isn't parallelism alone — it's <b>interference</b>. A well-designed quantum algorithm arranges the "waves" of probability so that wrong answers cancel each other out and the right answer's probability gets amplified, making it far more likely to be the one you measure. Grover's search algorithm is the cleanest real example: it doesn't check every answer for free, but it does find the right one quadratically faster than blind classical search.</p>
+      <div class="callout"><b>Takeaway:</b> Superposition gives you many branches at once. Interference is what makes opening the door worthwhile.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch4">0 / 3</div></div>
+        <div id="quiz-ch4"></div>
+        <div class="chapter-status" id="status-ch4"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 5 -->
+    <section class="chapter reveal" id="ch5">
+      <div class="chapter-head"><div class="chapter-icon">⚖</div><div><span class="chapter-num">CHAPTER 05</span><h2>Potential Quantum Advantage</h2></div></div>
+      <div class="story-panel">Scrolling through her feed, Maya sees a headline: <b>"Quantum Computer Solves in Seconds What Would Take a Classical Supercomputer a Billion Years!"</b> She's tempted to believe it. Instead, she brings it to Dr. Okafor, who runs what he calls "quantum court" — every claim has to earn its verdict, not just its headline.</div>
+      <p class="body-text">Not every quantum speedup claim is equal. Some are mathematically proven. Some are promising but unproven at scale. Some are actively disputed. Flip each card below to see where it actually lands.</p>
+      <div class="spotlight">
+        <div class="sicon">▧</div>
+        <div class="stext"><b>Platform Feature Spotlight — Research Hub</b>This "quantum court" is a preview of the full Research Hub, where you'll find paper summaries and the live, ongoing debate behind each of these claims.</div>
+      </div>
+      <div class="visual-box">
+        <div class="visual-label">Flip Each Claim for the Verdict</div>
+        <div class="hype-grid" id="hypeGrid"></div>
+      </div>
+      <div class="callout"><b>Takeaway:</b> "Quantum advantage" is not one fact — it's a spectrum of claims, and the honest answer to "is it real?" is almost always "it depends which one you mean."</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch5">0 / 3</div></div>
+        <div id="quiz-ch5"></div>
+        <div class="chapter-status" id="status-ch5"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 6 -->
+    <section class="chapter reveal" id="ch6">
+      <div class="chapter-head"><div class="chapter-icon">⚠</div><div><span class="chapter-num">CHAPTER 06</span><h2>Current Challenges</h2></div></div>
+      <div class="story-panel">Maya is sold on the theory. She wants to run her molecule model on a real quantum computer <i>tomorrow</i>. Dr. Okafor pulls up a dashboard instead of an oven mitt. "Before you get excited," he says, "let's look at where we actually are — not where the papers promise we'll be."</div>
+      <p class="body-text">Today's quantum processors are what researchers call <b>NISQ</b> — Noisy Intermediate-Scale Quantum. That single acronym explains most of the field's current growing pains:</p>
+      <div class="visual-box">
+        <div class="visual-label">How Solved Is Each Challenge, Today?</div>
+        <div class="chal-bars" id="chalBars"></div>
+      </div>
+      <ul class="points">
+        <li><b>Noise &amp; decoherence.</b> Qubits lose their quantum information quickly, limiting how deep (complex) a circuit can be before results become unreliable.</li>
+        <li><b>Small qubit counts.</b> Most real problems need far more qubits than current hardware reliably provides.</li>
+        <li><b>Barren plateaus.</b> As variational circuits scale up, gradients can vanish almost entirely, making training grind to a halt — you'll feel this firsthand in Module 11.</li>
+        <li><b>No standardized benchmarks.</b> Without agreed, fair comparisons, it's genuinely hard to know when a quantum method beats a classical one and when it just looks like it does.</li>
+      </ul>
+      <div class="spotlight">
+        <div class="sicon">✺</div>
+        <div class="stext"><b>Platform Feature Spotlight — AI-Powered Quantum Tutor</b>Stuck on a term below? Try the tutor demo — a small preview of the full AI Quantum Tutor, which in the live platform is powered by retrieval-augmented generation over the entire curriculum.</div>
+      </div>
+      <div class="tutor-widget">
+        <div class="tutor-head"><div class="tutor-avatar">✺</div><div class="tutor-title">Ask the Quantum Tutor</div></div>
+        <div class="tutor-note">Demo preview — tap a question below. (The live platform tutor answers open-ended questions via the AI Services Layer in our tech stack.)</div>
+        <div class="tutor-questions" id="tutorQuestions"></div>
+        <div class="tutor-answer" id="tutorAnswer"></div>
+      </div>
+      <div class="callout"><b>Takeaway:</b> None of this is a reason to give up on QML — it's the reason this course exists. Every challenge above is an open, active research problem you could eventually help solve.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch6">0 / 3</div></div>
+        <div id="quiz-ch6"></div>
+        <div class="chapter-status" id="status-ch6"></div>
+      </div>
+    </section>
+
+    <!-- FINAL ASSESSMENT -->
+    <section class="chapter reveal" id="final">
+      <div class="final-assess">
+        <div class="final-head">
+          <div class="module-eyebrow">◆ Adaptive Assessment</div>
+          <h2>Module 7 Assessment</h2>
+          <p>Six synthesis questions, one per chapter of Maya's story. Your result adapts to your whole session — chapters where you struggled above get flagged for review here, regardless of how this final round goes.</p>
+        </div>
+        <div id="quiz-final"></div>
+        <div class="result-panel" id="resultPanel">
+          <div class="result-top">
+            <div>
+              <div class="result-score" id="resultScore">0%</div>
+              <div class="quiz-score" id="resultDetail">0 / 6 correct</div>
+            </div>
+            <div class="result-badge" id="resultBadge"></div>
+          </div>
+          <div id="recommendWrap"></div>
+          <div class="result-actions">
+            <a href="qml-roadmap-landing-page.html#curriculum" class="btn btn-ghost">← Back to Curriculum</a>
+            <a href="#" class="btn btn-primary" id="continueBtn">Continue to Module 8 →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="module-nav" id="moduleNav"></div>
+
+  </main>
+</div>
+
+<script>
+/* ---------------- state ---------------- */
+let state = { xp:0, chapters:{ ch1:{correct:0,total:3,done:false}, ch2:{correct:0,total:3,done:false}, ch3:{correct:0,total:3,done:false}, ch4:{correct:0,total:3,done:false}, ch5:{correct:0,total:3,done:false}, ch6:{correct:0,total:3,done:false} }, finalDone:false };
+try{ const saved = localStorage.getItem('qml_module7_state'); if(saved) state = JSON.parse(saved); }catch(e){}
+function saveState(){ try{ localStorage.setItem('qml_module7_state', JSON.stringify(state)); }catch(e){} }
+function addXP(n){ state.xp += n; document.getElementById('xpCount').textContent = state.xp; saveState(); }
+document.getElementById('xpCount').textContent = state.xp;
+
+/* ---------------- Chapter 1: ladder visual ---------------- */
+(function(){
+  const ladder = document.getElementById('ladder');
+  const heights = [18, 30, 48, 74, 108];
+  const labels = ['5 atoms','15 atoms','40 atoms','90 atoms','200+ atoms'];
+  heights.forEach((h,i)=>{
+    const bar = document.createElement('div');
+    bar.className = 'ladder-bar';
+    bar.style.height = h+'px';
+    bar.innerHTML = `<span>${labels[i]}</span>`;
+    ladder.appendChild(bar);
+    if(i < heights.length-1){
+      const wall = document.createElement('div');
+      wall.className = 'ladder-wall';
+      wall.style.height = Math.max(h, heights[i+1])+'px';
+      ladder.appendChild(wall);
+    }
+  });
+})();
+
+/* ---------------- Chapter 2: complexity explorer ---------------- */
+const nSlider = document.getElementById('nSlider');
+function formatBig(num){
+  if(num > 1e21) return (num/1e21).toFixed(1)+' sextillion — more than the stars in the observable universe';
+  if(num > 1e12) return (num/1e12).toFixed(1)+' trillion';
+  if(num > 1e6) return (num/1e6).toFixed(1)+' million';
+  if(num > 1e3) return num.toLocaleString();
+  return num.toString();
+}
+function updateExplorer(){
+  const n = parseInt(nSlider.value);
+  document.getElementById('nValue').textContent = n;
+  const lin = n, poly = n*n, exp = Math.pow(2,n);
+  document.getElementById('valLinear').textContent = lin.toLocaleString();
+  document.getElementById('valPoly').textContent = poly.toLocaleString();
+  document.getElementById('valExp').textContent = exp > 1e15 ? exp.toExponential(2) : exp.toLocaleString();
+  document.getElementById('fillLinear').style.width = Math.min(100, (lin/40)*100)+'%';
+  document.getElementById('fillPoly').style.width = Math.min(100, (poly/1600)*100)+'%';
+  document.getElementById('fillExp').style.width = Math.min(100, (Math.log2(exp)/40)*100)+'%';
+  let fact = '';
+  if(n >= 30) fact = '⚡ At n = '+n+', brute force needs '+formatBig(exp)+' operations. A modern supercomputer would still be running.';
+  else if(n >= 20) fact = '⚡ At n = '+n+', we\'re already past a million operations just from doubling 20 times.';
+  else fact = 'Drag the slider higher and watch the exponential bar outrun the others.';
+  document.getElementById('funFact').textContent = fact;
+}
+nSlider.addEventListener('input', updateExplorer);
+updateExplorer();
+
+/* ---------------- Chapter 3: dimension toggle ---------------- */
+const tangled = [[70,70,'a'],[95,60,'a'],[60,95,'a'],[110,110,'a'],[85,130,'a'],[100,50,'b'],[75,110,'b'],[120,80,'b'],[55,60,'b'],[130,60,'b']];
+const separated = [[70,60,'a'],[95,45,'a'],[60,75,'a'],[110,55,'a'],[85,80,'a'],[300,150,'b'],[330,165,'b'],[350,140,'b'],[310,180,'b'],[340,190,'b']];
+function drawDim(coords){
+  const svg = document.getElementById('dimSvg');
+  svg.innerHTML = '<line x1="0" y1="110" x2="420" y2="110" stroke="rgba(148,178,224,0.1)" stroke-width="1"/>';
+  coords.forEach(c=>{
+    const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx', c[0]);
+    circle.setAttribute('cy', c[1]);
+    circle.setAttribute('r', 7);
+    circle.setAttribute('class', c[2]==='a' ? 'dot-2d' : 'dot-hd');
+    circle.setAttribute('fill', c[2]==='a' ? 'var(--cyan)' : 'var(--amber)');
+    circle.setAttribute('opacity', '0.85');
+    svg.appendChild(circle);
+  });
+}
+drawDim(tangled);
+function setDim(which){
+  document.getElementById('btn2d').classList.toggle('active', which==='2d');
+  document.getElementById('btnhd').classList.toggle('active', which==='hd');
+  drawDim(which==='2d' ? tangled : separated);
+}
+
+/* ---------------- Chapter 4: parallel universes ---------------- */
+function buildParallel(){
+  const svg = document.getElementById('parallelSvg');
+  const branchCount = 6;
+  let html = svg.innerHTML;
+  for(let i=0;i<branchCount;i++){
+    const y = 30 + i*28;
+    const midY = 100;
+    html += `<path class="pbranch" id="branch${i}" d="M20,100 C 150,${y} 300,${midY-(midY-y)*0.4} 400,100" stroke="${i===2?'var(--cyan)':'var(--ink-faint)'}"/>`;
+  }
+  html += `<circle id="measureDot" cx="400" cy="100" r="0" fill="var(--cyan)" style="filter:drop-shadow(0 0 8px var(--cyan));"/>`;
+  svg.innerHTML = html;
+}
+buildParallel();
+let parallelPlaying = false;
+function playParallel(){
+  if(parallelPlaying) return;
+  parallelPlaying = true;
+  for(let i=0;i<6;i++){ document.getElementById('branch'+i).classList.remove('lit'); }
+  document.getElementById('measureDot').setAttribute('r','0');
+  setTimeout(()=>{ for(let i=0;i<6;i++){ document.getElementById('branch'+i).classList.add('lit'); } addXP(2); }, 100);
+  setTimeout(()=>{
+    for(let i=0;i<6;i++){ if(i!==2) document.getElementById('branch'+i).classList.remove('lit'); }
+    document.getElementById('measureDot').setAttribute('r','7');
+  }, 1400);
+  setTimeout(()=>{ parallelPlaying = false; }, 2200);
+}
+
+/* ---------------- Chapter 5: hype cards ---------------- */
+const hypeData = [
+  {title:"Shor's Algorithm (Factoring)", tag:"proven", tagLabel:"Proven Speedup", back:"Mathematically proven exponential speedup over the best known classical factoring methods — but it needs large, fault-tolerant quantum computers we don't have yet."},
+  {title:"Grover's Algorithm (Search)", tag:"proven", tagLabel:"Proven Speedup", back:"A proven quadratic speedup for unstructured search. Modest compared to Shor's, but realistically achievable on nearer-term hardware for the right problems."},
+  {title:"Quantum Chemistry Simulation (VQE)", tag:"plausible", tagLabel:"Plausible Advantage", back:"Since molecules are themselves quantum systems, simulating them with a quantum computer is a natural fit — a strong near-term candidate for genuine advantage."},
+  {title:"Quantum Kernel Methods for ML", tag:"speculative", tagLabel:"Speculative", back:"Actively researched and debated. Some engineered datasets show an advantage; most real-world datasets tested so far don't show a clear one yet."},
+  {title:"Quantum Computers Will Replace All Classical Computers", tag:"myth", tagLabel:"Myth", back:"Not supported by current science. Quantum computers are specialized tools for specific problem types — not faster general-purpose replacements for your laptop."},
+  {title:"Any Claimed Speedup Is Automatically Real", tag:"myth", tagLabel:"Myth", back:"Headlines often skip the fine print. Every advantage claim needs to survive scrutiny against the best available classical algorithm — as Chapter 4 of Module 6 covered."}
+];
+(function(){
+  const grid = document.getElementById('hypeGrid');
+  hypeData.forEach((h,i)=>{
+    const card = document.createElement('div');
+    card.className = 'hype-card';
+    card.innerHTML = `
+      <div class="hype-inner">
+        <div class="hype-face hype-front">
+          <span class="hype-tag ${h.tag}">${h.tagLabel}</span>
+          <h6 style="margin-top:10px;">${h.title}</h6>
+          <div class="hype-hint">Tap to see the verdict →</div>
+        </div>
+        <div class="hype-face hype-back">${h.back}</div>
+      </div>`;
+    card.addEventListener('click', ()=>{ card.classList.toggle('flipped'); addXP(1); });
+    grid.appendChild(card);
+  });
+})();
+
+/* ---------------- Chapter 6: challenge bars ---------------- */
+const challenges = [
+  {label:'Noise & Decoherence', pct:25, status:'Mostly unsolved'},
+  {label:'Qubit Count', pct:35, status:'Growing slowly'},
+  {label:'Barren Plateaus', pct:20, status:'Active research'},
+  {label:'Benchmarking Standards', pct:15, status:'Immature'},
+  {label:'Interdisciplinary Talent', pct:45, status:'Improving'}
+];
+(function(){
+  const wrap = document.getElementById('chalBars');
+  challenges.forEach(c=>{
+    const row = document.createElement('div');
+    row.className = 'cbar-row';
+    row.innerHTML = `<div class="cbar-label">${c.label}</div><div class="cbar-track"><div class="cbar-fill" data-pct="${c.pct}"></div></div><div class="cbar-status">${c.status}</div>`;
+    wrap.appendChild(row);
+  });
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        document.querySelectorAll('.cbar-fill').forEach(f=> f.style.width = f.dataset.pct+'%');
+        obs.disconnect();
+      }
+    });
+  },{threshold:0.3});
+  obs.observe(wrap);
+})();
+
+/* ---------------- Chapter 6: AI tutor demo ---------------- */
+const tutorQA = [
+  {q:"What exactly is a barren plateau?", a:"Picture trying to find the lowest point in a valley, but the ground around you is almost perfectly flat in every direction — you can't tell which way is downhill. That's what happens to the training gradient in large variational quantum circuits: it vanishes almost everywhere, so the optimizer has no signal to follow. You'll dig into this hands-on in Module 11."},
+  {q:"Why can't we just add more qubits to fix everything?", a:"More qubits means more that can go wrong — each additional qubit adds more opportunities for noise and errors to creep in, and current hardware can't correct those errors the way classical hardware can. Scaling qubit count and scaling reliability are two separate, both-hard problems."},
+  {q:"Is NISQ a bad thing?", a:"Not bad — just honest. NISQ describes where we are today: real, useful, non-fault-tolerant quantum hardware. It's genuinely useful for research and specific near-term applications; it's just not yet the fault-tolerant, error-corrected quantum computer that headlines sometimes imply."},
+  {q:"When will these challenges be solved?", a:"Nobody knows for certain — that's an honest answer, not a dodge. Some researchers expect meaningful fault-tolerance within a decade; others are more cautious. Module 12's Research Hub tracks the ongoing, real debate rather than picking a date."}
+];
+(function(){
+  const qWrap = document.getElementById('tutorQuestions');
+  const answerBox = document.getElementById('tutorAnswer');
+  tutorQA.forEach(item=>{
+    const btn = document.createElement('button');
+    btn.className = 'tutor-q-btn';
+    btn.textContent = item.q;
+    btn.addEventListener('click', ()=>{
+      answerBox.textContent = item.a;
+      answerBox.classList.add('show');
+      addXP(2);
+    });
+    qWrap.appendChild(btn);
+  });
+})();
+
+/* ---------------- quiz data ---------------- */
+const quizzes = {
+  ch1: [
+    {q:"What mainly breaks down as Maya's molecule dataset grows more complex?", opts:["Her internet connection","Feature engineering and computational cost scale poorly with rising complexity","The color of her charts","Nothing — classical ML scales perfectly at any size"], correct:1, explain:"As complexity rises, both good feature engineering and the compute needed to train on it get disproportionately harder."},
+    {q:"Why is molecular / quantum chemistry data especially hard for classical ML?", opts:["It's too small to matter","The underlying phenomena are themselves quantum mechanical, which is awkward to represent with classical bits","Classical computers can't store numbers","Chemistry doesn't produce data"], correct:1, explain:"Electron configurations and bonding are governed by quantum mechanics — classical representations are an approximation, not a natural fit."},
+    {q:"Which is a genuine structural limitation of classical ML, not just an inconvenience?", opts:["Certain combinatorial search problems are practically unsolvable by brute force at scale","Classical ML can't do addition","Classical ML requires special hardware to run at all","Classical computers can't run Python"], correct:0, explain:"Some search spaces grow so fast that no realistic amount of classical compute can brute-force them — this is a structural limit, covered in depth in Chapter 2."}
+  ],
+  ch2: [
+    {q:"In the chessboard-and-rice story, why does the king get overwhelmed?", opts:["Because rice is expensive","Because doubling a quantity 64 times grows exponentially into an astronomical number","Because the board was too small","Because rice spoils quickly"], correct:1, explain:"Doubling repeatedly is exponential growth — by square 64, the total grains vastly exceed all rice ever harvested in human history."},
+    {q:"What kind of growth does brute-force search over molecule configurations typically follow?", opts:["Constant time","Linear time","Exponential time — roughly 2ⁿ for n variables","Negative time"], correct:2, explain:"Each added variable roughly doubles the search space, which is the definition of exponential growth."},
+    {q:"Why does exponential growth matter for practical computing?", opts:["It doesn't — computers are effectively infinitely fast","Even modest increases in problem size can make brute-force solutions impossible in any reasonable time","It only matters for rice-related problems","Exponential growth is always fast to compute"], correct:1, explain:"That's exactly what the Complexity Explorer above demonstrates — the exponential bar outruns linear and polynomial almost immediately."}
+  ],
+  ch3: [
+    {q:"Why did Maya's two-feature (2D) plot fail to separate binding from non-binding molecules?", opts:["The paper was too small","In low dimensions, genuinely different data points can visually overlap and become inseparable","She used the wrong pen color","Two dimensions is always enough for any dataset"], correct:1, explain:"Low-dimensional views can hide real structure that only becomes visible with more features — exactly what the toggle visual demonstrates."},
+    {q:"What is the 'curse of dimensionality'?", opts:["A rule that all problems become easier with more dimensions","The tendency for data to become sparse and models to overfit as dimensions increase carelessly","A rule limiting computers to 3 dimensions","A purely quantum phenomenon with no classical version"], correct:1, explain:"More dimensions can help separate data, but adding them carelessly also spreads data thin and risks overfitting — it cuts both ways."},
+    {q:"How large is the feature space naturally available to n qubits?", opts:["n","n squared","2ⁿ-dimensional","Always exactly 4-dimensional"], correct:2, explain:"n qubits naturally live in a 2ⁿ-dimensional space — a huge feature space that comes from the physics itself, not extra engineering."}
+  ],
+  ch4: [
+    {q:"What does superposition let n qubits do?", opts:["Store only one classical bit at a time","Represent a combination of all 2ⁿ possible states at once","Run exactly twice as fast as a classical bit, nothing more","Nothing useful without a classical computer attached"], correct:1, explain:"This is the real, proven part of Maya's 'infinite ovens' dream — n qubits can genuinely represent a combination of 2ⁿ states."},
+    {q:"Why can't a quantum computer just 'read out' every parallel branch it computed?", opts:["It can — that's exactly how quantum computers work","Measurement collapses the system to a single outcome, so raw parallelism alone doesn't hand you every answer","Quantum computers don't produce output","Reading quantum results is not physically possible at all"], correct:1, explain:"This is Dr. Okafor's correction to Maya's dream — you only get to taste one cake when you open the oven door."},
+    {q:"What is the actual mechanism, beyond parallelism, that makes algorithms like Grover's useful?", opts:["Random guessing, repeated many times","Interference, which amplifies correct answers and cancels out wrong ones","Simply turning the computer off and on again","Increasing the processor's clock speed"], correct:1, explain:"Interference is the real engine — it reshapes probabilities so the right answer becomes far more likely to be measured."}
+  ],
+  ch5: [
+    {q:"Which quantum algorithm has a proven exponential speedup but still needs hardware we don't yet have at scale?", opts:["Grover's algorithm","Shor's algorithm","Basic addition","Standard sorting algorithms"], correct:1, explain:"Shor's algorithm is mathematically proven to be exponentially faster at factoring — but it needs large, fault-tolerant quantum computers that don't exist yet."},
+    {q:"What kind of speedup does Grover's algorithm provide, and is it achievable today?", opts:["A quadratic speedup, achievable on suitable near-term problems","No speedup at all","An unlimited speedup on any laptop","A speedup that only exists in science fiction"], correct:0, explain:"Grover's offers a real but modest (quadratic) speedup — realistic on nearer-term hardware for well-suited problems."},
+    {q:"What is the current scientific status of quantum kernel methods giving an advantage on real-world ML datasets?", opts:["Universally proven and completely settled","Speculative and actively debated — some datasets show no advantage over classical kernels","Completely disproven and known to be impossible","Not a real research topic anyone studies"], correct:1, explain:"This is squarely in the 'speculative' category on the hype-o-meter — a genuinely open, active research question."}
+  ],
+  ch6: [
+    {q:"What does 'NISQ' describe about today's quantum hardware?", opts:["Hardware that is always slow by design","'Noisy Intermediate-Scale Quantum' — small, error-prone processors without full error correction", "A type of internet search engine","A description that applies only to classical computers"], correct:1, explain:"NISQ names exactly where the field is today — useful, real hardware, but noisy and not yet fault-tolerant."},
+    {q:"What problem specifically threatens the trainability of large variational quantum circuits?", opts:["Barren plateaus, where gradients vanish as circuits scale up","Too much available electricity","Having too many qubits available","Processors running too fast"], correct:0, explain:"Barren plateaus flatten the training landscape as circuits grow, starving the optimizer of useful gradient signal."},
+    {q:"Why is a lack of standardized benchmarks a genuine challenge for the field?", opts:["Benchmarks are unnecessary in science generally","Without agreed comparisons, it's hard to fairly judge whether a quantum method actually beats a classical one","Benchmarks make computers run slower","Only classical ML needs benchmarks, not QML"], correct:1, explain:"Without shared, fair benchmarks, advantage claims are hard to verify — a running theme since Chapter 5's hype-o-meter."}
+  ]
+};
+const finalQuiz = [
+  {q:"Maya's molecule classifier struggles as complexity grows. What's the deepest reason, according to this module?", opts:["Her code has typos","Feature engineering, dimensionality, and combinatorial search costs all compound as problems grow more complex","She needs a faster printer","Classical ML never works on any dataset"], correct:1, explain:"Chapter 1 establishes this compounding effect as the real, structural wall — not a fixable bug."},
+  {q:"The chessboard-and-rice story mainly illustrates:", opts:["Farming techniques","How exponential growth quickly outpaces even huge classical resources","How to play chess well","Why rice is a good crop to grow"], correct:1, explain:"It's Chapter 2's central intuition for why 2ⁿ-style growth becomes unmanageable so fast."},
+  {q:"Lifting tangled data into a higher-dimensional space to make it separable connects most directly to which quantum concept?", opts:["Quantum teleportation","The naturally huge, 2ⁿ-dimensional feature space of n qubits","Random number generation","Quantum cryptography"], correct:1, explain:"Chapter 3's toggle demo and the qubit feature-space fact are directly connected — quantum systems offer this 'lift' for free."},
+  {q:"What is the honest description of quantum parallelism's power, from Chapter 4?", opts:["It lets you read out every possible answer for free","It explores many branches at once, but interference — not raw parallelism — is what makes the right answer likely at measurement","It doesn't exist and is pure marketing","It only functions on specially licensed hardware"], correct:1, explain:"This is Dr. Okafor's correction to the 'infinite ovens' dream, and the core lesson of Chapter 4."},
+  {q:"Which best summarizes the current state of quantum advantage claims from the hype-o-meter?", opts:["All claims are proven and universally accepted","Some speedups (like Shor's, Grover's) are mathematically proven; real-world ML advantage is still actively debated","No quantum algorithm has ever been proven faster than classical","Quantum advantage was fully disproven decades ago"], correct:1, explain:"Chapter 5's flip-cards show a spectrum — from proven, to plausible, to speculative, to myth — not a single verdict."},
+  {q:"What's the biggest reason QML can't yet be deployed at massive real-world scale, per Chapter 6?", opts:["Lack of student interest in the field","NISQ-era hardware limits — noise, small qubit counts, and barren plateaus","There are too many available qubits today","Classical computers have been discontinued"], correct:1, explain:"Chapter 6's challenge bars point squarely at hardware maturity, not interest or classical computing's availability."}
+];
+
+/* ---------------- render quizzes ---------------- */
+function renderQuiz(containerId, items, chapterKey){
+  const container = document.getElementById(containerId);
+  items.forEach((item, idx)=>{
+    const qDiv = document.createElement('div');
+    qDiv.className = 'q-item';
+    qDiv.innerHTML = `
+      <div class="q-text">${idx+1}. ${item.q}</div>
+      <div class="q-options">${item.opts.map((o,i)=>`<button class="q-opt" data-i="${i}">${o}</button>`).join('')}</div>
+      <div class="q-explain">${item.explain}</div>
+    `;
+    container.appendChild(qDiv);
+    const buttons = qDiv.querySelectorAll('.q-opt');
+    const explainEl = qDiv.querySelector('.q-explain');
+    buttons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = parseInt(btn.dataset.i);
+        buttons.forEach(b=>b.disabled = true);
+        if(i === item.correct){
+          btn.classList.add('correct');
+          if(chapterKey) onCorrect(chapterKey);
+          else onFinalAnswer(idx, true);
+        } else {
+          btn.classList.add('incorrect');
+          buttons[item.correct].classList.add('correct');
+          if(chapterKey) onIncorrect(chapterKey);
+          else onFinalAnswer(idx, false);
+        }
+        explainEl.classList.add('show');
+      });
+    });
+  });
+}
+Object.keys(quizzes).forEach(key=>{ renderQuiz('quiz-'+key, quizzes[key], key); updateChapterScore(key); });
+renderQuiz('quiz-final', finalQuiz, null);
+
+function updateChapterScore(key){
+  const s = state.chapters[key];
+  document.getElementById('score-'+key).textContent = s.correct+' / '+s.total;
+}
+function onCorrect(key){
+  const s = state.chapters[key];
+  s.correct = Math.min(s.correct+1, s.total);
+  addXP(10);
+  checkChapterDone(key);
+  updateChapterScore(key);
+  saveState();
+}
+function onIncorrect(key){
+  const s = state.chapters[key];
+  s.hadMiss = true;
+  checkChapterDone(key);
+  updateChapterScore(key);
+  saveState();
+}
+let answeredCount = { ch1:0, ch2:0, ch3:0, ch4:0, ch5:0, ch6:0 };
+function checkChapterDone(key){
+  answeredCount[key]++;
+  const s = state.chapters[key];
+  if(answeredCount[key] >= s.total){
+    s.done = true;
+    const dot = document.getElementById('dot-'+key);
+    const statusEl = document.getElementById('status-'+key);
+    statusEl.classList.add('show');
+    if(s.hadMiss){
+      dot.classList.add('warn');
+      statusEl.classList.add('review');
+      statusEl.innerHTML = '⚠ Review suggested — you missed at least one question in this chapter.';
+    } else {
+      dot.classList.add('done');
+      statusEl.classList.add('mastered');
+      statusEl.innerHTML = '✓ Mastered — perfect score on this chapter.';
+      addXP(15);
+    }
+    saveState();
+  }
+}
+
+let finalAnswers = [];
+function onFinalAnswer(idx, correct){
+  finalAnswers[idx] = correct;
+  if(finalAnswers.filter(a=>a!==undefined).length === finalQuiz.length){
+    showFinalResult();
+  }
+}
+function showFinalResult(){
+  const correctCount = finalAnswers.filter(a=>a===true).length;
+  const pct = Math.round((correctCount/finalQuiz.length)*100);
+  document.getElementById('resultScore').textContent = pct+'%';
+  document.getElementById('resultDetail').textContent = correctCount+' / '+finalQuiz.length+' correct';
+  const badge = document.getElementById('resultBadge');
+  const pass = pct >= 70;
+  badge.textContent = pass ? 'Passed' : 'Retry Recommended';
+  badge.className = 'result-badge ' + (pass ? 'pass' : 'retry');
+  addXP(correctCount*10 + (pass?25:0));
+
+  const weakChapters = Object.keys(state.chapters).filter(k => state.chapters[k].hadMiss);
+  const wrap = document.getElementById('recommendWrap');
+  if(weakChapters.length === 0 && pass){
+    wrap.innerHTML = '<div class="callout" style="margin-top:4px;"><b>Great work.</b> No flagged chapters and a passing assessment score — you are ready for Module 8: Quantum Data Encoding.</div>';
+  } else {
+    const names = { ch1:"Limitations of Classical ML", ch2:"Computational Complexity", ch3:"High-Dimensional Feature Spaces", ch4:"Quantum Parallelism", ch5:"Potential Quantum Advantage", ch6:"Current Challenges" };
+    let html = '<div class="visual-label" style="margin-top:18px;">Recommended Review</div><ul class="recommend-list">';
+    weakChapters.forEach(k=> html += '<li>↺ Revisit <b>'+names[k]+'</b> — a quick-check answer there was missed.</li>');
+    if(!pass){ html += '<li>↺ Your assessment score was below 70% — consider re-reading the callout boxes at the end of each chapter before continuing.</li>'; }
+    html += '</ul>';
+    wrap.innerHTML = html;
+  }
+  document.getElementById('resultPanel').classList.add('show');
+  document.getElementById('dot-final').classList.add(pass ? 'done' : 'warn');
+  state.finalDone = true;
+  saveState();
+}
+
+/* ---------------- scrollspy + progress bar ---------------- */
+const sections = document.querySelectorAll('.chapter');
+const sideLinks = document.querySelectorAll('.side-list a');
+const spyObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      sideLinks.forEach(a=>a.classList.remove('active'));
+      const link = document.querySelector('.side-list a[data-target="'+entry.target.id+'"]');
+      if(link) link.classList.add('active');
+    }
+  });
+},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>spyObserver.observe(s));
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+  document.getElementById('progressFill').style.width = scrolled+'%';
+});
+
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+},{threshold:0.08});
+revealEls.forEach(el=>io.observe(el));
+
+/* ---------------- prev/next module nav, from the shared registry ---------------- */
+(function(){
+  const { prev, next } = qmlGetAdjacentModules(7);
+  const wrap = document.getElementById('moduleNav');
+  function cardHTML(mod, dir){
+    if(!mod){
+      return '<div class="mn-card disabled '+dir+'"><span class="mn-eyebrow">'+(dir==='next'?'Up Next':'Previous')+'</span><span class="mn-title">\u2014 none \u2014</span></div>';
+    }
+    const available = !!mod.file;
+    const arrow = dir==='prev' ? '\u2190 ' : '';
+    const arrowEnd = dir==='next' ? ' \u2192' : '';
+    const eyebrow = (dir==='prev' ? 'Previous \u2014 Module '+mod.id : 'Up Next \u2014 Module '+mod.id) + (available ? '' : ' (Coming Soon)');
+    if(available){
+      return '<a class="mn-card enabled '+dir+'" href="'+mod.file+'">'
+        + '<span class="mn-eyebrow">'+eyebrow+'</span>'
+        + '<span class="mn-title">'+arrow+mod.title+arrowEnd+'</span>'
+        + '<span class="mn-arrow">Open tutorial</span>'
+        + '</a>';
+    }
+    return '<div class="mn-card disabled '+dir+'">'
+      + '<span class="mn-eyebrow">'+eyebrow+'</span>'
+      + '<span class="mn-title">'+mod.title+'</span>'
+      + '<span class="mn-arrow">Not published yet</span>'
+      + '</div>';
+  }
+  wrap.innerHTML = cardHTML(prev,'prev') + cardHTML(next,'next');
+
+  const continueBtn = document.getElementById('continueBtn');
+  if(continueBtn){
+    if(next && next.file){
+      continueBtn.href = next.file;
+      continueBtn.textContent = 'Continue to Module '+next.id+' \u2192';
+    } else if(next){
+      continueBtn.href = 'qml-roadmap-landing-page.html#curriculum';
+      continueBtn.textContent = 'Module '+next.id+' — Coming Soon';
+      continueBtn.style.opacity = '0.6';
+    }
+  }
+})();
+</script>
+
+</body>
+</html>

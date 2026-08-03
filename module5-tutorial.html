@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 5 — Quantum Computing Foundations | QML Curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="modules-registry.js"></script>
+<style>
+:root{
+  --bg:#070b14; --bg-2:#0b111f; --panel:#0e1526; --panel-2:#101a2e;
+  --line:rgba(148,178,224,0.14); --line-strong:rgba(148,178,224,0.28);
+  --ink:#e9eef8; --ink-dim:#9fb0c9; --ink-faint:#5f7089;
+  --cyan:#5ad1e6; --cyan-dim:rgba(90,209,230,0.14);
+  --violet:#b39bff; --violet-dim:rgba(179,155,255,0.14);
+  --amber:#f2a341; --amber-dim:rgba(242,163,65,0.14);
+  --green:#5ee6a0; --green-dim:rgba(94,230,160,0.14);
+  --red:#f2726a; --red-dim:rgba(242,114,106,0.14);
+  --blue:#4fa3f7;
+  --serif:'Fraunces', Georgia, serif; --sans:'Inter', -apple-system, sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.7;}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto !important;}}
+.progress-rail{position:fixed; top:0; left:0; right:0; height:3px; background:var(--line); z-index:100;}
+.progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--violet),var(--amber)); transition:width .1s linear;}
+header{position:sticky; top:3px; z-index:60; backdrop-filter:blur(14px); background:rgba(7,11,20,0.82); border-bottom:1px solid var(--line);}
+.nav-wrap{max-width:1280px; margin:0 auto; padding:14px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+.back-link{display:flex; align-items:center; gap:8px; color:var(--ink-dim); text-decoration:none; font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; transition:color .2s;}
+.back-link:hover{color:var(--cyan);}
+.crumb{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); letter-spacing:0.06em; text-transform:uppercase;}
+.crumb b{color:var(--cyan);}
+.xp-badge{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12.5px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; color:var(--amber); background:var(--amber-dim);}
+.layout{max-width:1280px; margin:0 auto; padding:52px 32px 120px; display:grid; grid-template-columns:260px 1fr; gap:56px;}
+.sidebar{position:sticky; top:80px; align-self:start; height:fit-content; max-height:calc(100vh - 100px); overflow-y:auto;}
+.side-title{font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;}
+.side-list{list-style:none; display:flex; flex-direction:column; gap:1px;}
+.side-list a{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink-dim); font-size:12.5px; padding:8px 12px; border-radius:8px; border-left:2px solid transparent; transition:background .2s, color .2s, border-color .2s;}
+.side-list a:hover{background:var(--panel);}
+.side-list a.active{color:var(--ink); background:var(--panel); border-left-color:var(--cyan);}
+.side-dot{width:7px; height:7px; border-radius:50%; background:#2a3550; flex-shrink:0; transition:background .3s;}
+.side-dot.done{background:var(--green); box-shadow:0 0 6px var(--green);}
+.side-dot.warn{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+.tut-hero{margin-bottom:44px;}
+.module-eyebrow{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--cyan); background:var(--cyan-dim); margin-bottom:20px;}
+.tut-hero h1{font-family:var(--serif); font-weight:600; font-size:clamp(30px,4vw,44px); line-height:1.1; letter-spacing:-0.01em;}
+.tut-hero p.lede{margin-top:16px; color:var(--ink-dim); font-size:16px; max-width:660px;}
+.chip-row{display:flex; gap:8px; margin-top:22px; flex-wrap:wrap;}
+.chip{font-family:var(--mono); font-size:10.5px; letter-spacing:0.04em; color:var(--ink-faint); border:1px solid var(--line); padding:5px 11px; border-radius:100px;}
+.character-card{margin-top:28px; display:flex; gap:18px; align-items:center; padding:20px 22px; background:linear-gradient(120deg, rgba(90,209,230,0.08), rgba(179,155,255,0.05)); border:1px solid var(--line-strong); border-radius:14px;}
+.avatar-ring{width:56px; height:56px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1.5px solid var(--cyan); font-family:var(--serif); font-size:22px; color:var(--cyan);}
+.character-card .cname{font-weight:700; font-size:14.5px; color:var(--ink);}
+.character-card .crole{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:2px;}
+.character-card p{font-size:13.5px; color:var(--ink-dim); margin-top:6px;}
+.chapter{margin-bottom:80px; scroll-margin-top:90px;}
+.chapter-head{display:flex; align-items:center; gap:14px; margin-bottom:20px;}
+.chapter-icon{width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1px solid var(--line-strong); font-size:18px; color:var(--cyan); flex-shrink:0;}
+.chapter-num{font-family:var(--mono); font-size:12px; color:var(--ink-faint); letter-spacing:0.08em; display:block;}
+.chapter h2{font-family:var(--serif); font-weight:600; font-size:clamp(22px,2.6vw,29px); letter-spacing:-0.01em;}
+.story-panel{position:relative; margin:16px 0 22px; padding:18px 22px 18px 48px; border-radius:12px; background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--cyan); font-family:var(--serif); font-style:italic; font-size:14.5px; color:var(--ink-dim); line-height:1.65;}
+.story-panel::before{content:'\201C'; position:absolute; left:14px; top:6px; font-size:32px; color:var(--cyan); font-style:normal; opacity:0.6;}
+.story-panel b{color:var(--ink); font-style:normal;}
+.chapter > p.body-text{color:var(--ink-dim); font-size:14.5px; margin-bottom:14px;}
+.chapter > p.body-text b{color:var(--ink); font-weight:600;}
+.chapter ul.points{margin:14px 0 18px 0; padding-left:0; list-style:none; display:flex; flex-direction:column; gap:9px;}
+.chapter ul.points li{display:flex; gap:10px; font-size:13.5px; color:var(--ink-dim); padding:11px 13px; background:var(--panel); border:1px solid var(--line); border-radius:10px;}
+.chapter ul.points li::before{content:'\25C6'; color:var(--cyan); font-size:8px; margin-top:5px; flex-shrink:0;}
+.callout{margin:18px 0; padding:14px 16px; border-radius:10px; border-left:3px solid var(--violet); background:var(--violet-dim); font-size:13px; color:var(--ink-dim);}
+.callout b{color:var(--ink);}
+.visual-box{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px; margin:20px 0; overflow-x:auto;}
+.visual-label{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+.toggle-btn{font-family:var(--mono); font-size:11px; letter-spacing:0.05em; text-transform:uppercase; padding:8px 16px; border-radius:100px; border:1px solid var(--line-strong); background:transparent; color:var(--ink-dim); cursor:pointer; transition:all .2s;}
+.toggle-btn.active{color:var(--cyan); border-color:var(--cyan); background:var(--cyan-dim);}
+.toggle-btn:disabled{opacity:0.5; cursor:default;}
+.ctrl-row{display:flex; align-items:center; gap:14px; margin-bottom:14px; flex-wrap:wrap;}
+.ctrl-row label{font-family:var(--mono); font-size:11.5px; color:var(--ink-dim); min-width:60px;}
+.ctrl-row input[type=range]{width:160px; accent-color:var(--cyan);}
+.ctrl-readout{font-family:var(--mono); font-size:12px; color:var(--cyan); min-width:40px; display:inline-block;}
+.center-svg{display:flex; justify-content:center;}
+.readout-line{text-align:center; margin-top:10px; font-family:var(--mono); font-size:12px; color:var(--ink-dim);}
+.compare-line{text-align:center; margin-top:6px; font-size:12.5px; color:var(--ink);}
+.btn-row{display:flex; gap:8px; justify-content:center; margin-bottom:14px; flex-wrap:wrap;}
+.circuit-strip{display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; min-height:50px; margin:6px 0 14px;}
+.circuit-chip{min-width:42px; height:42px; padding:0 10px; border-radius:9px; background:var(--panel-2); border:1px solid var(--cyan); display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-weight:700; color:var(--cyan); font-size:13px;}
+.circuit-chip.empty{border:1px dashed var(--line-strong); color:var(--ink-faint); font-weight:400; font-size:11px;}
+.state-readout{text-align:center; font-family:var(--mono); font-size:13px; color:var(--ink); margin-top:8px;}
+
+/* flip-card grid (reused) */
+.encoding-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+.enc-card{perspective:1000px; height:132px; cursor:pointer;}
+.enc-inner{position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d;}
+.enc-card.flipped .enc-inner{transform:rotateY(180deg);}
+.enc-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; padding:13px; display:flex; flex-direction:column; justify-content:center; border:1px solid var(--line-strong);}
+.enc-front{background:var(--panel-2);}
+.enc-front .en{font-family:var(--mono); font-size:9.5px; color:var(--ink-faint); margin-bottom:4px;}
+.enc-front h6{font-size:13px; font-weight:700; color:var(--ink);}
+.enc-back{background:var(--panel); transform:rotateY(180deg); font-size:10.5px; color:var(--ink-dim); line-height:1.5;}
+@media (max-width:760px){.encoding-grid{grid-template-columns:1fr 1fr;}}
+@media (max-width:480px){.encoding-grid{grid-template-columns:1fr;}}
+
+/* trial cards (reused) */
+.forest-grid{display:grid; grid-template-columns:repeat(8,1fr); gap:8px;}
+@media (max-width:700px){.forest-grid{grid-template-columns:repeat(4,1fr);}}
+.tree-vote{background:var(--panel-2); border:1px solid var(--line-strong); border-radius:10px; padding:12px 6px; text-align:center;}
+.tree-vote .ticon{font-size:18px; color:var(--cyan);}
+.tree-vote .tvote{font-family:var(--mono); font-size:9.5px; margin-top:6px; color:var(--ink-dim);}
+.forest-result{margin-top:14px; text-align:center; font-family:var(--mono); font-size:13px; color:var(--ink);}
+
+/* quiz (shared) */
+.quiz-box{margin-top:24px; background:var(--panel); border:1px solid var(--line-strong); border-radius:14px; padding:22px;}
+.quiz-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
+.quiz-title{font-family:var(--mono); font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--cyan); display:flex; align-items:center; gap:8px;}
+.quiz-score{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);}
+.q-item{margin-bottom:20px;}
+.q-item:last-child{margin-bottom:0;}
+.q-text{font-size:13.5px; font-weight:600; margin-bottom:10px; color:var(--ink);}
+.q-options{display:flex; flex-direction:column; gap:7px;}
+.q-opt{text-align:left; padding:10px 13px; border-radius:9px; border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-dim); font-size:12.5px; cursor:pointer; transition:border-color .2s, background .2s, color .2s; font-family:var(--sans);}
+.q-opt:hover:not(:disabled){border-color:var(--ink-dim); color:var(--ink);}
+.q-opt.correct{border-color:var(--green); background:var(--green-dim); color:var(--green);}
+.q-opt.incorrect{border-color:var(--red); background:var(--red-dim); color:var(--red);}
+.q-opt:disabled{cursor:default;}
+.q-explain{margin-top:9px; font-size:12px; color:var(--ink-dim); padding:10px 13px; border-radius:8px; background:var(--panel-2); border-left:2px solid var(--cyan); display:none;}
+.q-explain.show{display:block;}
+.chapter-status{margin-top:14px; padding:9px 13px; border-radius:8px; font-family:var(--mono); font-size:11px; display:none; align-items:center; gap:8px;}
+.chapter-status.show{display:flex;}
+.chapter-status.mastered{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.35);}
+.chapter-status.review{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.35);}
+.final-assess{margin-top:20px; background:linear-gradient(180deg,var(--panel-2),var(--panel)); border:1px solid var(--line-strong); border-radius:16px; padding:34px;}
+.final-head{margin-bottom:26px;}
+.final-head .module-eyebrow{color:var(--amber); border-color:var(--line-strong); background:var(--amber-dim);}
+.final-head h2{font-family:var(--serif); font-size:clamp(26px,3vw,34px); font-weight:600;}
+.final-head p{color:var(--ink-dim); margin-top:10px; font-size:14.5px;}
+.result-panel{margin-top:28px; padding:24px; border-radius:12px; border:1px solid var(--line-strong); background:var(--bg); display:none;}
+.result-panel.show{display:block;}
+.result-top{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:18px;}
+.result-score{font-family:var(--serif); font-size:44px; font-weight:600;}
+.result-badge{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; padding:6px 14px; border-radius:100px;}
+.result-badge.pass{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.4);}
+.result-badge.retry{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.4);}
+.recommend-list{list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+.recommend-list li{font-size:13px; color:var(--ink-dim); padding:10px 12px; background:var(--panel-2); border-radius:8px; border:1px solid var(--line);}
+.result-actions{display:flex; gap:12px; margin-top:22px; flex-wrap:wrap;}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:9px; font-size:13.5px; font-weight:600; text-decoration:none; cursor:pointer; border:1px solid transparent; transition:transform .2s, box-shadow .2s;}
+.btn-primary{background:var(--blue); color:#04101f;}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 26px -8px rgba(79,163,247,0.5);}
+.btn-ghost{background:transparent; border-color:var(--line-strong); color:var(--ink);}
+.btn-ghost:hover{border-color:var(--ink-dim); transform:translateY(-2px);}
+.reveal{opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease;}
+.reveal.in{opacity:1; transform:translateY(0);}
+.module-nav{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:70px; padding-top:36px; border-top:1px solid var(--line);}
+.mn-card{display:flex; flex-direction:column; gap:6px; padding:20px 22px; border-radius:14px; background:var(--panel); border:1px solid var(--line); text-decoration:none; transition:border-color .25s, transform .25s;}
+.mn-card.enabled:hover{border-color:var(--line-strong); transform:translateY(-3px);}
+.mn-card.disabled{opacity:0.5; cursor:default;}
+.mn-card.next{align-items:flex-end; text-align:right;}
+.mn-eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint);}
+.mn-title{font-family:var(--serif); font-size:16px; font-weight:600; color:var(--ink);}
+.mn-arrow{font-family:var(--mono); font-size:12px; color:var(--cyan);}
+@media (max-width:700px){.module-nav{grid-template-columns:1fr;}}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static; display:flex; overflow-x:auto; gap:4px; padding-bottom:10px; max-height:none;}
+  .side-list{flex-direction:row;}
+  .side-list a{white-space:nowrap;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-rail"><div class="progress-fill" id="progressFill"></div></div>
+
+<header>
+  <div class="nav-wrap">
+    <a class="back-link" href="qml-roadmap-landing-page.html#curriculum">← Back to Curriculum</a>
+    <div class="crumb">LEVEL 1 · BEGINNER — <b>MODULE 5</b></div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a class="back-link" href="progress-hub.html">My Progress</a>
+      <div class="xp-badge">⚡ <span id="xpCount">0</span> XP</div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="side-title">Module 5 Chapters</div>
+    <ul class="side-list" id="sideList">
+      <li><a href="#ch1" data-target="ch1"><span class="side-dot" id="dot-ch1"></span>Linear Algebra Basics</a></li>
+      <li><a href="#ch2" data-target="ch2"><span class="side-dot" id="dot-ch2"></span>Complex Numbers</a></li>
+      <li><a href="#ch3" data-target="ch3"><span class="side-dot" id="dot-ch3"></span>Dirac Notation</a></li>
+      <li><a href="#ch4" data-target="ch4"><span class="side-dot" id="dot-ch4"></span>Quantum Gates</a></li>
+      <li><a href="#ch5" data-target="ch5"><span class="side-dot" id="dot-ch5"></span>Quantum Circuits</a></li>
+      <li><a href="#ch6" data-target="ch6"><span class="side-dot" id="dot-ch6"></span>Bloch Sphere</a></li>
+      <li><a href="#ch7" data-target="ch7"><span class="side-dot" id="dot-ch7"></span>Quantum Measurement</a></li>
+      <li><a href="#final" data-target="final"><span class="side-dot" id="dot-final"></span>Module Assessment</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <div class="tut-hero reveal">
+      <div class="module-eyebrow">◆ Module 5 · Beginner</div>
+      <h1>Quantum Computing Foundations</h1>
+      <p class="lede">Module 4 explained <em>why</em> quantum computing matters. This module hands you the actual toolkit — the math and notation every quantum circuit is written in — so gates, circuits, and measurement stop being metaphors and start being things you can compute by hand.</p>
+      <div class="chip-row">
+        <span class="chip">7 Chapters</span>
+        <span class="chip">Real Matrix Math</span>
+        <span class="chip">Build-Your-Own Circuit</span>
+        <span class="chip">21 Quick-Check Questions</span>
+        <span class="chip">1 Adaptive Assessment</span>
+        <span class="chip">~60 min</span>
+      </div>
+      <div class="character-card">
+        <div class="avatar-ring">A</div>
+        <div>
+          <div class="cname">Alex, doing the math</div>
+          <div class="crole">Curious Beginner · Notebook Out</div>
+          <p>Alex believes the quantum ideas now. Today's the day the friend hands over a pencil and says: "Good — now let's actually compute one."</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CH1: LINEAR ALGEBRA BASICS -->
+    <section class="chapter reveal" id="ch1">
+      <div class="chapter-head"><div class="chapter-icon">▤</div><div><span class="chapter-num">CHAPTER 01</span><h2>Linear Algebra Basics</h2></div></div>
+      <div class="story-panel">"Every quantum state you'll ever write down is just a <b>vector</b>," the friend says, "and every gate that acts on it is just a <b>matrix</b>. That's the whole secret — it's linear algebra wearing a lab coat."</div>
+      <p class="body-text">A qubit's state is a column vector, like <b>[a, b]</b>. A gate is a matrix that transforms it: multiply the matrix by the vector, and out comes a new vector — the new state. Pick a matrix below and watch it act on the vector live.</p>
+      <div class="visual-box">
+        <div class="visual-label">Matrix Acting on a Vector</div>
+        <div class="ctrl-row"><label>x</label><input type="range" id="vecX" min="-10" max="10" value="10" step="1"><span class="ctrl-readout" id="vecXVal">1.0</span></div>
+        <div class="ctrl-row"><label>y</label><input type="range" id="vecY" min="-10" max="10" value="0" step="1"><span class="ctrl-readout" id="vecYVal">0.0</span></div>
+        <div class="btn-row">
+          <button class="toggle-btn active" data-mat="I" onclick="setMatrix('I')">Identity</button>
+          <button class="toggle-btn" data-mat="SWAP" onclick="setMatrix('SWAP')">Swap Rows</button>
+          <button class="toggle-btn" data-mat="SCALE" onclick="setMatrix('SCALE')">Scale ×2</button>
+          <button class="toggle-btn" data-mat="NEGY" onclick="setMatrix('NEGY')">Flip Sign of y</button>
+        </div>
+        <div class="center-svg"><svg viewBox="0 0 300 200" width="300" height="200" id="vecSvg"></svg></div>
+        <div class="readout-line" id="vecReadout">—</div>
+      </div>
+      <ul class="points">
+        <li><b>A vector [x, y]</b> is nothing more than an ordered list of numbers — quantum states just happen to use vectors of amplitudes.</li>
+        <li><b>Matrix × vector = new vector</b> — every gate you'll meet from Chapter 4 onward is exactly this operation, just with specific numbers.</li>
+        <li>The <b>cyan arrow</b> above is the input vector; the <b>amber arrow</b> is what the selected matrix transforms it into.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> "Apply a gate" and "multiply by a matrix" are the same sentence — once that clicks, the rest of this module is just specific matrices worth memorizing.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch1">0 / 3</div></div><div id="quiz-ch1"></div><div class="chapter-status" id="status-ch1"></div></div>
+    </section>
+
+    <!-- CH2: COMPLEX NUMBERS -->
+    <section class="chapter reveal" id="ch2">
+      <div class="chapter-head"><div class="chapter-icon">ℂ</div><div><span class="chapter-num">CHAPTER 02</span><h2>Complex Numbers</h2></div></div>
+      <div class="story-panel">"One more piece of notation," the friend says. "Quantum amplitudes aren't just any numbers — they're <b>complex</b> numbers, with a real part and an imaginary part."</div>
+      <p class="body-text">A complex number is written <b>a + bi</b>, where <b>i = √-1</b>. Plotted on the plane below, <b>a</b> is the horizontal position and <b>b</b> is the vertical position. Its <b>magnitude</b> (distance from the origin) is what determines measurement probability — its <b>phase</b> (angle) is invisible to a single measurement but crucial once qubits interact.</p>
+      <div class="visual-box">
+        <div class="visual-label">The Complex Plane (Argand Diagram)</div>
+        <div class="ctrl-row"><label>real (a)</label><input type="range" id="reSlider" min="-10" max="10" value="7" step="1"><span class="ctrl-readout" id="reVal">0.7</span></div>
+        <div class="ctrl-row"><label>imag (b)</label><input type="range" id="imSlider" min="-10" max="10" value="7" step="1"><span class="ctrl-readout" id="imVal">0.7</span></div>
+        <div class="center-svg"><svg viewBox="0 0 260 200" width="260" height="200" id="complexSvg"></svg></div>
+        <div class="readout-line" id="complexReadout">—</div>
+      </div>
+      <ul class="points">
+        <li><b>Magnitude |a + bi| = √(a² + b²)</b> — squaring the magnitude of a quantum amplitude gives its measurement probability, the same Born rule from Module 4.</li>
+        <li><b>Phase</b> is the angle the arrow makes with the horizontal axis — two states with the same magnitude but different phase are physically distinct, even though a single measurement can't tell them apart.</li>
+        <li>Every ket you'll write from Chapter 3 onward can have complex-number amplitudes — this module keeps most worked examples real-valued for clarity, but the machinery generalizes directly.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Magnitude tells you "how likely"; phase tells you "in what way" — and quantum interference, later in this course, is entirely a story about phase.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch2">0 / 3</div></div><div id="quiz-ch2"></div><div class="chapter-status" id="status-ch2"></div></div>
+    </section>
+
+    <!-- CH3: DIRAC NOTATION -->
+    <section class="chapter reveal" id="ch3">
+      <div class="chapter-head"><div class="chapter-icon">⟩</div><div><span class="chapter-num">CHAPTER 03</span><h2>Dirac Notation</h2></div></div>
+      <div class="story-panel">"Physicists got tired of writing full column vectors everywhere," the friend says, "so they invented shorthand." A <b>ket</b> |ψ⟩ is a state vector. A <b>bra</b> ⟨φ| is its mirror image, used for computing overlaps.</div>
+      <p class="body-text">The overlap between two states, written <b>⟨φ|ψ⟩</b>, is just their vectors' dot product. Its squared size tells you how "alike" two states are — 1 means identical, 0 means completely distinguishable. Pick two kets below and compute their overlap.</p>
+      <div class="visual-box">
+        <div class="visual-label">Compute an Inner Product ⟨φ|ψ⟩</div>
+        <div class="btn-row" id="braBtns"></div>
+        <div class="btn-row" id="ketBtns"></div>
+        <div class="readout-line" id="diracReadout">Pick a bra and a ket above.</div>
+      </div>
+      <ul class="points">
+        <li><b>|0⟩ = [1, 0]</b> and <b>|1⟩ = [0, 1]</b> are the two basic building-block kets — every other single-qubit state is some combination of these two.</li>
+        <li><b>|+⟩ = [1/√2, 1/√2]</b> and <b>|−⟩ = [1/√2, −1/√2]</b> are equal superpositions — you'll build both of these yourself with a gate in Chapter 4.</li>
+        <li><b>⟨ψ|ψ⟩ always equals 1</b> for a valid quantum state — this is exactly the "probabilities add up to 100%" rule from Module 4, written in matrix form.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Bra-ket notation isn't new physics — it's just a compact way to write vectors and dot products, and ⟨φ|ψ⟩ is the single most useful calculation in this whole module.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch3">0 / 3</div></div><div id="quiz-ch3"></div><div class="chapter-status" id="status-ch3"></div></div>
+    </section>
+
+    <!-- CH4: QUANTUM GATES -->
+    <section class="chapter reveal" id="ch4">
+      <div class="chapter-head"><div class="chapter-icon">⊞</div><div><span class="chapter-num">CHAPTER 04</span><h2>Quantum Gates</h2></div></div>
+      <div class="story-panel">"Time to actually transform a qubit," the friend says. "A gate is just a matrix — but a special kind: it has to preserve total probability, which means it has to be <b>unitary</b>."</div>
+      <p class="body-text">Start from |0⟩ and apply a gate below. Watch the resulting amplitudes — and the resulting probabilities — update from real matrix multiplication, exactly like Chapter 1's vector demo.</p>
+      <div class="visual-box">
+        <div class="visual-label">Apply a Gate to |0⟩</div>
+        <div class="btn-row">
+          <button class="toggle-btn active" onclick="applyGate('I')">I (Identity)</button>
+          <button class="toggle-btn" onclick="applyGate('X')">X (Bit Flip)</button>
+          <button class="toggle-btn" onclick="applyGate('Z')">Z (Phase Flip)</button>
+          <button class="toggle-btn" onclick="applyGate('H')">H (Hadamard)</button>
+        </div>
+        <div class="center-svg"><svg viewBox="0 0 260 150" width="260" height="150" id="gateSvg"></svg></div>
+        <div class="state-readout" id="gateState">|\u03C8\u27E9 = 1.00|0\u27E9 + 0.00|1\u27E9</div>
+        <div class="readout-line" id="gateReadout">P(|0\u27E9) = 100.0%   P(|1\u27E9) = 0.0%</div>
+      </div>
+      <ul class="points">
+        <li><b>X</b> swaps the amplitudes of |0⟩ and |1⟩ — the quantum version of a classical NOT gate.</li>
+        <li><b>Z</b> leaves probabilities unchanged but flips the sign (phase) of the |1⟩ amplitude — invisible to a single measurement, but not to later gates.</li>
+        <li><b>H (Hadamard)</b> turns |0⟩ into |+⟩, an equal 50/50 superposition — this single gate is how nearly every quantum algorithm gets started.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Every gate you just clicked is unitary — the total probability (P(|0⟩) + P(|1⟩)) stays exactly 100% no matter which one you apply, which is exactly what "valid quantum gate" means.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch4">0 / 3</div></div><div id="quiz-ch4"></div><div class="chapter-status" id="status-ch4"></div></div>
+    </section>
+
+    <!-- CH5: QUANTUM CIRCUITS -->
+    <section class="chapter reveal" id="ch5">
+      <div class="chapter-head"><div class="chapter-icon">⇶</div><div><span class="chapter-num">CHAPTER 05</span><h2>Quantum Circuits</h2></div></div>
+      <div class="story-panel">"One gate is a sentence," the friend says. "A <b>circuit</b> is a whole paragraph — gates applied one after another, left to right, each one acting on whatever state the last one left behind."</div>
+      <p class="body-text">Build a tiny circuit below by clicking gates onto the strip in order. The state updates after each one — exactly the same matrix multiplication as Chapter 4, just chained together.</p>
+      <div class="visual-box">
+        <div class="visual-label">Build a Circuit, Starting from |0⟩</div>
+        <div class="btn-row">
+          <button class="toggle-btn active" onclick="addToCircuit('X')">+ X</button>
+          <button class="toggle-btn active" onclick="addToCircuit('Z')">+ Z</button>
+          <button class="toggle-btn active" onclick="addToCircuit('H')">+ H</button>
+          <button class="toggle-btn" onclick="resetCircuit()">↺ Reset</button>
+        </div>
+        <div class="circuit-strip" id="circuitStrip"></div>
+        <div class="state-readout" id="circuitState">|\u03C8\u27E9 = 1.00|0\u27E9 + 0.00|1\u27E9</div>
+        <div class="readout-line" id="circuitReadout">P(|0\u27E9) = 100.0%   P(|1\u27E9) = 0.0%</div>
+      </div>
+      <ul class="points">
+        <li><b>Order matters:</b> try H then Z versus Z then H — same two gates, different final state, because matrix multiplication isn't commutative.</li>
+        <li><b>Try H, then X, then H</b> — this three-gate circuit does something a single gate can't achieve alone (worth predicting before you click).</li>
+        <li>Real quantum programs are exactly this: sequences of a handful of basic gates, chosen to steer a state toward a useful final answer.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> A circuit diagram is a recipe read left to right — and because gate order changes the outcome, circuit design is really about finding the right sequence, not just the right ingredients.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch5">0 / 3</div></div><div id="quiz-ch5"></div><div class="chapter-status" id="status-ch5"></div></div>
+    </section>
+
+    <!-- CH6: BLOCH SPHERE -->
+    <section class="chapter reveal" id="ch6">
+      <div class="chapter-head"><div class="chapter-icon">◉</div><div><span class="chapter-num">CHAPTER 06</span><h2>Bloch Sphere</h2></div></div>
+      <div class="story-panel">"Module 4 showed you a slice of this sphere," the friend says. "Now you have the matrices to earn the full picture — two angles, not one, because a qubit's state needs both magnitude and phase to pin down."</div>
+      <p class="body-text">The angle <b>θ (theta)</b> controls how much |0⟩ versus |1⟩ — exactly like Module 4. The angle <b>φ (phi)</b> adds the phase information from Chapter 2, rotating the state around the vertical axis without changing its measurement probabilities at all.</p>
+      <div class="visual-box">
+        <div class="visual-label">Full Bloch Sphere — θ and φ</div>
+        <div class="ctrl-row"><label>θ (theta)</label><input type="range" id="thetaSlider" min="0" max="180" value="90" step="1"><span class="ctrl-readout" id="thetaVal">90°</span></div>
+        <div class="ctrl-row"><label>φ (phi)</label><input type="range" id="phiSlider" min="0" max="360" value="0" step="1"><span class="ctrl-readout" id="phiVal">0°</span></div>
+        <div class="btn-row">
+          <button class="toggle-btn active" onclick="presetBloch(0,0)">|0\u27E9</button>
+          <button class="toggle-btn" onclick="presetBloch(180,0)">|1\u27E9</button>
+          <button class="toggle-btn" onclick="presetBloch(90,0)">|+\u27E9</button>
+          <button class="toggle-btn" onclick="presetBloch(90,180)">|\u2212\u27E9</button>
+        </div>
+        <div class="center-svg"><svg viewBox="0 0 300 220" width="300" height="220" id="blochSvg"></svg></div>
+        <div class="readout-line" id="blochReadout">—</div>
+      </div>
+      <ul class="points">
+        <li><b>θ alone determines measurement probability</b> — P(|0⟩) = cos²(θ/2), P(|1⟩) = sin²(θ/2), unaffected by φ at all.</li>
+        <li><b>φ moves the point around the equator's "latitude circle"</b> at a fixed θ — this is exactly the invisible-to-single-measurement phase from Chapter 2.</li>
+        <li>The four preset buttons are the four states you've been computing with all module — |0⟩ and |1⟩ at the poles, |+⟩ and |−⟩ on the equator, 180° apart in φ.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Every gate from Chapter 4 is secretly a specific rotation of this sphere — X flips pole to pole, Z spins around the vertical axis, H swings a pole out to the equator.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch6">0 / 3</div></div><div id="quiz-ch6"></div><div class="chapter-status" id="status-ch6"></div></div>
+    </section>
+
+    <!-- CH7: QUANTUM MEASUREMENT -->
+    <section class="chapter reveal" id="ch7">
+      <div class="chapter-head"><div class="chapter-icon">⊚</div><div><span class="chapter-num">CHAPTER 07</span><h2>Quantum Measurement</h2></div></div>
+      <div class="story-panel">"Last piece," the friend says. "You now have the vocabulary to state the Born rule precisely: the probability of any measurement outcome is the squared overlap between your state and that outcome — ⟨outcome|ψ⟩, squared."</div>
+      <p class="body-text">Pick a state and a measurement basis below. The probabilities are computed live from real inner products — not looked up, calculated — then run repeated simulated measurements and watch the tally converge.</p>
+      <div class="visual-box">
+        <div class="visual-label">Measure a State in a Chosen Basis</div>
+        <div class="btn-row">
+          <span style="font-family:var(--mono); font-size:11px; color:var(--ink-faint); align-self:center;">STATE:</span>
+          <button class="toggle-btn active" onclick="setMeasState('0')">|0\u27E9</button>
+          <button class="toggle-btn" onclick="setMeasState('1')">|1\u27E9</button>
+          <button class="toggle-btn" onclick="setMeasState('+')">|+\u27E9</button>
+          <button class="toggle-btn" onclick="setMeasState('-')">|\u2212\u27E9</button>
+        </div>
+        <div class="btn-row">
+          <span style="font-family:var(--mono); font-size:11px; color:var(--ink-faint); align-self:center;">BASIS:</span>
+          <button class="toggle-btn active" onclick="setMeasBasis('Z')">Z-basis {|0\u27E9,|1\u27E9}</button>
+          <button class="toggle-btn" onclick="setMeasBasis('X')">X-basis {|+\u27E9,|\u2212\u27E9}</button>
+        </div>
+        <div class="readout-line" id="measFormula">—</div>
+        <div class="ctrl-row" style="justify-content:center; margin-top:10px;"><button class="toggle-btn active" onclick="runMeasurements()">▶ Measure ×20</button> <button class="toggle-btn" onclick="resetMeasurements()">↺ Reset Tally</button></div>
+        <div class="center-svg"><svg viewBox="0 0 260 170" width="260" height="170" id="measSvg"></svg></div>
+        <div class="readout-line" id="measReadout">No measurements yet.</div>
+      </div>
+      <ul class="points">
+        <li><b>Same state, different basis, different probabilities</b> — try |0⟩ measured in the X-basis and you'll get a genuine 50/50 split, even though it's a "pure" state.</li>
+        <li><b>The Born rule</b> — P(outcome) = |⟨outcome|ψ⟩|² — is exactly the inner-product calculation from Chapter 3, squared.</li>
+        <li>This is the same measurement process from Module 4, now written with the exact formula behind it instead of just "measurement forces a random outcome."</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Measurement isn't mysterious once you have the math — it's ⟨outcome|state⟩, squared, and every quantum algorithm in this course is ultimately judged by the measurement probabilities it produces.</div>
+      <div class="quiz-box"><div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch7">0 / 3</div></div><div id="quiz-ch7"></div><div class="chapter-status" id="status-ch7"></div></div>
+    </section>
+
+    <!-- FINAL ASSESSMENT -->
+    <section class="chapter reveal" id="final">
+      <div class="final-assess">
+        <div class="final-head">
+          <div class="module-eyebrow">◆ Adaptive Assessment</div>
+          <h2>Module 5 Assessment</h2>
+          <p>Seven synthesis questions, one per chapter. Your result adapts to your whole session — chapters where you struggled above get flagged for review here.</p>
+        </div>
+        <div id="quiz-final"></div>
+        <div class="result-panel" id="resultPanel">
+          <div class="result-top">
+            <div><div class="result-score" id="resultScore">0%</div><div class="quiz-score" id="resultDetail">0 / 7 correct</div></div>
+            <div class="result-badge" id="resultBadge"></div>
+          </div>
+          <div id="recommendWrap"></div>
+          <div class="result-actions">
+            <a href="qml-roadmap-landing-page.html#curriculum" class="btn btn-ghost">← Back to Curriculum</a>
+            <a href="#" class="btn btn-primary" id="continueBtn">Continue to Next Module →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="module-nav" id="moduleNav"></div>
+  </main>
+</div>
+
+<script>
+let state = { xp:0, chapters:{
+  ch1:{correct:0,total:3,done:false}, ch2:{correct:0,total:3,done:false}, ch3:{correct:0,total:3,done:false},
+  ch4:{correct:0,total:3,done:false}, ch5:{correct:0,total:3,done:false}, ch6:{correct:0,total:3,done:false},
+  ch7:{correct:0,total:3,done:false}
+}, finalDone:false };
+try{ const saved = localStorage.getItem('qml_module5_state'); if(saved) state = JSON.parse(saved); }catch(e){}
+function saveState(){ try{ localStorage.setItem('qml_module5_state', JSON.stringify(state)); }catch(e){} }
+function addXP(n){ state.xp += n; document.getElementById('xpCount').textContent = state.xp; saveState(); }
+document.getElementById('xpCount').textContent = state.xp;
+
+/* ============ CH1: matrix acting on a vector ============ */
+const matrices = {
+  I: [[1,0],[0,1]],
+  SWAP: [[0,1],[1,0]],
+  SCALE: [[2,0],[0,2]],
+  NEGY: [[1,0],[0,-1]]
+};
+let currentMat = 'I';
+function setMatrix(m){
+  currentMat = m;
+  document.querySelectorAll('[data-mat]').forEach(b=>b.classList.toggle('active', b.dataset.mat===m));
+  updateVec();
+  addXP(2);
+}
+function matVec(M, v){ return [M[0][0]*v[0]+M[0][1]*v[1], M[1][0]*v[0]+M[1][1]*v[1]]; }
+function drawVec(vin, vout){
+  const cx=150, cy=100, scale=12;
+  const svg = document.getElementById('vecSvg');
+  let html = '<line x1="20" y1="100" x2="280" y2="100" stroke="var(--line-strong)" stroke-width="1"/><line x1="150" y1="10" x2="150" y2="190" stroke="var(--line-strong)" stroke-width="1"/>';
+  function arrow(v, color){
+    const x2 = cx+v[0]*scale, y2 = cy-v[1]*scale;
+    return '<line x1="'+cx+'" y1="'+cy+'" x2="'+x2+'" y2="'+y2+'" stroke="'+color+'" stroke-width="2.4"/><circle cx="'+x2+'" cy="'+y2+'" r="5" fill="'+color+'"/>';
+  }
+  html += arrow(vin, 'var(--cyan)');
+  html += arrow(vout, 'var(--amber)');
+  svg.innerHTML = html;
+}
+function updateVec(){
+  const x = parseInt(document.getElementById('vecX').value)/10;
+  const y = parseInt(document.getElementById('vecY').value)/10;
+  document.getElementById('vecXVal').textContent = x.toFixed(1);
+  document.getElementById('vecYVal').textContent = y.toFixed(1);
+  const vout = matVec(matrices[currentMat], [x,y]);
+  drawVec([x,y], vout);
+  document.getElementById('vecReadout').textContent = 'input = ['+x.toFixed(1)+', '+y.toFixed(1)+']    output = ['+vout[0].toFixed(1)+', '+vout[1].toFixed(1)+']';
+}
+document.getElementById('vecX').addEventListener('input', updateVec);
+document.getElementById('vecY').addEventListener('input', updateVec);
+updateVec();
+
+/* ============ CH2: complex plane ============ */
+function drawComplex(a,b){
+  const cx=130, cy=100, scale=12;
+  const x2 = cx+a*scale, y2 = cy-b*scale;
+  const svg = document.getElementById('complexSvg');
+  let html = '<line x1="10" y1="100" x2="250" y2="100" stroke="var(--line-strong)" stroke-width="1"/><line x1="130" y1="10" x2="130" y2="190" stroke="var(--line-strong)" stroke-width="1"/>';
+  html += '<text x="234" y="94" font-family="JetBrains Mono" font-size="9" fill="#5f7089">Re</text><text x="134" y="20" font-family="JetBrains Mono" font-size="9" fill="#5f7089">Im</text>';
+  html += '<line x1="'+cx+'" y1="'+cy+'" x2="'+x2+'" y2="'+y2+'" stroke="var(--cyan)" stroke-width="2.4"/><circle cx="'+x2+'" cy="'+y2+'" r="5" fill="var(--cyan)" filter="drop-shadow(0 0 5px var(--cyan))"/>';
+  svg.innerHTML = html;
+}
+function updateComplex(){
+  const a = parseInt(document.getElementById('reSlider').value)/10;
+  const b = parseInt(document.getElementById('imSlider').value)/10;
+  document.getElementById('reVal').textContent = a.toFixed(1);
+  document.getElementById('imVal').textContent = b.toFixed(1);
+  const mag = Math.sqrt(a*a+b*b);
+  const phase = Math.atan2(b,a)*180/Math.PI;
+  document.getElementById('complexReadout').textContent = a.toFixed(1)+' + '+b.toFixed(1)+'i    |z| = '+mag.toFixed(2)+'    phase = '+phase.toFixed(0)+'\u00B0';
+  drawComplex(a,b);
+}
+document.getElementById('reSlider').addEventListener('input', updateComplex);
+document.getElementById('imSlider').addEventListener('input', updateComplex);
+updateComplex();
+
+/* ============ CH3: dirac inner products ============ */
+const kets = {
+  '0': {label:'|0\u27E9', v:[1,0]},
+  '1': {label:'|1\u27E9', v:[0,1]},
+  '+': {label:'|+\u27E9', v:[1/Math.sqrt(2), 1/Math.sqrt(2)]},
+  '-': {label:'|\u2212\u27E9', v:[1/Math.sqrt(2), -1/Math.sqrt(2)]}
+};
+let braKey='0', ketKey='1';
+function buildDiracButtons(){
+  const braWrap = document.getElementById('braBtns');
+  const ketWrap = document.getElementById('ketBtns');
+  braWrap.innerHTML = '<span style="font-family:var(--mono); font-size:11px; color:var(--ink-faint); align-self:center;">BRA:</span>' + Object.keys(kets).map(k=>'<button class="toggle-btn'+(k===braKey?' active':'')+'" id="bra-'+k+'" onclick="pickBra(\''+k+'\')">\u27E8'+kets[k].label.slice(1)+'</button>').join('');
+  ketWrap.innerHTML = '<span style="font-family:var(--mono); font-size:11px; color:var(--ink-faint); align-self:center;">KET:</span>' + Object.keys(kets).map(k=>'<button class="toggle-btn'+(k===ketKey?' active':'')+'" id="ket-'+k+'" onclick="pickKet(\''+k+'\')">'+kets[k].label+'</button>').join('');
+}
+function pickBra(k){ braKey=k; buildDiracButtons(); updateDirac(); }
+function pickKet(k){ ketKey=k; buildDiracButtons(); updateDirac(); }
+function updateDirac(){
+  const bv = kets[braKey].v, kv = kets[ketKey].v;
+  const overlap = bv[0]*kv[0] + bv[1]*kv[1];
+  document.getElementById('diracReadout').textContent = '\u27E8'+kets[braKey].label.slice(1)+kets[ketKey].label+' = '+overlap.toFixed(2)+'    |overlap|\u00B2 = '+(overlap*overlap*100).toFixed(0)+'%';
+  addXP(2);
+}
+buildDiracButtons();
+updateDirac();
+
+/* ============ CH4: gates on |0> ============ */
+const gateMats = {
+  I: [[1,0],[0,1]],
+  X: [[0,1],[1,0]],
+  Z: [[1,0],[0,-1]],
+  H: [[1/Math.sqrt(2), 1/Math.sqrt(2)],[1/Math.sqrt(2), -1/Math.sqrt(2)]]
+};
+function drawAmplitudeBars(svgId, amps){
+  const svg = document.getElementById(svgId);
+  const h0 = Math.abs(amps[0])*100, h1 = Math.abs(amps[1])*100;
+  const c0 = amps[0] < 0 ? 'var(--red)' : 'var(--cyan)';
+  const c1 = amps[1] < 0 ? 'var(--red)' : 'var(--violet)';
+  let html = '<line x1="20" y1="120" x2="240" y2="120" stroke="var(--line-strong)" stroke-width="1"/>';
+  html += '<rect x="60" y="'+(120-h0)+'" width="46" height="'+h0+'" rx="4" fill="'+c0+'" opacity="0.75" stroke="'+c0+'" stroke-width="1.4"/>';
+  html += '<rect x="150" y="'+(120-h1)+'" width="46" height="'+h1+'" rx="4" fill="'+c1+'" opacity="0.75" stroke="'+c1+'" stroke-width="1.4"/>';
+  html += '<text x="72" y="136" font-family="JetBrains Mono" font-size="11" fill="#e9eef8">|0\u27E9</text>';
+  html += '<text x="162" y="136" font-family="JetBrains Mono" font-size="11" fill="#e9eef8">|1\u27E9</text>';
+  svg.innerHTML = html;
+}
+function applyGate(g){
+  document.querySelectorAll('#ch4 .toggle-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  const amps = matVec(gateMats[g], [1,0]);
+  drawAmplitudeBars('gateSvg', amps);
+  document.getElementById('gateState').textContent = '|\u03C8\u27E9 = '+amps[0].toFixed(2)+'|0\u27E9 + '+amps[1].toFixed(2)+'|1\u27E9';
+  document.getElementById('gateReadout').textContent = 'P(|0\u27E9) = '+(amps[0]*amps[0]*100).toFixed(1)+'%    P(|1\u27E9) = '+(amps[1]*amps[1]*100).toFixed(1)+'%';
+  addXP(3);
+}
+drawAmplitudeBars('gateSvg', [1,0]);
+
+/* ============ CH5: build-a-circuit ============ */
+let circuitGates = [];
+function renderCircuit(){
+  const strip = document.getElementById('circuitStrip');
+  strip.innerHTML = circuitGates.length ? circuitGates.map(g=>'<div class="circuit-chip">'+g+'</div>').join('<span style="color:var(--ink-faint);">\u2192</span>') : '<div class="circuit-chip empty">empty \u2014 add a gate</div>';
+  let vec = [1,0];
+  circuitGates.forEach(g=>{ vec = matVec(gateMats[g], vec); });
+  document.getElementById('circuitState').textContent = '|\u03C8\u27E9 = '+vec[0].toFixed(2)+'|0\u27E9 + '+vec[1].toFixed(2)+'|1\u27E9';
+  document.getElementById('circuitReadout').textContent = 'P(|0\u27E9) = '+(vec[0]*vec[0]*100).toFixed(1)+'%    P(|1\u27E9) = '+(vec[1]*vec[1]*100).toFixed(1)+'%';
+}
+function addToCircuit(g){
+  if(circuitGates.length >= 6) return;
+  circuitGates.push(g);
+  renderCircuit();
+  addXP(2);
+}
+function resetCircuit(){ circuitGates = []; renderCircuit(); }
+renderCircuit();
+
+/* ============ CH6: full Bloch sphere ============ */
+function drawBloch(thetaDeg, phiDeg){
+  const theta = thetaDeg*Math.PI/180, phi = phiDeg*Math.PI/180;
+  const cx=150, cy=115, R=75;
+  const depth = Math.sin(theta)*Math.sin(phi);
+  const x2 = cx + R*Math.sin(theta)*Math.cos(phi);
+  const y2 = cy - R*Math.cos(theta);
+  const r = 5 + depth*2;
+  const svg = document.getElementById('blochSvg');
+  let html = '';
+  html += '<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+R+'" ry="'+(R*0.36)+'" fill="none" stroke="var(--line-strong)" stroke-width="1" stroke-dasharray="3 3"/>';
+  html += '<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="var(--line-strong)" stroke-width="1.4"/>';
+  html += '<line x1="'+cx+'" y1="'+(cy-R)+'" x2="'+cx+'" y2="'+(cy+R)+'" stroke="var(--line)" stroke-width="1"/>';
+  html += '<text x="'+(cx-8)+'" y="'+(cy-R-10)+'" font-family="JetBrains Mono" font-size="12" fill="#5ad1e6">|0\u27E9</text>';
+  html += '<text x="'+(cx-8)+'" y="'+(cy+R+20)+'" font-family="JetBrains Mono" font-size="12" fill="#b39bff">|1\u27E9</text>';
+  html += '<line x1="'+cx+'" y1="'+cy+'" x2="'+x2+'" y2="'+y2+'" stroke="var(--amber)" stroke-width="2.2" opacity="'+(0.6+depth*0.4)+'"/>';
+  html += '<circle cx="'+x2+'" cy="'+y2+'" r="'+r+'" fill="var(--amber)" filter="drop-shadow(0 0 6px var(--amber))"/>';
+  html += '<circle cx="'+cx+'" cy="'+cy+'" r="2.5" fill="var(--ink-faint)"/>';
+  svg.innerHTML = html;
+}
+function updateBloch(){
+  const thetaDeg = parseInt(document.getElementById('thetaSlider').value);
+  const phiDeg = parseInt(document.getElementById('phiSlider').value);
+  document.getElementById('thetaVal').textContent = thetaDeg+'\u00B0';
+  document.getElementById('phiVal').textContent = phiDeg+'\u00B0';
+  const theta = thetaDeg*Math.PI/180;
+  const p0 = Math.cos(theta/2)**2, p1 = Math.sin(theta/2)**2;
+  document.getElementById('blochReadout').textContent = 'P(|0\u27E9) = '+(p0*100).toFixed(1)+'%    P(|1\u27E9) = '+(p1*100).toFixed(1)+'%    (\u03C6 does not change these)';
+  drawBloch(thetaDeg, phiDeg);
+}
+function presetBloch(t,p){
+  document.getElementById('thetaSlider').value = t;
+  document.getElementById('phiSlider').value = p;
+  updateBloch();
+  addXP(1);
+}
+document.getElementById('thetaSlider').addEventListener('input', updateBloch);
+document.getElementById('phiSlider').addEventListener('input', updateBloch);
+updateBloch();
+
+/* ============ CH7: measurement in a chosen basis ============ */
+let measState = '0', measBasis = 'Z';
+let measCounts = {a:0,b:0};
+function setMeasState(k){
+  measState = k;
+  document.querySelectorAll('#ch7 .btn-row:nth-of-type(1) .toggle-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  updateMeasFormula();
+}
+function setMeasBasis(b){
+  measBasis = b;
+  document.querySelectorAll('#ch7 .btn-row:nth-of-type(2) .toggle-btn').forEach(btn=>btn.classList.remove('active'));
+  event.target.classList.add('active');
+  updateMeasFormula();
+}
+function updateMeasFormula(){
+  const sv = kets[measState].v;
+  const basisKets = measBasis==='Z' ? ['0','1'] : ['+','-'];
+  const pa = Math.pow(sv[0]*kets[basisKets[0]].v[0] + sv[1]*kets[basisKets[0]].v[1], 2);
+  const pb = Math.pow(sv[0]*kets[basisKets[1]].v[0] + sv[1]*kets[basisKets[1]].v[1], 2);
+  document.getElementById('measFormula').textContent = 'State '+kets[measState].label+' in '+(measBasis==='Z'?'Z':'X')+'-basis \u2192 P('+kets[basisKets[0]].label+') = '+(pa*100).toFixed(1)+'%    P('+kets[basisKets[1]].label+') = '+(pb*100).toFixed(1)+'%';
+}
+function drawMeasHist(){
+  const basisKets = measBasis==='Z' ? ['0','1'] : ['+','-'];
+  const total = measCounts.a+measCounts.b;
+  const h0 = total ? (measCounts.a/total)*130 : 0;
+  const h1 = total ? (measCounts.b/total)*130 : 0;
+  const svg = document.getElementById('measSvg');
+  let html = '<line x1="20" y1="150" x2="240" y2="150" stroke="var(--line-strong)" stroke-width="1"/>';
+  html += '<rect x="60" y="'+(150-h0)+'" width="46" height="'+h0+'" rx="4" fill="var(--cyan-dim)" stroke="var(--cyan)" stroke-width="1.4"/>';
+  html += '<rect x="150" y="'+(150-h1)+'" width="46" height="'+h1+'" rx="4" fill="var(--violet-dim)" stroke="var(--violet)" stroke-width="1.4"/>';
+  html += '<text x="'+(70-basisKets[0].length)+'" y="166" font-family="JetBrains Mono" font-size="11" fill="#e9eef8">'+kets[basisKets[0]].label+'</text>';
+  html += '<text x="'+(160-basisKets[1].length)+'" y="166" font-family="JetBrains Mono" font-size="11" fill="#e9eef8">'+kets[basisKets[1]].label+'</text>';
+  svg.innerHTML = html;
+  document.getElementById('measReadout').textContent = total+' measurements \u2014 '+kets[basisKets[0]].label+': '+measCounts.a+'   '+kets[basisKets[1]].label+': '+measCounts.b;
+}
+function runMeasurements(){
+  const sv = kets[measState].v;
+  const basisKets = measBasis==='Z' ? ['0','1'] : ['+','-'];
+  const pa = Math.pow(sv[0]*kets[basisKets[0]].v[0] + sv[1]*kets[basisKets[0]].v[1], 2);
+  for(let i=0;i<20;i++){ if(Math.random() < pa) measCounts.a++; else measCounts.b++; }
+  drawMeasHist();
+  addXP(4);
+}
+function resetMeasurements(){ measCounts = {a:0,b:0}; drawMeasHist(); }
+updateMeasFormula();
+drawMeasHist();
+
+/* ============ quiz data ============ */
+const quizzes = {
+  ch1: [
+    {q:"What mathematical object represents a quantum state?", opts:["A single plain number","A vector","A written sentence","A color"], correct:1, explain:"Every quantum state, like every classical vector, is an ordered list of numbers."},
+    {q:"What does multiplying a matrix by a vector produce?", opts:["A new, transformed vector","A single scalar number always","Nothing \u2014 it's undefined","The same vector, unchanged, always"], correct:0, explain:"This is exactly the operation shown in the demo \u2014 the amber output arrow."},
+    {q:"What did the 'Swap Rows' matrix do to the demo vector?", opts:["Deleted it","Swapped its two components","Doubled both components","Rotated it by 360\u00B0"], correct:1, explain:"The swap matrix exchanges the x and y components of the vector."}
+  ],
+  ch2: [
+    {q:"What two parts make up a complex number a + bi?", opts:["A real part and an imaginary part","Two real parts","A magnitude and a color","A vector and a matrix"], correct:0, explain:"a is the real part, b is the imaginary part multiplying i."},
+    {q:"What does squaring a quantum amplitude's magnitude give you?", opts:["Its phase angle","Its measurement probability","Its real part only","Nothing physically meaningful"], correct:1, explain:"This is the Born rule, first introduced in Module 4 and formalized here."},
+    {q:"What does the phase of a complex amplitude affect?", opts:["Nothing, ever","How a state behaves when combined with other states, even though it's invisible to a single measurement","Only its magnitude","The color displayed on the diagram"], correct:1, explain:"Phase becomes crucial for interference between multiple amplitudes, covered later in the course."}
+  ],
+  ch3: [
+    {q:"What does a ket |\u03C8\u27E9 represent?", opts:["A column vector describing a quantum state","A type of quantum gate","A measurement result only","A classical bit"], correct:0, explain:"Ket notation is just compact shorthand for a state vector."},
+    {q:"What does a bra \u27E8\u03C6| let you compute when combined with a ket?", opts:["The state's color","An inner product / overlap between two states","A random number","The state's temperature"], correct:1, explain:"\u27E8\u03C6|\u03C8\u27E9 is exactly the dot product computed in the demo."},
+    {q:"What does \u27E8\u03C8|\u03C8\u27E9 always equal for a valid quantum state?", opts:["0","1","-1","It varies randomly"], correct:1, explain:"This is the vector version of 'total probability equals 100%.'"}
+  ],
+  ch4: [
+    {q:"What property must every valid quantum gate matrix have?", opts:["It must be unitary, preserving total probability","It must contain only positive numbers","It must be a 1x1 matrix","It must always equal the identity matrix"], correct:0, explain:"Unitary matrices are exactly what keep P(|0\u27E9)+P(|1\u27E9) equal to 100% after any gate."},
+    {q:"What does the X gate do to |0\u27E9?", opts:["Leaves it unchanged","Flips it to |1\u27E9","Deletes the qubit","Doubles its amplitude"], correct:1, explain:"X swaps the |0\u27E9 and |1\u27E9 amplitudes \u2014 the quantum bit-flip gate."},
+    {q:"What does the Hadamard (H) gate do to |0\u27E9?", opts:["Nothing at all","Creates an equal superposition, |+\u27E9","Turns it into |1\u27E9 with certainty","Measures it immediately"], correct:1, explain:"H is the standard way nearly every quantum algorithm creates its first superposition."}
+  ],
+  ch5: [
+    {q:"What is a quantum circuit?", opts:["A single isolated gate","A sequence of gates applied one after another to a state","A type of classical processor","A measurement device only"], correct:1, explain:"Circuits chain gates together, each acting on the output of the previous one."},
+    {q:"In the circuit-building demo, what updates every time you add a gate?", opts:["Nothing changes","The state vector and its probabilities, recomputed from the full gate sequence so far","Only the color of the chip","The XP counter only"], correct:1, explain:"Each added gate multiplies the running state vector by that gate's matrix."},
+    {q:"Does the order of gates in a circuit matter?", opts:["No, gates always commute","Yes \u2014 applying the same gates in a different order generally gives a different final state","Only for more than 10 gates","Only for measurement, never for gates"], correct:1, explain:"Matrix multiplication isn't commutative in general, so H\u2192Z and Z\u2192H can differ."}
+  ],
+  ch6: [
+    {q:"What does the angle \u03B8 (theta) control on the Bloch sphere?", opts:["The state's color","How much the state leans toward |0\u27E9 versus |1\u27E9, and its measurement probabilities","The state's phase only, not probability","Nothing measurable"], correct:1, explain:"P(|0\u27E9)=cos\u00B2(\u03B8/2) and P(|1\u27E9)=sin\u00B2(\u03B8/2) depend only on \u03B8."},
+    {q:"What does the angle \u03C6 (phi) add that \u03B8 alone doesn't capture?", opts:["A second, independent probability value","Phase information, invisible to a single measurement but physically real","A classical bit value","Nothing \u2014 \u03C6 has no effect"], correct:1, explain:"\u03C6 rotates the state around the vertical axis without changing measurement probabilities."},
+    {q:"Where do |+\u27E9 and |\u2212\u27E9 sit on the Bloch sphere?", opts:["At the north and south poles","On the equator, 180\u00B0 apart in \u03C6","Outside the sphere","At the exact center"], correct:1, explain:"Both have \u03B8=90\u00B0 (equal |0\u27E9/|1\u27E9 probability) but differ in \u03C6 by 180\u00B0."}
+  ],
+  ch7: [
+    {q:"What rule computes the probability of a measurement outcome from a state's amplitude?", opts:["The Born rule: P(outcome) = |\u27E8outcome|\u03C8\u27E9|\u00B2","A fixed 50/50 split always","The outcome's color","There is no rule; it's unpredictable"], correct:0, explain:"This squared-inner-product formula is exactly what the demo computes live."},
+    {q:"What happens to a state's measurement probabilities when you change the measurement basis?", opts:["They never change","They generally change, since probability depends on overlap with the chosen basis kets","Only the labels change, not the numbers","The state itself is destroyed"], correct:1, explain:"The demo showed |0\u27E9 measured in the X-basis giving a 50/50 split, unlike the Z-basis."},
+    {q:"What did running repeated measurements in the demo show?", opts:["Completely unrelated random noise","The tally converging toward the exact probabilities computed by the Born rule","Every trial gave the same fixed outcome","Nothing \u2014 the counts stayed at zero"], correct:1, explain:"Over many trials, sampled outcomes approach the true underlying probabilities."}
+  ]
+};
+const finalQuiz = [
+  {q:"What does multiplying a matrix by a state vector represent physically?", opts:["Applying a quantum gate to that state","Measuring the state","Deleting the state","Nothing physical"], correct:0, explain:"Chapter 1's core equivalence: gate = matrix, applied to state = vector."},
+  {q:"What does squaring a complex amplitude's magnitude give you?", opts:["Its measurement probability","Its phase angle","Its real part only","Its color"], correct:0, explain:"Chapter 2's Born-rule connection between magnitude and probability."},
+  {q:"What does \u27E8\u03C6|\u03C8\u27E9 compute?", opts:["The overlap (inner product) between two states","A random number","The sum of two states","A gate matrix"], correct:0, explain:"Chapter 3's central Dirac-notation calculation."},
+  {q:"What must every valid quantum gate matrix be?", opts:["Unitary, preserving total probability","Any 2x2 matrix at all","Always equal to the identity","Only positive-valued"], correct:0, explain:"Chapter 4's unitary-gate demo, applying I, X, Z, and H."},
+  {q:"Why does the order of gates in a circuit matter?", opts:["Because matrix multiplication generally isn't commutative","It never matters","Only the first gate in a circuit has any effect","Circuits ignore gate order by design"], correct:0, explain:"Chapter 5's build-your-own-circuit demo, comparing gate orderings."},
+  {q:"What does the angle \u03C6 add on the Bloch sphere that \u03B8 doesn't capture?", opts:["Phase information, invisible to a single measurement","A second probability value","Nothing at all","A classical bit"], correct:0, explain:"Chapter 6's full Bloch sphere with both \u03B8 and \u03C6."},
+  {q:"What is the Born rule?", opts:["P(outcome) = |\u27E8outcome|\u03C8\u27E9|\u00B2","P(outcome) is always exactly 50%","Probability has no formula in quantum mechanics","P(outcome) equals the state's phase"], correct:0, explain:"Chapter 7's measurement-in-a-basis demo, computing this formula live."}
+];
+
+function renderQuiz(containerId, items, chapterKey){
+  const container = document.getElementById(containerId);
+  items.forEach((item, idx)=>{
+    const qDiv = document.createElement('div');
+    qDiv.className = 'q-item';
+    qDiv.innerHTML = '<div class="q-text">'+(idx+1)+'. '+item.q+'</div>'
+      + '<div class="q-options">'+item.opts.map((o,i)=>'<button class="q-opt" data-i="'+i+'">'+o+'</button>').join('')+'</div>'
+      + '<div class="q-explain">'+item.explain+'</div>';
+    container.appendChild(qDiv);
+    const buttons = qDiv.querySelectorAll('.q-opt');
+    const explainEl = qDiv.querySelector('.q-explain');
+    buttons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = parseInt(btn.dataset.i);
+        buttons.forEach(b=>b.disabled = true);
+        if(i === item.correct){
+          btn.classList.add('correct');
+          if(chapterKey) onCorrect(chapterKey); else onFinalAnswer(idx, true);
+        } else {
+          btn.classList.add('incorrect');
+          buttons[item.correct].classList.add('correct');
+          if(chapterKey) onIncorrect(chapterKey); else onFinalAnswer(idx, false);
+        }
+        explainEl.classList.add('show');
+      });
+    });
+  });
+}
+Object.keys(quizzes).forEach(key=>{ renderQuiz('quiz-'+key, quizzes[key], key); updateChapterScore(key); });
+renderQuiz('quiz-final', finalQuiz, null);
+
+function updateChapterScore(key){ document.getElementById('score-'+key).textContent = state.chapters[key].correct+' / '+state.chapters[key].total; }
+function onCorrect(key){ const s=state.chapters[key]; s.correct=Math.min(s.correct+1,s.total); addXP(10); checkChapterDone(key); updateChapterScore(key); saveState(); }
+function onIncorrect(key){ state.chapters[key].hadMiss=true; checkChapterDone(key); updateChapterScore(key); saveState(); }
+let answeredCount = { ch1:0, ch2:0, ch3:0, ch4:0, ch5:0, ch6:0, ch7:0 };
+function checkChapterDone(key){
+  answeredCount[key]++;
+  const s = state.chapters[key];
+  if(answeredCount[key] >= s.total){
+    s.done = true;
+    const dot = document.getElementById('dot-'+key), statusEl = document.getElementById('status-'+key);
+    statusEl.classList.add('show');
+    if(s.hadMiss){ dot.classList.add('warn'); statusEl.classList.add('review'); statusEl.innerHTML='\u26A0 Review suggested \u2014 you missed at least one question in this chapter.'; }
+    else { dot.classList.add('done'); statusEl.classList.add('mastered'); statusEl.innerHTML='\u2713 Mastered \u2014 perfect score on this chapter.'; addXP(15); }
+    saveState();
+  }
+}
+let finalAnswers = [];
+function onFinalAnswer(idx, correct){
+  finalAnswers[idx]=correct;
+  if(finalAnswers.filter(a=>a!==undefined).length === finalQuiz.length) showFinalResult();
+}
+function showFinalResult(){
+  const correctCount = finalAnswers.filter(a=>a===true).length;
+  const pct = Math.round((correctCount/finalQuiz.length)*100);
+  document.getElementById('resultScore').textContent = pct+'%';
+  document.getElementById('resultDetail').textContent = correctCount+' / '+finalQuiz.length+' correct';
+  const badge = document.getElementById('resultBadge');
+  const pass = pct >= 70;
+  badge.textContent = pass ? 'Passed' : 'Retry Recommended';
+  badge.className = 'result-badge ' + (pass ? 'pass' : 'retry');
+  addXP(correctCount*10 + (pass?25:0));
+  const weakChapters = Object.keys(state.chapters).filter(k => state.chapters[k].hadMiss);
+  const wrap = document.getElementById('recommendWrap');
+  if(weakChapters.length === 0 && pass){
+    wrap.innerHTML = '<div class="callout" style="margin-top:4px;"><b>Great work.</b> No flagged chapters and a passing score \u2014 you\u2019re ready to move on to the next module.</div>';
+  } else {
+    const names = { ch1:"Linear Algebra Basics", ch2:"Complex Numbers", ch3:"Dirac Notation", ch4:"Quantum Gates", ch5:"Quantum Circuits", ch6:"Bloch Sphere", ch7:"Quantum Measurement" };
+    let html = '<div class="visual-label" style="margin-top:18px;">Recommended Review</div><ul class="recommend-list">';
+    weakChapters.forEach(k=> html += '<li>\u21BA Revisit <b>'+names[k]+'</b> \u2014 a quick-check answer there was missed.</li>');
+    if(!pass){ html += '<li>\u21BA Your assessment score was below 70% \u2014 consider re-reading the callout boxes first.</li>'; }
+    html += '</ul>';
+    wrap.innerHTML = html;
+  }
+  document.getElementById('resultPanel').classList.add('show');
+  document.getElementById('dot-final').classList.add(pass ? 'done' : 'warn');
+  state.finalDone = true;
+  saveState();
+}
+
+const sections = document.querySelectorAll('.chapter');
+const sideLinks = document.querySelectorAll('.side-list a');
+const spyObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      sideLinks.forEach(a=>a.classList.remove('active'));
+      const link = document.querySelector('.side-list a[data-target="'+entry.target.id+'"]');
+      if(link) link.classList.add('active');
+    }
+  });
+},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>spyObserver.observe(s));
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  document.getElementById('progressFill').style.width = ((h.scrollTop)/(h.scrollHeight-h.clientHeight)*100)+'%';
+});
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }); },{threshold:0.08});
+revealEls.forEach(el=>io.observe(el));
+
+(function(){
+  if(typeof qmlGetAdjacentModules !== 'function') { document.getElementById('moduleNav').style.display='none'; return; }
+  const { prev, next } = qmlGetAdjacentModules(5);
+  const wrap = document.getElementById('moduleNav');
+  function cardHTML(mod, dir){
+    if(!mod) return '<div class="mn-card disabled '+dir+'"><span class="mn-eyebrow">'+(dir==='next'?'Up Next':'Previous')+'</span><span class="mn-title">\u2014 none \u2014</span></div>';
+    const available = !!mod.file;
+    const arrow = dir==='prev' ? '\u2190 ' : ''; const arrowEnd = dir==='next' ? ' \u2192' : '';
+    const eyebrow = (dir==='prev' ? 'Previous \u2014 Module '+mod.id : 'Up Next \u2014 Module '+mod.id) + (available ? '' : ' (Coming Soon)');
+    if(available) return '<a class="mn-card enabled '+dir+'" href="'+mod.file+'"><span class="mn-eyebrow">'+eyebrow+'</span><span class="mn-title">'+arrow+mod.title+arrowEnd+'</span><span class="mn-arrow">Open tutorial</span></a>';
+    return '<div class="mn-card disabled '+dir+'"><span class="mn-eyebrow">'+eyebrow+'</span><span class="mn-title">'+mod.title+'</span><span class="mn-arrow">Not published yet</span></div>';
+  }
+  wrap.innerHTML = cardHTML(prev,'prev') + cardHTML(next,'next');
+  const continueBtn = document.getElementById('continueBtn');
+  if(continueBtn){
+    if(next && next.file){ continueBtn.href = next.file; continueBtn.textContent = 'Continue to Module '+next.id+' \u2192'; }
+    else if(next){ continueBtn.href = 'qml-roadmap-landing-page.html#curriculum'; continueBtn.textContent = 'Module '+next.id+' — Coming Soon'; continueBtn.style.opacity='0.6'; }
+  }
+})();
+</script>
+
+</body>
+</html>

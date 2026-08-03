@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Powered Quantum Tutor | QML Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="modules-registry.js"></script>
+<style>
+:root{
+  --bg:#070b14; --bg-2:#0b111f; --panel:#0e1526; --panel-2:#101a2e;
+  --line:rgba(148,178,224,0.14); --line-strong:rgba(148,178,224,0.28);
+  --ink:#e9eef8; --ink-dim:#9fb0c9; --ink-faint:#5f7089;
+  --cyan:#5ad1e6; --cyan-dim:rgba(90,209,230,0.14);
+  --violet:#b39bff; --violet-dim:rgba(179,155,255,0.14);
+  --amber:#f2a341; --amber-dim:rgba(242,163,65,0.14);
+  --green:#5ee6a0; --green-dim:rgba(94,230,160,0.14);
+  --red:#f2726a; --red-dim:rgba(242,114,106,0.14);
+  --blue:#4fa3f7;
+  --serif:'Fraunces', Georgia, serif; --sans:'Inter', -apple-system, sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.6;}
+header{position:sticky; top:0; z-index:60; backdrop-filter:blur(14px); background:rgba(7,11,20,0.82); border-bottom:1px solid var(--line);}
+.nav-wrap{max-width:1280px; margin:0 auto; padding:16px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+.logo{font-family:var(--mono); font-weight:700; font-size:15px; color:var(--cyan); border:1px solid var(--line-strong); border-radius:8px; padding:6px 12px; letter-spacing:0.5px; white-space:nowrap;}
+.logo span{color:var(--ink-faint);}
+.back-link{display:flex; align-items:center; gap:8px; color:var(--ink-dim); text-decoration:none; font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; transition:color .2s;}
+.back-link:hover{color:var(--cyan);}
+
+.wrap{max-width:1100px; margin:0 auto; padding:56px 32px 120px;}
+.module-eyebrow{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--violet); background:var(--violet-dim); margin-bottom:20px;}
+h1{font-family:var(--serif); font-weight:600; font-size:clamp(30px,4vw,44px); letter-spacing:-0.01em;}
+.lede{margin-top:12px; color:var(--ink-dim); font-size:15.5px; max-width:700px;}
+.chip-row{display:flex; gap:8px; margin-top:20px; flex-wrap:wrap;}
+.chip{font-family:var(--mono); font-size:10.5px; letter-spacing:0.04em; color:var(--ink-faint); border:1px solid var(--line); padding:5px 11px; border-radius:100px;}
+
+.honesty-note{
+  margin-top:24px; padding:16px 18px; border-radius:12px; background:var(--amber-dim);
+  border:1px solid rgba(242,163,65,0.35); font-size:13px; color:var(--ink-dim);
+}
+.honesty-note b{color:var(--amber); font-family:var(--mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; display:block; margin-bottom:5px;}
+
+.tutor-shell{
+  margin-top:32px; background:var(--panel); border:1px solid var(--line-strong); border-radius:16px;
+  overflow:hidden; display:flex; flex-direction:column;
+}
+.tutor-topbar{
+  display:flex; align-items:center; justify-content:space-between; padding:16px 22px;
+  border-bottom:1px solid var(--line); background:var(--panel-2);
+}
+.tutor-topbar-left{display:flex; align-items:center; gap:12px;}
+.tutor-orb{
+  width:38px; height:38px; border-radius:50%; background:var(--violet-dim); border:1.5px solid var(--violet);
+  display:flex; align-items:center; justify-content:center; font-size:17px; color:var(--violet);
+}
+.tutor-name{font-weight:700; font-size:14px; color:var(--ink);}
+.tutor-status{font-family:var(--mono); font-size:10.5px; color:var(--green); display:flex; align-items:center; gap:5px;}
+.tutor-status::before{content:''; width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green);}
+.asked-counter{font-family:var(--mono); font-size:11px; color:var(--ink-faint);}
+
+.chat-area{
+  height:460px; overflow-y:auto; padding:22px; display:flex; flex-direction:column; gap:16px;
+}
+.msg{max-width:82%; display:flex; flex-direction:column; gap:6px;}
+.msg.user{align-self:flex-end; align-items:flex-end;}
+.msg.bot{align-self:flex-start; align-items:flex-start;}
+.bubble{padding:13px 16px; border-radius:14px; font-size:13.5px; line-height:1.6;}
+.msg.user .bubble{background:var(--blue); color:#04101f; border-bottom-right-radius:4px;}
+.msg.bot .bubble{background:var(--panel-2); border:1px solid var(--line); color:var(--ink-dim); border-bottom-left-radius:4px;}
+.msg.bot .bubble b{color:var(--ink);}
+.msg-meta{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+.confidence-tag{font-family:var(--mono); font-size:9.5px; letter-spacing:0.05em; text-transform:uppercase; padding:3px 8px; border-radius:100px;}
+.confidence-tag.high{background:var(--green-dim); color:var(--green);}
+.confidence-tag.medium{background:var(--amber-dim); color:var(--amber);}
+.confidence-tag.low{background:var(--red-dim); color:var(--red);}
+.source-link{font-family:var(--mono); font-size:10.5px; color:var(--cyan); text-decoration:none;}
+.source-link:hover{text-decoration:underline;}
+.feedback-row{display:flex; gap:8px; margin-top:2px;}
+.fb-btn{background:transparent; border:1px solid var(--line-strong); color:var(--ink-faint); font-size:11px; padding:4px 9px; border-radius:100px; cursor:pointer; transition:all .2s;}
+.fb-btn:hover{border-color:var(--ink-dim); color:var(--ink);}
+.fb-btn.active{border-color:var(--cyan); color:var(--cyan); background:var(--cyan-dim);}
+.typing-dots{display:flex; gap:4px; padding:13px 16px;}
+.typing-dots span{width:6px; height:6px; border-radius:50%; background:var(--ink-faint); animation:blink 1.2s infinite;}
+.typing-dots span:nth-child(2){animation-delay:0.2s;}
+.typing-dots span:nth-child(3){animation-delay:0.4s;}
+@keyframes blink{0%,100%{opacity:0.3;}50%{opacity:1;}}
+
+.starter-row{padding:0 22px 16px; display:flex; flex-wrap:wrap; gap:8px;}
+.starter-chip{
+  font-family:var(--sans); font-size:12px; padding:8px 14px; border-radius:100px; border:1px solid var(--line-strong);
+  background:var(--panel-2); color:var(--ink-dim); cursor:pointer; transition:all .2s;
+}
+.starter-chip:hover{border-color:var(--violet); color:var(--ink);}
+
+.input-row{display:flex; gap:10px; padding:18px 22px; border-top:1px solid var(--line); background:var(--panel-2);}
+.tutor-input{
+  flex:1; background:var(--bg); border:1px solid var(--line-strong); border-radius:10px; padding:12px 16px;
+  color:var(--ink); font-family:var(--sans); font-size:13.5px;
+}
+.tutor-input:focus{outline:none; border-color:var(--cyan);}
+.send-btn{
+  padding:12px 22px; border-radius:10px; border:none; background:var(--blue); color:#04101f;
+  font-weight:700; font-size:13.5px; cursor:pointer; transition:transform .2s;
+}
+.send-btn:hover{transform:translateY(-2px);}
+.send-btn:disabled{opacity:0.5; cursor:default; transform:none;}
+
+/* browse by topic */
+.browse-toggle{
+  margin-top:28px; display:flex; align-items:center; justify-content:space-between; cursor:pointer;
+  padding:16px 20px; background:var(--panel); border:1px solid var(--line); border-radius:12px;
+}
+.browse-toggle h3{font-family:var(--mono); font-size:12.5px; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink);}
+.browse-arrow{font-family:var(--mono); color:var(--ink-faint); transition:transform .3s;}
+.browse-arrow.open{transform:rotate(180deg);}
+.browse-panel{max-height:0; overflow:hidden; transition:max-height .5s ease;}
+.browse-panel.open{max-height:2400px;}
+.browse-inner{padding-top:16px; display:flex; flex-direction:column; gap:18px;}
+.browse-module{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px 18px;}
+.browse-module-head{font-family:var(--mono); font-size:11px; color:var(--violet); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:10px;}
+.browse-chips{display:flex; flex-wrap:wrap; gap:8px;}
+.browse-chip{
+  font-size:11.5px; padding:7px 12px; border-radius:100px; border:1px solid var(--line-strong);
+  background:var(--panel-2); color:var(--ink-dim); cursor:pointer; transition:all .2s;
+}
+.browse-chip:hover{border-color:var(--cyan); color:var(--ink);}
+
+.reset-row{margin-top:20px; text-align:right;}
+.reset-link{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); cursor:pointer; text-decoration:underline; background:none; border:none;}
+
+footer{padding:40px 32px; border-top:1px solid var(--line); text-align:center; font-family:var(--mono); font-size:12px; color:var(--ink-faint);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-wrap">
+    <div class="logo">{TAA}<span>·QML</span></div>
+    <a class="back-link" href="qml-roadmap-landing-page.html#platform">← Back to Platform</a>
+    <a class="back-link" href="progress-hub.html">My Progress</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="module-eyebrow">◆ AI-Powered Quantum Tutor</div>
+  <h1>Ask anything from the curriculum.</h1>
+  <p class="lede">A free, always-on tutor built from every concept across all 12 modules — encodings, algorithms, applications, the frontier, and the capstone skills. Type a question or tap a starter chip below.</p>
+  <div class="chip-row">
+    <span class="chip">Zero Cost</span>
+    <span class="chip">No API Key</span>
+    <span class="chip">Runs Entirely in Your Browser</span>
+    <span class="chip">~55 Curated Answers</span>
+  </div>
+
+  <div class="honesty-note">
+    <b>How this actually works</b>
+    This tutor does not call a paid language model — that would cost money per question, and this tool is free. Instead, it searches a curated knowledge base built from this course's own content, using a real text-matching algorithm (term-frequency scoring) that runs entirely in your browser. It is genuinely useful for course questions, and honest about when it is not confident in a match — it will say so rather than guess.
+  </div>
+
+  <div class="tutor-shell">
+    <div class="tutor-topbar">
+      <div class="tutor-topbar-left">
+        <div class="tutor-orb">✺</div>
+        <div>
+          <div class="tutor-name">Quantum Tutor</div>
+          <div class="tutor-status">Ready — searching 55 answers</div>
+        </div>
+      </div>
+      <div class="asked-counter"><span id="askedCount">0</span> questions asked</div>
+    </div>
+
+    <div class="chat-area" id="chatArea"></div>
+
+    <div class="starter-row" id="starterRow"></div>
+
+    <div class="input-row">
+      <input type="text" class="tutor-input" id="tutorInput" placeholder="Ask about any encoding, algorithm, domain, or concept...">
+      <button class="send-btn" id="sendBtn">Ask →</button>
+    </div>
+  </div>
+
+  <div class="browse-toggle" id="browseToggle">
+    <h3>Or Browse Every Topic by Module</h3>
+    <span class="browse-arrow" id="browseArrow">▾</span>
+  </div>
+  <div class="browse-panel" id="browsePanel">
+    <div class="browse-inner" id="browseInner"></div>
+  </div>
+
+  <div class="reset-row"><button class="reset-link" id="resetChatBtn">Clear conversation</button></div>
+</div>
+
+<footer>AI-Powered Quantum Tutor — a free, client-side retrieval engine. Part of the QML Curriculum platform.</footer>
+
+<script>
+/* ================================================================
+   KNOWLEDGE BASE — one entry per concept across all 12 modules.
+   Each entry: id, module (number), moduleTitle, chapter, file,
+   question (a natural phrasing), answer, keywords (extra search terms).
+   ================================================================ */
+const KB = [
+  // ---- Module 6: Intersection Between ML and Quantum Computing ----
+  {id:1, module:6, chapter:"Evolution of AI and Quantum Computing", file:"module6-tutorial.html",
+   q:"How did AI and quantum computing become connected?",
+   a:"AI grew out of computer science and logic, while quantum computing grew out of physics, starting with Feynman's 1981 proposal that quantum systems could simulate physics more naturally than classical computers. The two fields only really intersected once cloud-accessible quantum hardware arrived around 2016 alongside mature deep learning tools, giving researchers on both sides shared infrastructure to combine.",
+   kw:["history","feynman","timeline","origin"]},
+  {id:2, module:6, chapter:"Why Combine ML and Quantum?", file:"module6-tutorial.html",
+   a:"Combining ML and quantum computing runs in two directions: 'Quantum for ML' uses quantum circuits as the learning model itself (this is what most people mean by QML), while 'ML for Quantum' uses machine learning to design better circuits, mitigate hardware noise, or calibrate real qubits. They are related but distinct research programs.",
+   q:"What is the difference between quantum for ML and ML for quantum?",
+   kw:["direction","combination","ml for quantum","quantum for ml"]},
+  {id:3, module:6, chapter:"Hybrid Quantum-Classical Computing", file:"module6-tutorial.html",
+   q:"What is the hybrid quantum-classical loop?",
+   a:"Because today's quantum hardware is small and noisy (NISQ era), almost every practical quantum algorithm uses a hybrid loop: a classical computer proposes circuit parameters, the quantum processor evaluates the circuit and returns a measurement, and the classical side uses that result to propose better parameters. This loop repeats until the result converges, and it underlies VQE, QAOA, and every variational algorithm in this course.",
+   kw:["hybrid loop","variational","classical optimizer"]},
+  {id:4, module:6, chapter:"Current Research Landscape", file:"module6-tutorial.html",
+   q:"What are the major active research areas in QML right now?",
+   a:"Current QML research spans several clusters: scrutiny of claimed quantum advantage results, differentiable quantum programming frameworks like PennyLane, NISQ algorithm design (including barren plateau research), industry hardware platforms like IBM and IonQ, domain-specific applications, and efforts to standardize fair benchmarks.",
+   kw:["research landscape","pennylane","industry"]},
+  {id:5, module:6, chapter:"Opportunities and Challenges", file:"module6-tutorial.html",
+   q:"What are the real opportunities and challenges in QML today?",
+   a:"Genuine opportunities include access to high-dimensional feature spaces and a natural fit for quantum-native data like molecular simulation. Genuine challenges include barren plateaus, noise and decoherence, small qubit counts, and a lack of standardized benchmarks. The honest summary is 'promising and unresolved,' not 'revolutionary' or 'hopeless.'",
+   kw:["opportunities","challenges","honest summary"]},
+
+  // ---- Module 7: Why Quantum Machine Learning? ----
+  {id:6, module:7, chapter:"Limitations of Classical ML", file:"module7-tutorial.html",
+   q:"What are the real limitations of classical machine learning?",
+   a:"Classical ML hits real structural limits: feature engineering gets exponentially harder as data complexity grows, some data (like molecular electron structure) is fundamentally quantum mechanical and awkward to represent classically, and certain combinatorial search problems are practically unsolvable by brute force at scale.",
+   kw:["classical ml limits","feature engineering"]},
+  {id:7, module:7, chapter:"Computational Complexity", file:"module7-tutorial.html",
+   q:"Why does computational complexity matter for quantum computing?",
+   a:"Exponential growth (roughly 2 to the power of n) makes brute-force search over many variables impossible even for supercomputers once n gets modestly large — the same math behind the old chessboard-and-rice-grains story. This is the reason quantum computing is only relevant for specific problems where a clever trick like interference can beat that scaling, not a general fix for all slow algorithms.",
+   kw:["big o","exponential growth","complexity"]},
+  {id:8, module:7, chapter:"High-Dimensional Feature Spaces", file:"module7-tutorial.html",
+   q:"Why do high-dimensional feature spaces matter for QML?",
+   a:"Data that looks hopelessly tangled in a low number of dimensions can become separable once viewed in more of them — the intuition behind kernel methods. A system of n qubits naturally lives in a 2 to the power of n dimensional space, a huge feature space that comes from the physics itself rather than extra engineering.",
+   kw:["dimensionality","curse of dimensionality","hilbert space"]},
+  {id:9, module:7, chapter:"Quantum Parallelism", file:"module7-tutorial.html",
+   q:"What is quantum parallelism, really?",
+   a:"Superposition lets n qubits represent a combination of 2 to the power of n states at once, but measurement collapses this down to a single outcome — so raw parallelism alone does not give you every answer for free. The real engine behind quantum speedups is interference, which amplifies the correct answer's probability and cancels out wrong ones.",
+   kw:["superposition","interference","measurement"]},
+  {id:10, module:7, chapter:"Potential Quantum Advantage", file:"module7-tutorial.html",
+   q:"Is quantum advantage real?",
+   a:"It depends which claim you mean. Shor's algorithm and Grover's algorithm have mathematically proven speedups (though Shor's needs hardware that does not exist yet at scale). Quantum chemistry simulation is a plausible near-term advantage. Quantum kernel methods for general machine learning are still speculative and actively debated — some datasets show no advantage over classical methods.",
+   kw:["quantum advantage","shor","grover","speedup"]},
+  {id:11, module:7, chapter:"Current Challenges (NISQ)", file:"module7-tutorial.html",
+   q:"What does NISQ mean and why does it matter?",
+   a:"NISQ stands for Noisy Intermediate-Scale Quantum — today's real quantum processors, which have few qubits, short coherence times, and no full error correction. This is why hybrid algorithms, shallow circuits, and error mitigation techniques matter so much right now.",
+   kw:["nisq","noisy intermediate scale quantum"]},
+
+  // ---- Module 8: Quantum Data Encoding ----
+  {id:12, module:8, chapter:"Basis Encoding", file:"module8-tutorial.html",
+   q:"What is basis encoding?",
+   a:"Basis encoding maps an n-bit binary string directly onto n qubits using an X gate for every bit that is 1. It is exact with no information loss, but it costs one full qubit per classical bit, so it offers no compression. It fits genuinely discrete or binary data best, not continuous measurements.",
+   kw:["basis encoding","x gate"]},
+  {id:13, module:8, chapter:"Angle Encoding", file:"module8-tutorial.html",
+   q:"What is angle encoding?",
+   a:"Angle encoding maps a classical feature value onto a rotation gate, typically Ry(x), applied to a qubit starting at the zero state. It uses one feature per qubit, giving shallow, hardware-friendly circuits, though it only uses a small slice of each qubit's available state space compared to amplitude encoding.",
+   kw:["angle encoding","ry rotation"]},
+  {id:14, module:8, chapter:"Dense Angle Encoding", file:"module8-tutorial.html",
+   q:"What is dense angle encoding?",
+   a:"Dense angle encoding extends standard angle encoding by applying two rotation gates per qubit, such as Ry then Rz, packing two features into the same qubit. This roughly halves the number of qubits needed for the same amount of data, at the cost of a slightly deeper circuit.",
+   kw:["dense angle encoding","ry rz"]},
+  {id:15, module:8, chapter:"Amplitude Encoding", file:"module8-tutorial.html",
+   q:"What is amplitude encoding and what is the catch?",
+   a:"Amplitude encoding packs a normalized classical vector of length 2 to the power of n directly into the amplitudes of n qubits, giving extraordinary compression (1024 numbers in just 10 qubits). The catch is that preparing an arbitrary amplitude-encoded state generally needs a circuit whose depth also scales with the vector's size, so the compression is not entirely free.",
+   kw:["amplitude encoding","state preparation","compression"]},
+  {id:16, module:8, chapter:"IQP Encoding", file:"module8-tutorial.html",
+   q:"What is IQP encoding?",
+   a:"Instantaneous Quantum Polynomial (IQP) encoding applies Hadamards then diagonal phase gates whose angles depend on products of features, capturing feature interactions directly in the encoding step rather than just individual values. It is believed to be classically hard to simulate, which is theoretically interesting but does not automatically guarantee a practical machine learning advantage.",
+   kw:["iqp","havlicek","feature interactions"]},
+  {id:17, module:8, chapter:"Hamiltonian Encoding", file:"module8-tutorial.html",
+   q:"What is Hamiltonian encoding?",
+   a:"Hamiltonian encoding embeds data into the coefficients of a physical Hamiltonian and evolves the quantum state under that Hamiltonian over time. It is a natural fit for genuinely physical data such as molecular interaction strengths, but it is more hardware-demanding since simulating time evolution accurately typically needs deeper circuits via Trotterization.",
+   kw:["hamiltonian encoding","time evolution","trotterization"]},
+  {id:18, module:8, chapter:"QSample Encoding", file:"module8-tutorial.html",
+   q:"What is QSample encoding?",
+   a:"QSample encoding prepares a quantum state so that measuring it reproduces a target classical probability distribution — the squared amplitude of each basis state matches the corresponding classical probability. It is related to the Grover-Rudolph state preparation method and differs from amplitude encoding, which cares about raw vector values rather than matching a probability distribution.",
+   kw:["qsample","probability distribution","grover rudolph"]},
+  {id:19, module:8, chapter:"QRAM", file:"module8-tutorial.html",
+   q:"What is QRAM and is it solved?",
+   a:"QRAM (Quantum Random Access Memory) is a proposed architecture for loading classical data into superposition efficiently. It is not solved at useful scale today — the proposed bucket-brigade architecture requires physical components that scale with dataset size, and many quantum advantage claims quietly assume efficient QRAM access as an unproven prerequisite.",
+   kw:["qram","data loading","bucket brigade"]},
+  {id:20, module:8, chapter:"Data Re-uploading", file:"module8-tutorial.html",
+   q:"What is data re-uploading?",
+   a:"Data re-uploading repeats the data-encoding step multiple times throughout a circuit, interleaved with trainable gates, instead of encoding once at the start. A surprising theoretical result shows this lets even a single qubit approximate complex bounded functions, since each re-uploading layer adds another frequency term to a Fourier-series-like expansion.",
+   kw:["data reuploading","fourier series","expressivity"]},
+
+  // ---- Module 9: Variational Quantum Circuits & Core QML Algorithms ----
+  {id:21, module:9, chapter:"Parameterized Quantum Circuits", file:"module9-tutorial.html",
+   q:"What is a parameterized quantum circuit (PQC)?",
+   a:"A PQC is a fixed circuit template, called an ansatz, with free parameters (usually rotation angles) that get tuned during training, the same way weights get tuned in a classical network. Layers typically alternate rotation gates, which hold the trainable parameters, with entangling gates like CNOT.",
+   kw:["pqc","ansatz","parameterized circuit"]},
+  {id:22, module:9, chapter:"Variational Quantum Classifiers", file:"module9-tutorial.html",
+   q:"What is a variational quantum classifier (VQC)?",
+   a:"A VQC encodes data, runs it through a trainable ansatz, measures an observable such as the Z expectation value on one qubit, and compares that measurement to the true label to compute a loss. A classical optimizer then updates the ansatz's parameters, in the same hybrid loop from Module 6.",
+   kw:["vqc","variational classifier"]},
+  {id:23, module:9, chapter:"Quantum Support Vector Machines", file:"module9-tutorial.html",
+   q:"What is a quantum support vector machine (QSVM)?",
+   a:"A QSVM uses a quantum circuit only to compute a kernel — a similarity measure between data points based on their overlap in a quantum feature map — and then hands that kernel matrix to an ordinary classical support vector machine for training. This means the quantum computer is called once per pair of points rather than once per training iteration.",
+   kw:["qsvm","quantum kernel svm"]},
+  {id:24, module:9, chapter:"Quantum Neural Networks", file:"module9-tutorial.html",
+   q:"What is a quantum neural network (QNN) and how is it different from a VQC?",
+   a:"QNN and VQC are frequently used interchangeably in practice; QNN is really the broader umbrella term for any layered, trainable quantum circuit built to echo a classical neural network's structure. One honest wrinkle is that quantum evolution is linear, so the nonlinearity that gives classical networks their power has to come from measurement or a small classical layer stitched on afterward.",
+   kw:["qnn","quantum neural network"]},
+  {id:25, module:9, chapter:"Quantum Kernel Methods", file:"module9-tutorial.html",
+   q:"What are quantum kernel methods and what is kernel concentration?",
+   a:"Any classical kernel method, not just SVMs, can use a quantum-computed kernel instead of a classical one. As the feature map gets more expressive, kernel values can concentrate exponentially close to a constant, which hurts trainability and generalization — a real, documented failure mode, similar in spirit to barren plateaus.",
+   kw:["quantum kernel","kernel concentration"]},
+  {id:26, module:9, chapter:"Quantum PCA", file:"module9-tutorial.html",
+   q:"What is quantum PCA and what is its catch?",
+   a:"Quantum PCA (qPCA) uses phase estimation and density matrix exponentiation to extract dominant eigenvalues and eigenvectors, claimed to scale exponentially better than classical PCA. The catch is that this speedup typically assumes the data is already available as an efficiently-preparable quantum state, the same open assumption behind QRAM.",
+   kw:["qpca","quantum pca","dimensionality reduction"]},
+  {id:27, module:9, chapter:"Quantum Autoencoders", file:"module9-tutorial.html",
+   q:"What is a quantum autoencoder?",
+   a:"A quantum autoencoder is a trainable circuit that compresses an n-qubit input state into fewer latent qubits, while the discarded trash qubits are pushed toward a fixed reference state like the zero state during training. Applications include compressing quantum simulation data and anomaly detection, since data that compresses poorly may be unusual.",
+   kw:["quantum autoencoder","compression","anomaly detection"]},
+
+  // ---- Module 10: Real-World QML Applications ----
+  {id:28, module:10, chapter:"Healthcare", file:"module10-tutorial.html",
+   q:"How is QML applied to healthcare?",
+   a:"QML applications in healthcare include diagnostic classification and patient risk stratification on high-dimensional clinical and genomic data, using the same encode-ansatz-measure pipeline from Module 9. Honest challenges include strict data privacy regulation and typically small clinical dataset sizes.",
+   kw:["healthcare qml","diagnosis","clinical data"]},
+  {id:29, module:10, chapter:"Drug Discovery", file:"module10-tutorial.html",
+   q:"How is QML applied to drug discovery?",
+   a:"Drug discovery narrows an enormous virtual compound library through classical pre-screening, then quantum-simulates a much smaller set of candidates using Hamiltonian encoding, before a trained classifier predicts binding affinity or toxicity on the survivors — QML aims to shrink the early-stage search, not replace the lab.",
+   kw:["drug discovery","virtual screening","molecule"]},
+  {id:30, module:10, chapter:"Finance", file:"module10-tutorial.html",
+   q:"How is QML applied to finance?",
+   a:"Quantum amplitude estimation offers a proven quadratic reduction in the samples needed for Monte Carlo-style option pricing compared to classical sampling. Quantum kernel methods are also being explored for fraud detection, and portfolio optimization is often framed as a combinatorial optimization problem.",
+   kw:["finance qml","amplitude estimation","option pricing","fraud detection"]},
+  {id:31, module:10, chapter:"Cybersecurity", file:"module10-tutorial.html",
+   q:"How does quantum computing relate to cybersecurity?",
+   a:"On defense, QSVM and QNN-style models can classify network traffic or files as malicious or benign. On the other side, Shor's algorithm threatens classical encryption, which is exactly why post-quantum cryptography — new classical cryptography designed to resist quantum attacks — is now its own major research field.",
+   kw:["cybersecurity","post quantum cryptography","ransomware","intrusion detection"]},
+  {id:32, module:10, chapter:"Climate Science", file:"module10-tutorial.html",
+   q:"How is QML applied to climate science?",
+   a:"Climate applications split into prediction-focused work (extreme weather forecasting from high-dimensional sensor data) and optimization-focused work (energy grid management). This is one of the least mature domains covered in the course — mostly exploratory, not yet operational.",
+   kw:["climate qml","weather prediction","energy grid"]},
+  {id:33, module:10, chapter:"Materials Discovery", file:"module10-tutorial.html",
+   q:"How is QML applied to materials discovery?",
+   a:"Materials discovery is structurally the same search-and-simulate problem as drug discovery, applied to batteries, superconductors, and solar cell materials. It uses Hamiltonian encoding for simulation, and the search space grows exponentially with each additional candidate element, the same combinatorial explosion from Module 7.",
+   kw:["materials discovery","batteries","superconductors"]},
+  {id:34, module:10, chapter:"Computer Vision", file:"module10-tutorial.html",
+   q:"Can quantum computers process real images?",
+   a:"Amplitude encoding's qubit count for images looks small (under 20 qubits even for a 224 by 224 photo), but the real bottleneck is state preparation — loading an arbitrary image still needs a circuit whose depth scales with the image's size. Most current work uses small or downsampled images, or hybrid 'quanvolutional' layers where a small quantum circuit only handles feature extraction.",
+   kw:["computer vision","quanvolutional","image encoding"]},
+  {id:35, module:10, chapter:"Natural Language Processing", file:"module10-tutorial.html",
+   q:"What is quantum NLP?",
+   a:"Quantum NLP (QNLP) approaches like DisCoCat represent a sentence's grammatical structure compositionally within a quantum circuit, similar to how a quantum graph neural network mirrors a molecule's bond structure. It is still very early-stage, with small-scale demonstrations rather than production systems.",
+   kw:["quantum nlp","qnlp","discocat"]},
+
+  // ---- Module 11: Advanced Quantum Machine Learning ----
+  {id:36, module:11, chapter:"Quantum Convolutional Neural Networks", file:"module11-tutorial.html",
+   q:"What is a quantum convolutional neural network (QCNN)?",
+   a:"A QCNN alternates convolutional layers (a small, weight-shared gate applied across many sites) with pooling layers (measuring or tracing out half the qubits), shrinking the circuit at each stage. Under reasonable conditions, QCNNs are proven to avoid the barren plateau problem that plagues generic deep ansatze — a rare, genuinely positive trainability result.",
+   kw:["qcnn","quantum convolutional","pooling"]},
+  {id:37, module:11, chapter:"Barren Plateaus", file:"module11-tutorial.html",
+   q:"What is a barren plateau?",
+   a:"A barren plateau is when the gradient of a quantum circuit's output vanishes almost everywhere as the circuit or qubit count grows, starving a classical optimizer of any useful training signal. This course computed it live using the exact parameter-shift rule and showed average gradient magnitude shrinking sharply from 2 qubits up to 10.",
+   kw:["barren plateau","vanishing gradient","parameter shift rule"]},
+  {id:38, module:11, chapter:"Quantum Reinforcement Learning", file:"module11-tutorial.html",
+   q:"What is quantum reinforcement learning?",
+   a:"In quantum RL, a parameterized quantum circuit represents the agent's policy, producing action probabilities from measurement outcomes. Training uses policy-gradient methods with parameter-shift gradients, the same mechanism from the barren plateau chapter, applied to a reward signal instead of a labeled loss. It is still largely exploratory and small-scale.",
+   kw:["quantum rl","reinforcement learning","policy circuit"]},
+  {id:39, module:11, chapter:"Quantum Generative Models", file:"module11-tutorial.html",
+   q:"What is a QGAN?",
+   a:"A Quantum GAN keeps the classical GAN's adversarial structure: a quantum generator tries to produce samples matching a real data distribution while a discriminator tries to tell them apart, closely related to QSample encoding's goal of matching a distribution. QGANs inherit classical GANs' training instability, potentially compounded by barren-plateau-style trainability issues.",
+   kw:["qgan","quantum gan","generative model"]},
+  {id:40, module:11, chapter:"Quantum Graph Neural Networks", file:"module11-tutorial.html",
+   q:"What is a quantum graph neural network?",
+   a:"A quantum graph neural network places entangling gates according to a real graph's actual edges, such as molecular bonds, instead of an arbitrary fixed layout, mirroring classical GNN message-passing. This respects permutation invariance, since a molecule's properties should not depend on how you happen to number its atoms.",
+   kw:["quantum gnn","graph neural network","permutation invariance"]},
+  {id:41, module:11, chapter:"Quantum Error Mitigation", file:"module11-tutorial.html",
+   q:"What is zero-noise extrapolation?",
+   a:"Zero-noise extrapolation (ZNE) deliberately runs a circuit at multiple amplified noise levels, then fits a curve back to an estimated value at zero noise. It is a statistical, post-processing technique for today's noisy hardware, not a way to make the hardware itself error-free the way full error correction aims to.",
+   kw:["zne","zero noise extrapolation","error mitigation"]},
+  {id:42, module:11, chapter:"Noise in Quantum Systems", file:"module11-tutorial.html",
+   q:"What are T1 and T2 in quantum computing?",
+   a:"T1 describes energy relaxation — how long a qubit takes to decay from the one state toward the zero state. T2 describes dephasing — how long phase information between the zero and one states survives, a genuinely separate process from T1. Both limit how many gates can be chained before results become unreliable, which is why circuit depth is precious on NISQ hardware.",
+   kw:["t1","t2","decoherence","dephasing"]},
+  {id:43, module:11, chapter:"Fault-Tolerant Quantum Computing", file:"module11-tutorial.html",
+   q:"What is fault-tolerant quantum computing and the threshold theorem?",
+   a:"Fault tolerance encodes one logical qubit redundantly across many physical qubits, using syndrome measurements to detect and correct errors without directly measuring the fragile encoded data. The threshold theorem says that if physical error rates stay below a certain level, arbitrarily long computation becomes possible in principle, but current estimates need hundreds to thousands of physical qubits per logical qubit.",
+   kw:["fault tolerance","threshold theorem","logical qubit","surface code"]},
+
+  // ---- Module 12: Research & Capstone Project ----
+  {id:44, module:12, chapter:"Reading QML Research Papers", file:"module12-tutorial.html",
+   q:"How should I read a QML research paper critically?",
+   a:"Treat the abstract as a hypothesis to verify, not a conclusion to accept. Check whether the methods section reveals hidden assumptions like efficient state preparation, whether the comparison uses the best available classical baseline rather than a strawman, and whether the results actually support the headline claim.",
+   kw:["reading papers","critical reading","red flags"]},
+  {id:45, module:12, chapter:"Open Research Challenges", file:"module12-tutorial.html",
+   q:"What are the biggest open problems in QML right now?",
+   a:"The recurring open problems across this course are barren plateaus, the unsolved QRAM data-loading problem, kernel concentration, the efficient-state-preparation assumption behind claims like quantum PCA, NISQ-era noise, large fault-tolerance overhead, the image-encoding state-preparation bottleneck, and the lack of standardized benchmarks.",
+   kw:["open problems","open challenges","unsolved"]},
+  {id:46, module:12, chapter:"Benchmarking Quantum Models", file:"module12-tutorial.html",
+   q:"How do I fairly benchmark a quantum model against a classical one?",
+   a:"Compare against a well-tuned classical baseline, not a strawman; match compute budget or wall-clock time, not just qubit count; and report variance across multiple runs rather than a single favorable result. A benchmark that only makes your own method look good is the easiest mistake to make without noticing.",
+   kw:["benchmarking","fair comparison","baseline"]},
+  {id:47, module:12, chapter:"Responsible AI & Quantum Computing", file:"module12-tutorial.html",
+   q:"What responsible AI concerns apply to quantum machine learning?",
+   a:"Bias present in training data carries straight through quantum encoding into a quantum model, the same as classical ML. The same classifier that defends a system could, with different labels, attack one. Quantum hardware access is currently concentrated among well-funded institutions, and overclaiming results misleads other researchers and the public.",
+   kw:["responsible ai","bias","dual use","equitable access"]},
+  {id:48, module:12, chapter:"Future Directions in QML", file:"module12-tutorial.html",
+   q:"What does the future of QML look like?",
+   a:"Near-term, plausible developments include continued error-mitigation improvements and larger NISQ devices. Mid-term and long-term possibilities like early fault-tolerant demonstrations and broad, proven advantage are labeled speculative — genuinely possible, not guaranteed, consistent with this course's honesty throughout.",
+   kw:["future directions","roadmap","predictions"]},
+  {id:49, module:12, chapter:"Final Capstone Project", file:"module12-tutorial.html",
+   q:"How do I plan a QML capstone project?",
+   a:"A complete capstone plan covers seven stages: problem definition, data preprocessing, quantum data encoding, model implementation, training and evaluation, execution on simulators or hardware, and documentation. Module 12's Capstone Builder tool lets you fill in and export a real plan across all seven sections.",
+   kw:["capstone","final project","project planning"]},
+
+  // ---- General / meta FAQ ----
+  {id:50, module:0, chapter:"General", file:null,
+   q:"What is quantum machine learning in one sentence?",
+   a:"Quantum machine learning is the use of quantum circuits, either as the learning model itself or as a tool to compute something a classical model then learns from, to represent and process data in ways that may be difficult or impossible classically.",
+   kw:["what is qml","definition"]},
+  {id:51, module:0, chapter:"General", file:null,
+   q:"What is the difference between Qiskit and PennyLane?",
+   a:"Both are open-source quantum computing frameworks used throughout this course. Qiskit, from IBM, is widely used for circuit construction and running on IBM Quantum hardware. PennyLane is built specifically around differentiable quantum programming, making it a common choice for variational and QML workflows that need gradients.",
+   kw:["qiskit","pennylane","frameworks"]},
+  {id:52, module:0, chapter:"General", file:null,
+   q:"Is quantum computing going to replace classical computers?",
+   a:"No, not based on current science. Quantum computers are specialized tools that offer advantages for specific problem types, not faster general-purpose replacements for everyday computing. Module 7 covers this distinction directly.",
+   kw:["replace classical computers","myth"]},
+  {id:53, module:0, chapter:"General", file:null,
+   q:"What should a complete beginner learn first?",
+   a:"Start with Module 6 if you already know some classical ML, or review linear algebra, complex numbers, and Python basics first if those feel rusty. The roadmap on the curriculum page lays out prerequisites, beginner, intermediate, and advanced levels in order.",
+   kw:["beginner","where to start","prerequisites"]},
+  {id:54, module:0, chapter:"General", file:null,
+   q:"Where can I practice hands-on instead of just reading?",
+   a:"Try the Quantum Circuit Simulator to build real circuits and see a live state-vector engine compute the results, or the 3D Bloch Sphere Explorer to see gates rotate a qubit's state in real time, including a genuine two-qubit entanglement demonstration.",
+   kw:["hands on","practice","circuit simulator","bloch sphere"]},
+  {id:55, module:0, chapter:"General", file:null,
+   q:"What is a qubit?",
+   a:"A qubit is the quantum analog of a classical bit. Instead of being strictly 0 or 1, it can exist in a superposition of both, described by two complex amplitudes whose squared magnitudes give the probability of measuring each outcome. A single qubit's state can be visualized as a point on the Bloch sphere.",
+   kw:["qubit","bloch sphere","superposition basics"]}
+];
+
+/* ================================================================
+   SEARCH ENGINE — simple TF-IDF-style scoring, pure JS, no deps.
+   ================================================================ */
+const STOPWORDS = new Set(["a","an","the","is","are","was","were","be","been","being","of","to","in","on","for","and","or","but","what","does","do","did","how","why","when","where","which","who","this","that","these","those","it","its","as","with","from","by","at","about","into","if","not","no","can","could","would","should","will","i","you","we","they","he","she","my","your","our"]);
+function tokenize(text){
+  return text.toLowerCase().replace(/[^a-z0-9\s]/g," ").split(/\s+/).filter(t=> t.length>1 && !STOPWORDS.has(t));
+}
+// Build searchable doc per entry and a global document-frequency map
+KB.forEach(entry=>{
+  const text = [entry.q, entry.a, entry.chapter, (entry.kw||[]).join(" ")].join(" ");
+  entry._tokens = tokenize(text);
+  entry._termFreq = {};
+  entry._tokens.forEach(t=> entry._termFreq[t] = (entry._termFreq[t]||0)+1);
+});
+const docFreq = {};
+KB.forEach(entry=>{
+  const seen = new Set(entry._tokens);
+  seen.forEach(t=> docFreq[t] = (docFreq[t]||0)+1);
+});
+const N_DOCS = KB.length;
+function idf(term){ return Math.log((N_DOCS+1) / ((docFreq[term]||0)+1)) + 1; }
+
+function searchKB(query){
+  const qTokens = tokenize(query);
+  if(qTokens.length===0) return [];
+  const scores = KB.map(entry=>{
+    let score = 0;
+    qTokens.forEach(t=>{
+      const tf = entry._termFreq[t] || 0;
+      if(tf>0) score += tf * idf(t);
+      // exact keyword match bonus
+      if((entry.kw||[]).some(k=> k.toLowerCase().includes(t))) score += idf(t)*1.5;
+    });
+    // normalize slightly by doc length to avoid long-answer bias
+    score = score / Math.sqrt(entry._tokens.length);
+    return {entry, score};
+  });
+  scores.sort((a,b)=> b.score-a.score);
+  return scores.filter(s=> s.score>0);
+}
+
+/* ================================================================
+   CHAT UI
+   ================================================================ */
+let askedCount = 0;
+try{ askedCount = parseInt(localStorage.getItem('qml_tutor_asked')||'0'); }catch(e){}
+document.getElementById('askedCount').textContent = askedCount;
+function bumpAskedCount(){ askedCount++; try{ localStorage.setItem('qml_tutor_asked', askedCount); }catch(e){} document.getElementById('askedCount').textContent = askedCount; }
+
+const chatArea = document.getElementById('chatArea');
+function scrollChatToBottom(){ chatArea.scrollTop = chatArea.scrollHeight; }
+
+function addUserMessage(text){
+  const msg = document.createElement('div');
+  msg.className = 'msg user';
+  msg.innerHTML = '<div class="bubble">'+escapeHtml(text)+'</div>';
+  chatArea.appendChild(msg);
+  scrollChatToBottom();
+}
+function escapeHtml(s){
+  const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+}
+function showTypingIndicator(){
+  const msg = document.createElement('div');
+  msg.className = 'msg bot';
+  msg.id = 'typingIndicator';
+  msg.innerHTML = '<div class="bubble typing-dots"><span></span><span></span><span></span></div>';
+  chatArea.appendChild(msg);
+  scrollChatToBottom();
+}
+function removeTypingIndicator(){
+  const el = document.getElementById('typingIndicator');
+  if(el) el.remove();
+}
+function addBotMessage(result){
+  const msg = document.createElement('div');
+  msg.className = 'msg bot';
+  if(!result){
+    msg.innerHTML = '<div class="bubble">I do not have a confident match for that in the curriculum yet. Try rephrasing, or browse by topic below \u2014 I cover encodings, algorithms, applications, the frontier topics, and research skills across all 12 modules.</div>';
+    chatArea.appendChild(msg);
+    scrollChatToBottom();
+    return;
+  }
+  const {entry, confidence} = result;
+  const confClass = confidence==='high' ? 'high' : confidence==='medium' ? 'medium' : 'low';
+  const confLabel = confidence==='high' ? 'Confident match' : confidence==='medium' ? 'Possible match' : 'Low confidence';
+  let html = '<div class="bubble">'+entry.a+'</div>';
+  html += '<div class="msg-meta"><span class="confidence-tag '+confClass+'">'+confLabel+'</span>';
+  if(entry.file){
+    html += '<a class="source-link" href="'+entry.file+'" target="_blank">Module '+entry.module+' \u2014 '+entry.chapter+' \u2192</a>';
+  } else {
+    html += '<span class="source-link" style="color:var(--ink-faint); cursor:default;">General knowledge</span>';
+  }
+  html += '</div>';
+  html += '<div class="feedback-row"><button class="fb-btn" data-fb="up">\ud83d\udc4d Helpful</button><button class="fb-btn" data-fb="down">\ud83d\udc4e Not quite</button></div>';
+  msg.innerHTML = html;
+  chatArea.appendChild(msg);
+  const upBtn = msg.querySelector('[data-fb="up"]');
+  const downBtn = msg.querySelector('[data-fb="down"]');
+  upBtn.addEventListener('click', ()=>{ upBtn.classList.add('active'); downBtn.classList.remove('active'); });
+  downBtn.addEventListener('click', ()=>{
+    downBtn.classList.add('active'); upBtn.classList.remove('active');
+    const note = document.createElement('div');
+    note.className = 'bubble';
+    note.style.marginTop = '6px';
+    note.style.fontSize = '12px';
+    note.textContent = 'Noted \u2014 try rephrasing your question, or use "Browse Every Topic by Module" below to find it directly.';
+    msg.appendChild(note);
+  });
+  scrollChatToBottom();
+}
+
+function handleAsk(query){
+  if(!query || !query.trim()) return;
+  addUserMessage(query);
+  bumpAskedCount();
+  showTypingIndicator();
+  const results = searchKB(query);
+  const delay = 450 + Math.random()*350;
+  setTimeout(()=>{
+    removeTypingIndicator();
+    if(results.length===0 || results[0].score < 0.35){
+      addBotMessage(null);
+      return;
+    }
+    const top = results[0];
+    const confidence = top.score > 1.4 ? 'high' : top.score > 0.7 ? 'medium' : 'low';
+    addBotMessage({entry: top.entry, confidence});
+  }, delay);
+}
+
+document.getElementById('sendBtn').addEventListener('click', ()=>{
+  const input = document.getElementById('tutorInput');
+  handleAsk(input.value);
+  input.value = '';
+});
+document.getElementById('tutorInput').addEventListener('keydown', (e)=>{
+  if(e.key==='Enter'){ document.getElementById('sendBtn').click(); }
+});
+
+/* starter chips */
+const starterQuestions = [
+  "What is a barren plateau?",
+  "What is amplitude encoding?",
+  "What is QRAM?",
+  "What is the difference between VQC and QNN?",
+  "Is quantum advantage real?",
+  "How do I plan a capstone project?"
+];
+(function(){
+  const wrap = document.getElementById('starterRow');
+  starterQuestions.forEach(q=>{
+    const chip = document.createElement('button');
+    chip.className = 'starter-chip';
+    chip.textContent = q;
+    chip.addEventListener('click', ()=> handleAsk(q));
+    wrap.appendChild(chip);
+  });
+})();
+
+/* greeting */
+(function(){
+  const msg = document.createElement('div');
+  msg.className = 'msg bot';
+  msg.innerHTML = '<div class="bubble">Hi! I can answer questions about any encoding, algorithm, application domain, or frontier topic from this curriculum. Try a starter question below, or type your own.</div>';
+  chatArea.appendChild(msg);
+})();
+
+/* browse by topic panel */
+const moduleTitles = {
+  6:"Module 6 \u2014 Intersection Between ML and Quantum Computing",
+  7:"Module 7 \u2014 Why Quantum Machine Learning?",
+  8:"Module 8 \u2014 Quantum Data Encoding",
+  9:"Module 9 \u2014 Variational Quantum Circuits & Core QML Algorithms",
+  10:"Module 10 \u2014 Real-World QML Applications",
+  11:"Module 11 \u2014 Advanced Quantum Machine Learning",
+  12:"Module 12 \u2014 Research & Capstone Project",
+  0:"General Questions"
+};
+(function(){
+  const inner = document.getElementById('browseInner');
+  const grouped = {};
+  KB.forEach(entry=>{
+    if(!grouped[entry.module]) grouped[entry.module] = [];
+    grouped[entry.module].push(entry);
+  });
+  Object.keys(grouped).sort((a,b)=> a-b).forEach(modId=>{
+    const block = document.createElement('div');
+    block.className = 'browse-module';
+    const head = document.createElement('div');
+    head.className = 'browse-module-head';
+    head.textContent = moduleTitles[modId] || ('Module '+modId);
+    block.appendChild(head);
+    const chips = document.createElement('div');
+    chips.className = 'browse-chips';
+    grouped[modId].forEach(entry=>{
+      const chip = document.createElement('button');
+      chip.className = 'browse-chip';
+      chip.textContent = entry.chapter===entry.q ? entry.chapter : entry.chapter;
+      chip.title = entry.q;
+      chip.addEventListener('click', ()=>{
+        document.getElementById('browsePanel').classList.remove('open');
+        document.getElementById('browseArrow').classList.remove('open');
+        handleAsk(entry.q);
+        window.scrollTo({top:0, behavior:'smooth'});
+      });
+      chips.appendChild(chip);
+    });
+    block.appendChild(chips);
+    inner.appendChild(block);
+  });
+})();
+document.getElementById('browseToggle').addEventListener('click', ()=>{
+  document.getElementById('browsePanel').classList.toggle('open');
+  document.getElementById('browseArrow').classList.toggle('open');
+});
+
+document.getElementById('resetChatBtn').addEventListener('click', ()=>{
+  chatArea.innerHTML = '<div class="msg bot"><div class="bubble">Conversation cleared. Ask me anything from the curriculum.</div></div>';
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 10 — Real-World QML Applications | QML Curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="modules-registry.js"></script>
+<style>
+:root{
+  --bg:#070b14; --bg-2:#0b111f; --panel:#0e1526; --panel-2:#101a2e;
+  --line:rgba(148,178,224,0.14); --line-strong:rgba(148,178,224,0.28);
+  --ink:#e9eef8; --ink-dim:#9fb0c9; --ink-faint:#5f7089;
+  --cyan:#5ad1e6; --cyan-dim:rgba(90,209,230,0.14);
+  --violet:#b39bff; --violet-dim:rgba(179,155,255,0.14);
+  --amber:#f2a341; --amber-dim:rgba(242,163,65,0.14);
+  --green:#5ee6a0; --green-dim:rgba(94,230,160,0.14);
+  --red:#f2726a; --red-dim:rgba(242,114,106,0.14);
+  --blue:#4fa3f7;
+  --serif:'Fraunces', Georgia, serif; --sans:'Inter', -apple-system, sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.7;}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto !important;}}
+
+.progress-rail{position:fixed; top:0; left:0; right:0; height:3px; background:var(--line); z-index:100;}
+.progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--violet),var(--amber)); transition:width .1s linear;}
+
+header{position:sticky; top:3px; z-index:60; backdrop-filter:blur(14px); background:rgba(7,11,20,0.82); border-bottom:1px solid var(--line);}
+.nav-wrap{max-width:1280px; margin:0 auto; padding:14px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+.back-link{display:flex; align-items:center; gap:8px; color:var(--ink-dim); text-decoration:none; font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; transition:color .2s;}
+.back-link:hover{color:var(--cyan);}
+.crumb{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); letter-spacing:0.06em; text-transform:uppercase;}
+.crumb b{color:var(--amber);}
+.xp-badge{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12.5px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; color:var(--amber); background:var(--amber-dim);}
+
+.layout{max-width:1280px; margin:0 auto; padding:52px 32px 120px; display:grid; grid-template-columns:260px 1fr; gap:56px;}
+.sidebar{position:sticky; top:80px; align-self:start; height:fit-content; max-height:calc(100vh - 100px); overflow-y:auto;}
+.side-title{font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;}
+.side-list{list-style:none; display:flex; flex-direction:column; gap:1px;}
+.side-list a{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink-dim); font-size:12.5px; padding:8px 12px; border-radius:8px; border-left:2px solid transparent; transition:background .2s, color .2s, border-color .2s;}
+.side-list a:hover{background:var(--panel);}
+.side-list a.active{color:var(--ink); background:var(--panel); border-left-color:var(--amber);}
+.side-dot{width:7px; height:7px; border-radius:50%; background:#2a3550; flex-shrink:0; transition:background .3s;}
+.side-dot.done{background:var(--green); box-shadow:0 0 6px var(--green);}
+.side-dot.warn{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+
+.tut-hero{margin-bottom:44px;}
+.module-eyebrow{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--amber); background:var(--amber-dim); margin-bottom:20px;}
+.tut-hero h1{font-family:var(--serif); font-weight:600; font-size:clamp(30px,4vw,44px); line-height:1.1; letter-spacing:-0.01em;}
+.tut-hero p.lede{margin-top:16px; color:var(--ink-dim); font-size:16px; max-width:660px;}
+.chip-row{display:flex; gap:8px; margin-top:22px; flex-wrap:wrap;}
+.chip{font-family:var(--mono); font-size:10.5px; letter-spacing:0.04em; color:var(--ink-faint); border:1px solid var(--line); padding:5px 11px; border-radius:100px;}
+
+.character-card{margin-top:28px; display:flex; gap:18px; align-items:center; padding:20px 22px; background:linear-gradient(120deg, rgba(242,163,65,0.08), rgba(90,209,230,0.05)); border:1px solid var(--line-strong); border-radius:14px;}
+.avatar-ring{width:56px; height:56px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1.5px solid var(--amber); font-family:var(--serif); font-size:22px; color:var(--amber);}
+.character-card .cname{font-weight:700; font-size:14.5px; color:var(--ink);}
+.character-card .crole{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:2px;}
+.character-card p{font-size:13.5px; color:var(--ink-dim); margin-top:6px;}
+
+.chapter{margin-bottom:80px; scroll-margin-top:90px;}
+.chapter-head{display:flex; align-items:center; gap:14px; margin-bottom:20px;}
+.chapter-icon{width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1px solid var(--line-strong); font-size:18px; color:var(--amber); flex-shrink:0;}
+.chapter-num{font-family:var(--mono); font-size:12px; color:var(--ink-faint); letter-spacing:0.08em; display:block;}
+.chapter h2{font-family:var(--serif); font-weight:600; font-size:clamp(23px,2.8vw,30px); letter-spacing:-0.01em;}
+
+.story-panel{position:relative; margin:18px 0 24px; padding:22px 26px 22px 52px; border-radius:12px; background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--amber); font-family:var(--serif); font-style:italic; font-size:15.5px; color:var(--ink-dim); line-height:1.75;}
+.story-panel::before{content:'\201C'; position:absolute; left:16px; top:8px; font-size:38px; color:var(--amber); font-style:normal; opacity:0.6;}
+.story-panel b{color:var(--ink); font-style:normal;}
+
+.chapter > p.body-text{color:var(--ink-dim); font-size:15px; margin-bottom:16px;}
+.chapter > p.body-text b{color:var(--ink); font-weight:600;}
+.chapter ul.points{margin:16px 0 20px 0; padding-left:0; list-style:none; display:flex; flex-direction:column; gap:10px;}
+.chapter ul.points li{display:flex; gap:10px; font-size:14px; color:var(--ink-dim); padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px;}
+.chapter ul.points li::before{content:'\25C6'; color:var(--amber); font-size:8px; margin-top:5px; flex-shrink:0;}
+.callout{margin:22px 0; padding:16px 18px; border-radius:10px; border-left:3px solid var(--cyan); background:var(--cyan-dim); font-size:13.5px; color:var(--ink-dim);}
+.callout b{color:var(--ink);}
+.callout.warn{border-left-color:var(--amber); background:var(--amber-dim);}
+
+.spotlight{display:flex; align-items:center; gap:14px; margin:22px 0; padding:16px 18px; border-radius:12px; background:var(--violet-dim); border:1px solid rgba(179,155,255,0.35);}
+.spotlight .sicon{font-size:20px; color:var(--violet); flex-shrink:0;}
+.spotlight .stext{font-size:12.5px; color:var(--ink-dim);}
+.spotlight .stext b{color:var(--violet); font-family:var(--mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; display:block; margin-bottom:3px;}
+
+.visual-box{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:26px; margin:24px 0; overflow-x:auto;}
+.visual-label{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+
+.ctrl-row{display:flex; align-items:center; gap:16px; margin-bottom:20px; flex-wrap:wrap;}
+.ctrl-row label{font-family:var(--mono); font-size:12px; color:var(--ink-dim);}
+.ctrl-row input[type=range]{width:200px; accent-color:var(--amber);}
+.ctrl-readout{font-family:var(--serif); font-size:18px; color:var(--amber); min-width:32px; display:inline-block; text-align:center;}
+
+/* Ch1: preview grid (flip cards) */
+.encoding-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+.enc-card{perspective:1000px; height:120px; cursor:pointer;}
+.enc-inner{position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d;}
+.enc-card.flipped .enc-inner{transform:rotateY(180deg);}
+.enc-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:center; border:1px solid var(--line-strong);}
+.enc-front{background:var(--panel-2);}
+.enc-front .en{font-family:var(--mono); font-size:9.5px; color:var(--ink-faint); margin-bottom:4px;}
+.enc-front h6{font-size:12.5px; font-weight:700; color:var(--ink);}
+.enc-back{background:var(--panel); transform:rotateY(180deg); font-size:11px; color:var(--ink-dim); line-height:1.5;}
+@media (max-width:900px){.encoding-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:480px){.encoding-grid{grid-template-columns:1fr;}}
+
+/* pipeline row (reused across Healthcare/Climate) */
+.pipeline-row{display:flex; align-items:center; gap:0; justify-content:center; flex-wrap:wrap; margin-bottom:6px;}
+.pipe-step{padding:14px 18px; background:var(--panel-2); border:1px solid var(--line-strong); border-radius:10px; text-align:center; min-width:120px;}
+.pipe-step .pn{font-family:var(--mono); font-size:9.5px; color:var(--ink-faint); text-transform:uppercase;}
+.pipe-step .pl{font-size:12.5px; font-weight:700; color:var(--ink); margin-top:4px;}
+.pipe-arrow{font-family:var(--mono); color:var(--amber); font-size:16px; padding:0 8px;}
+
+/* compare-bars (reused pattern, funnel/log-scale) */
+.compare-bars{display:flex; flex-direction:column; gap:14px;}
+.cbrow{display:grid; grid-template-columns:210px 1fr 130px; align-items:center; gap:14px;}
+.cbrow .cblabel{font-family:var(--mono); font-size:11.5px; color:var(--ink-dim);}
+.cbtrack{height:10px; background:var(--panel-2); border-radius:6px; overflow:hidden; border:1px solid var(--line);}
+.cbfill{height:100%; border-radius:6px; transition:width .5s ease; background:var(--cyan);}
+.cbfill.b{background:var(--amber);}
+.cbval{font-family:var(--mono); font-size:11px; color:var(--ink); text-align:right;}
+
+/* Ch5: confusion matrix */
+.conf-grid{display:grid; grid-template-columns:110px 1fr 1fr; gap:2px; max-width:420px;}
+.conf-cell{padding:16px; text-align:center; border-radius:6px; font-family:var(--mono); font-size:12px;}
+.conf-head{background:transparent; color:var(--ink-faint); font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em;}
+.conf-tp{background:var(--green-dim); color:var(--green); font-weight:700; font-size:18px;}
+.conf-tn{background:var(--green-dim); color:var(--green); font-weight:700; font-size:18px;}
+.conf-fp{background:var(--red-dim); color:var(--red); font-weight:700; font-size:18px;}
+.conf-fn{background:var(--red-dim); color:var(--red); font-weight:700; font-size:18px;}
+
+/* Ch6: two-column compare (reused pattern) */
+.compare{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+.compare-col{padding:18px; border-radius:10px; background:var(--panel-2); border:1px solid var(--line);}
+.compare-col h5{font-family:var(--mono); font-size:12px; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:10px;}
+.compare-col.a h5{color:var(--cyan);}
+.compare-col.b h5{color:var(--amber);}
+.compare-col ul{list-style:none; display:flex; flex-direction:column; gap:8px;}
+.compare-col li{font-size:13px; color:var(--ink-dim); padding-left:16px; position:relative;}
+.compare-col li::before{content:'\2192'; position:absolute; left:0; color:var(--ink-faint);}
+@media (max-width:700px){.compare{grid-template-columns:1fr;}}
+
+/* Ch7: ladder (reused pattern) */
+.ladder{display:flex; align-items:flex-end; gap:10px; min-width:520px; height:150px; padding-top:26px;}
+.ladder-bar{flex:1; background:linear-gradient(180deg,var(--amber),var(--cyan)); border-radius:6px 6px 0 0; position:relative; opacity:0.85; transition:height .6s ease;}
+.ladder-bar span{position:absolute; top:-22px; left:50%; transform:translateX(-50%); font-family:var(--mono); font-size:10px; color:var(--ink-faint); white-space:nowrap;}
+.fun-fact{margin-top:16px; font-family:var(--mono); font-size:12px; color:var(--ink-faint); min-height:18px;}
+
+/* Ch8: savings cards (reused pattern) */
+.qubit-savings{margin-top:6px; display:flex; gap:16px; flex-wrap:wrap;}
+.savings-card{flex:1; min-width:150px; padding:14px; background:var(--panel-2); border-radius:10px; border:1px solid var(--line); text-align:center;}
+.savings-card .sv{font-family:var(--serif); font-size:22px; color:var(--cyan); font-weight:600;}
+.savings-card .sl{font-family:var(--mono); font-size:10px; color:var(--ink-faint); margin-top:4px;}
+
+/* Ch9: graph (reused pattern) */
+.graph-wrap{display:flex; justify-content:center;}
+.graph-node{fill:var(--panel-2); stroke:var(--line-strong); stroke-width:1.4;}
+.graph-node-label{font-family:var(--mono); font-size:10.5px; fill:var(--ink-dim);}
+.graph-edge{stroke:var(--violet); stroke-width:1.6;}
+
+.tutor-widget{background:var(--panel); border:1px solid var(--line-strong); border-radius:14px; padding:22px; margin:24px 0;}
+.tutor-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+.tutor-avatar{width:32px; height:32px; border-radius:9px; background:var(--violet-dim); color:var(--violet); display:flex; align-items:center; justify-content:center; font-size:15px;}
+.tutor-title{font-family:var(--mono); font-size:12px; letter-spacing:0.04em; color:var(--ink);}
+.tutor-note{font-size:11.5px; color:var(--ink-faint); margin-bottom:16px;}
+.tutor-questions{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;}
+.tutor-q-btn{font-family:var(--sans); font-size:12.5px; padding:9px 14px; border-radius:100px; border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-dim); cursor:pointer; transition:all .2s;}
+.tutor-q-btn:hover{border-color:var(--violet); color:var(--ink);}
+.tutor-answer{display:none; padding:14px 16px; border-radius:10px; background:var(--panel-2); border-left:3px solid var(--violet); font-size:13px; color:var(--ink-dim); line-height:1.6;}
+.tutor-answer.show{display:block; animation:fadein .3s ease;}
+@keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+/* quiz (shared pattern) */
+.quiz-box{margin-top:28px; background:var(--panel); border:1px solid var(--line-strong); border-radius:14px; padding:24px;}
+.quiz-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
+.quiz-title{font-family:var(--mono); font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--amber); display:flex; align-items:center; gap:8px;}
+.quiz-score{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);}
+.q-item{margin-bottom:22px;}
+.q-item:last-child{margin-bottom:0;}
+.q-text{font-size:14px; font-weight:600; margin-bottom:12px; color:var(--ink);}
+.q-options{display:flex; flex-direction:column; gap:8px;}
+.q-opt{text-align:left; padding:11px 14px; border-radius:9px; border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-dim); font-size:13px; cursor:pointer; transition:border-color .2s, background .2s, color .2s; font-family:var(--sans);}
+.q-opt:hover:not(:disabled){border-color:var(--ink-dim); color:var(--ink);}
+.q-opt.correct{border-color:var(--green); background:var(--green-dim); color:var(--green);}
+.q-opt.incorrect{border-color:var(--red); background:var(--red-dim); color:var(--red);}
+.q-opt:disabled{cursor:default;}
+.q-explain{margin-top:10px; font-size:12.5px; color:var(--ink-dim); padding:11px 14px; border-radius:8px; background:var(--panel-2); border-left:2px solid var(--amber); display:none;}
+.q-explain.show{display:block;}
+.chapter-status{margin-top:16px; padding:10px 14px; border-radius:8px; font-family:var(--mono); font-size:11.5px; display:none; align-items:center; gap:8px;}
+.chapter-status.show{display:flex;}
+.chapter-status.mastered{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.35);}
+.chapter-status.review{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.35);}
+
+.final-assess{margin-top:20px; background:linear-gradient(180deg,var(--panel-2),var(--panel)); border:1px solid var(--line-strong); border-radius:16px; padding:34px;}
+.final-head{margin-bottom:26px;}
+.final-head .module-eyebrow{color:var(--amber); border-color:var(--line-strong); background:var(--amber-dim);}
+.final-head h2{font-family:var(--serif); font-size:clamp(26px,3vw,34px); font-weight:600;}
+.final-head p{color:var(--ink-dim); margin-top:10px; font-size:14.5px;}
+.result-panel{margin-top:28px; padding:24px; border-radius:12px; border:1px solid var(--line-strong); background:var(--bg); display:none;}
+.result-panel.show{display:block;}
+.result-top{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:18px;}
+.result-score{font-family:var(--serif); font-size:44px; font-weight:600;}
+.result-badge{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; padding:6px 14px; border-radius:100px;}
+.result-badge.pass{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.4);}
+.result-badge.retry{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.4);}
+.recommend-list{list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+.recommend-list li{font-size:13px; color:var(--ink-dim); padding:10px 12px; background:var(--panel-2); border-radius:8px; border:1px solid var(--line);}
+.result-actions{display:flex; gap:12px; margin-top:22px; flex-wrap:wrap;}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:9px; font-size:13.5px; font-weight:600; text-decoration:none; cursor:pointer; border:1px solid transparent; transition:transform .2s, box-shadow .2s;}
+.btn-primary{background:var(--blue); color:#04101f;}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 26px -8px rgba(79,163,247,0.5);}
+.btn-ghost{background:transparent; border-color:var(--line-strong); color:var(--ink);}
+.btn-ghost:hover{border-color:var(--ink-dim); transform:translateY(-2px);}
+
+.reveal{opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease;}
+.reveal.in{opacity:1; transform:translateY(0);}
+
+.module-nav{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:70px; padding-top:36px; border-top:1px solid var(--line);}
+.mn-card{display:flex; flex-direction:column; gap:6px; padding:20px 22px; border-radius:14px; background:var(--panel); border:1px solid var(--line); text-decoration:none; transition:border-color .25s, transform .25s;}
+.mn-card.enabled:hover{border-color:var(--line-strong); transform:translateY(-3px);}
+.mn-card.disabled{opacity:0.5; cursor:default;}
+.mn-card.next{align-items:flex-end; text-align:right;}
+.mn-eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint);}
+.mn-title{font-family:var(--serif); font-size:16px; font-weight:600; color:var(--ink);}
+.mn-arrow{font-family:var(--mono); font-size:12px; color:var(--amber);}
+@media (max-width:700px){.module-nav{grid-template-columns:1fr;}}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static; display:flex; overflow-x:auto; gap:4px; padding-bottom:10px; max-height:none;}
+  .side-list{flex-direction:row;}
+  .side-list a{white-space:nowrap;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-rail"><div class="progress-fill" id="progressFill"></div></div>
+
+<header>
+  <div class="nav-wrap">
+    <a class="back-link" href="qml-roadmap-landing-page.html#curriculum">← Back to Curriculum</a>
+    <div class="crumb">LEVEL 3 · ADVANCED — <b>MODULE 10</b></div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a class="back-link" href="progress-hub.html">My Progress</a>
+      <div class="xp-badge">⚡ <span id="xpCount">0</span> XP</div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="side-title">Module 10 Chapters</div>
+    <ul class="side-list" id="sideList">
+      <li><a href="#ch1" data-target="ch1"><span class="side-dot" id="dot-ch1"></span>From Toolbox to Real Problems</a></li>
+      <li><a href="#ch2" data-target="ch2"><span class="side-dot" id="dot-ch2"></span>Healthcare</a></li>
+      <li><a href="#ch3" data-target="ch3"><span class="side-dot" id="dot-ch3"></span>Drug Discovery</a></li>
+      <li><a href="#ch4" data-target="ch4"><span class="side-dot" id="dot-ch4"></span>Finance</a></li>
+      <li><a href="#ch5" data-target="ch5"><span class="side-dot" id="dot-ch5"></span>Cybersecurity</a></li>
+      <li><a href="#ch6" data-target="ch6"><span class="side-dot" id="dot-ch6"></span>Climate Science</a></li>
+      <li><a href="#ch7" data-target="ch7"><span class="side-dot" id="dot-ch7"></span>Materials Discovery</a></li>
+      <li><a href="#ch8" data-target="ch8"><span class="side-dot" id="dot-ch8"></span>Computer Vision</a></li>
+      <li><a href="#ch9" data-target="ch9"><span class="side-dot" id="dot-ch9"></span>Natural Language Processing</a></li>
+      <li><a href="#final" data-target="final"><span class="side-dot" id="dot-final"></span>Module Assessment</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <div class="tut-hero reveal">
+      <div class="module-eyebrow">◆ Module 10 · Advanced</div>
+      <h1>Real-World QML Applications</h1>
+      <p class="lede">Maya's molecule problem was never a special case — it was one instance of a pattern that shows up across eight very different fields. This module is the tour of where else that same pattern lands, and how honestly each domain can claim it today.</p>
+      <div class="chip-row">
+        <span class="chip">9 Chapters</span>
+        <span class="chip">8 Domains</span>
+        <span class="chip">27 Quick-Check Questions</span>
+        <span class="chip">1 Adaptive Assessment</span>
+        <span class="chip">~55 min</span>
+      </div>
+      <div class="character-card">
+        <div class="avatar-ring">M</div>
+        <div>
+          <div class="cname">Maya &amp; Dr. Okafor, continued</div>
+          <div class="crole">Same lab, zooming out</div>
+          <p>Maya has the algorithms from Module 9 and the frontier problems from Module 11 ahead of her. First, Dr. Okafor wants her to see how far the toolbox actually reaches — and where it still doesn't, yet.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAPTER 1 -->
+    <section class="chapter reveal" id="ch1">
+      <div class="chapter-head"><div class="chapter-icon">⬢</div><div><span class="chapter-num">CHAPTER 01</span><h2>From Toolbox to Real Problems</h2></div></div>
+      <div class="story-panel">"Your molecule-binding classifier," Dr. Okafor says, "wasn't just a class exercise. It was a Healthcare and Drug Discovery case study, start to finish — encoding, ansatz, kernel, all of it." Maya blinks. She'd never framed it that way. <b>"That's the point of this module,"</b> he continues. "Same toolbox, seven more rooms."</div>
+      <p class="body-text">Every chapter ahead applies concepts you already have — encodings from Module 8, algorithms from Module 9 — to a real domain. None of these are hypothetical; all eight are active research and early-deployment areas today. Tap a card for a preview.</p>
+      <div class="visual-box">
+        <div class="visual-label">Eight Domains — Tap Each Card</div>
+        <div class="encoding-grid" id="encodingGrid"></div>
+      </div>
+      <div class="callout"><b>Takeaway:</b> You don't need eight new toolkits for eight domains — you need one toolkit and eight honest conversations about what it can and can't do yet in each one.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch1">0 / 3</div></div>
+        <div id="quiz-ch1"></div>
+        <div class="chapter-status" id="status-ch1"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 2 -->
+    <section class="chapter reveal" id="ch2">
+      <div class="chapter-head"><div class="chapter-icon">✚</div><div><span class="chapter-num">CHAPTER 02</span><h2>Healthcare</h2></div></div>
+      <div class="story-panel">"Zoom out from one molecule," Dr. Okafor says, "to a hospital's worth of patient records." Diagnostic imaging, genomic markers, years of clinical history — the same VQC pipeline Maya built for one binding prediction can, in principle, classify diagnoses or stratify patient risk.</div>
+      <p class="body-text">The pipeline looks familiar on purpose: patient data → quantum feature map → trained circuit → a risk or diagnosis score. What's genuinely different is the data itself.</p>
+      <div class="visual-box">
+        <div class="visual-label">The Familiar Pipeline, New Domain</div>
+        <div class="pipeline-row">
+          <div class="pipe-step"><div class="pn">Input</div><div class="pl">Clinical / Genomic Data</div></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step"><div class="pn">Step</div><div class="pl">Quantum Feature Map</div></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step"><div class="pn">Step</div><div class="pl">Trained Circuit (VQC)</div></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step"><div class="pn">Output</div><div class="pl">Diagnosis / Risk Score</div></div>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>Why it might fit:</b> clinical and genomic datasets are often extremely high-dimensional — exactly the curse-of-dimensionality territory from Module 7 that motivated looking at quantum feature spaces in the first place.</li>
+        <li><b>Real early work:</b> small-scale studies in diagnostic classification and patient risk stratification, mostly on simulators or small quantum devices so far.</li>
+        <li><b>Honest challenge:</b> healthcare data is tightly regulated and clinical datasets are typically small — a mismatch with how data-hungry most ML training still is, classical or quantum.</li>
+      </ul>
+      <div class="callout warn"><b>Careful:</b> "High-dimensional feature space" is a genuine reason to be curious about QML in healthcare — it is not, by itself, evidence of a working clinical advantage yet.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch2">0 / 3</div></div>
+        <div id="quiz-ch2"></div>
+        <div class="chapter-status" id="status-ch2"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 3 -->
+    <section class="chapter reveal" id="ch3">
+      <div class="chapter-head"><div class="chapter-icon">⚗</div><div><span class="chapter-num">CHAPTER 03</span><h2>Drug Discovery</h2></div></div>
+      <div class="story-panel">"This one's yours," Dr. Okafor says. "You've been living inside it since Module 6." He walks Maya through the full pipeline her single classifier sits inside of — starting from a compound library too large for any lab to test directly.</div>
+      <p class="body-text">Drug discovery starts absurdly large and narrows in stages: an enormous virtual compound library gets filtered by cheap classical pre-screening, then a much smaller set gets quantum-simulated in detail, before only a handful ever reach a real lab bench.</p>
+      <div class="spotlight">
+        <div class="sicon">▧</div>
+        <div class="stext"><b>Platform Feature Spotlight — Research Hub</b>Current benchmark datasets and papers on quantum-simulated drug candidates are tracked in the Research Hub — a good next stop after this chapter.</div>
+      </div>
+      <div class="visual-box">
+        <div class="visual-label">The Narrowing Funnel</div>
+        <div class="compare-bars" id="drugBars"></div>
+      </div>
+      <ul class="points">
+        <li><b>Where Hamiltonian encoding (Module 8) comes back:</b> a candidate molecule's binding energy is governed by real physics — simulating it via its actual Hamiltonian is a near-literal fit, not a forced analogy.</li>
+        <li><b>Where Maya's VQC comes back:</b> after simulation narrows the field, a trained classifier (exactly her Module 6–9 pipeline) predicts binding affinity or toxicity on the survivors.</li>
+        <li><b>Realistic framing:</b> QML doesn't replace the lab — it aims to shrink how much of the enormous early-stage search has to happen there at all.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Every technique from Modules 6 through 9 shows up somewhere in this one pipeline — encoding, kernels, and the hybrid loop all had this exact use case in mind from the start.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch3">0 / 3</div></div>
+        <div id="quiz-ch3"></div>
+        <div class="chapter-status" id="status-ch3"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 4 -->
+    <section class="chapter reveal" id="ch4">
+      <div class="chapter-head"><div class="chapter-icon">▲</div><div><span class="chapter-num">CHAPTER 04</span><h2>Finance</h2></div></div>
+      <div class="story-panel">"Different domain, same underlying question," Dr. Okafor says: "how do you estimate something uncertain without running forever?" He introduces quantum amplitude estimation — a technique with a genuinely proven speedup, not just a hopeful one.</div>
+      <p class="body-text">Classical option pricing often relies on Monte Carlo sampling, where precision ε costs roughly <b>1/ε²</b> samples. <b>Quantum amplitude estimation</b> can reach the same precision in roughly <b>1/ε</b> samples — a proven quadratic reduction. Drag the slider to see the gap grow.</p>
+      <div class="spotlight">
+        <div class="sicon">▤</div>
+        <div class="stext"><b>Platform Feature Spotlight — QML Playground</b>The full Playground lets you run this comparison against a real simulated option-pricing model, not just the illustrative curve below.</div>
+      </div>
+      <div class="visual-box">
+        <div class="visual-label">Samples Needed for Target Precision</div>
+        <div class="ctrl-row">
+          <label for="precSlider">Target precision (higher = more precise) =</label>
+          <input type="range" id="precSlider" min="1" max="10" value="4">
+          <span class="ctrl-readout" id="precReadout">4</span>
+        </div>
+        <div class="compare-bars" id="financeBars"></div>
+      </div>
+      <ul class="points">
+        <li><b>Amplitude estimation</b> is one of the field's cleanest proven speedups — no assumptions about efficient state preparation the way qPCA (Module 9) needed.</li>
+        <li><b>Quantum kernel methods (Module 9)</b> reappear here too, applied to fraud detection — distinguishing legitimate from fraudulent transaction patterns.</li>
+        <li>Portfolio optimization is another active area, often framed as a combinatorial problem suited to variational optimization techniques.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Finance is one of the few domains in this module with a headline technique that's mathematically proven, not just plausible — worth remembering the difference from Module 7's hype-o-meter.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch4">0 / 3</div></div>
+        <div id="quiz-ch4"></div>
+        <div class="chapter-status" id="status-ch4"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 5 -->
+    <section class="chapter reveal" id="ch5">
+      <div class="chapter-head"><div class="chapter-icon">⛨</div><div><span class="chapter-num">CHAPTER 05</span><h2>Cybersecurity</h2></div></div>
+      <div class="story-panel">"This one cuts both ways," Dr. Okafor warns. "QML can help defend systems. Quantum computing, more broadly, is also the reason today's encryption has an expiration date." He wants Maya to hold both facts at once, not just the exciting one.</div>
+      <p class="body-text">On defense: network traffic or files get classified as malicious or benign using the same QSVM/QNN-style models from Module 9, with quantum kernels potentially capturing complex, high-dimensional attack patterns. On the other side: <b>Shor's algorithm</b> (Module 7) threatens the math behind most classical encryption — which is exactly why <b>post-quantum cryptography</b> is now its own major research field.</p>
+      <div class="visual-box">
+        <div class="visual-label">Illustrative Traffic Classification</div>
+        <div class="conf-grid">
+          <div class="conf-cell conf-head"></div>
+          <div class="conf-cell conf-head">Predicted Malicious</div>
+          <div class="conf-cell conf-head">Predicted Benign</div>
+          <div class="conf-cell conf-head" style="text-align:right; padding-right:10px;">Actually Malicious</div>
+          <div class="conf-cell conf-tp">✓ 91%</div>
+          <div class="conf-cell conf-fn">✕ 9%</div>
+          <div class="conf-cell conf-head" style="text-align:right; padding-right:10px;">Actually Benign</div>
+          <div class="conf-cell conf-fp">✕ 6%</div>
+          <div class="conf-cell conf-tn">✓ 94%</div>
+        </div>
+      </div>
+      <div class="tutor-widget">
+        <div class="tutor-head"><div class="tutor-avatar">✺</div><div class="tutor-title">Ask the Quantum Tutor</div></div>
+        <div class="tutor-note">Demo preview — tap a question below.</div>
+        <div class="tutor-questions" id="tutorQuestions"></div>
+        <div class="tutor-answer" id="tutorAnswer"></div>
+      </div>
+      <ul class="points">
+        <li><b>Ransomware and intrusion detection</b> are two of the most-studied applied QML cybersecurity tasks — both are, structurally, the same binding/non-binding classification problem Maya's been solving since Module 6.</li>
+        <li><b>Post-quantum cryptography</b> isn't a QML topic exactly, but it's the direct consequence of quantum computing's capabilities — a field-wide response to Shor's algorithm's threat to RSA-style encryption.</li>
+      </ul>
+      <div class="callout warn"><b>Careful:</b> The illustrative numbers above are for teaching the pipeline shape, not a benchmark claim — real classifier performance depends entirely on the dataset and threat model.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch5">0 / 3</div></div>
+        <div id="quiz-ch5"></div>
+        <div class="chapter-status" id="status-ch5"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 6 -->
+    <section class="chapter reveal" id="ch6">
+      <div class="chapter-head"><div class="chapter-icon">☁</div><div><span class="chapter-num">CHAPTER 06</span><h2>Climate Science</h2></div></div>
+      <div class="story-panel">"Weather isn't one number," Dr. Okafor says. "It's millions of correlated ones, changing every second." Climate and atmospheric systems are exactly the kind of high-dimensional, tangled data that motivated looking at quantum feature spaces back in Module 7.</div>
+      <p class="body-text">Two rough use-case shapes keep coming up in this domain — worth telling apart.</p>
+      <div class="visual-box">
+        <div class="visual-label">Two Angles on Climate QML</div>
+        <div class="compare">
+          <div class="compare-col a">
+            <h5>Prediction-Focused</h5>
+            <ul>
+              <li>Extreme weather event forecasting from high-dimensional sensor data</li>
+              <li>Quantum feature maps for pattern recognition in atmospheric data</li>
+              <li>Early-stage, mostly simulator-scale demonstrations</li>
+            </ul>
+          </div>
+          <div class="compare-col b">
+            <h5>Optimization-Focused</h5>
+            <ul>
+              <li>Energy grid management and renewable integration scheduling</li>
+              <li>Carbon-capture material search overlaps directly with Chapter 7</li>
+              <li>Often framed as combinatorial optimization, similar to finance's portfolio problems</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <ul class="points">
+        <li>Both angles reuse the same underlying pattern-recognition and optimization tools from Modules 8–9 — climate isn't a new algorithm family, just a very demanding data source.</li>
+        <li><b>Honest caveat:</b> this is one of the least mature domains in this module — most published work is exploratory, well short of operational deployment.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Big, tangled, high-dimensional data is a real reason to be curious about QML here — it is not yet a track record.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch6">0 / 3</div></div>
+        <div id="quiz-ch6"></div>
+        <div class="chapter-status" id="status-ch6"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 7 -->
+    <section class="chapter reveal" id="ch7">
+      <div class="chapter-head"><div class="chapter-icon">⬡</div><div><span class="chapter-num">CHAPTER 07</span><h2>Materials Discovery</h2></div></div>
+      <div class="story-panel">"Same story as drugs," Dr. Okafor says, "different molecules." Better batteries, superconductors, solar cells — all of them are, structurally, the exact search-and-simulate problem from Chapter 3, just applied to materials instead of medicines.</div>
+      <p class="body-text">And the search space explodes exactly the way Module 7's chessboard story warned: each additional candidate element or substitution site multiplies the possibilities. Drag the slider to feel it grow.</p>
+      <div class="visual-box">
+        <div class="visual-label">Material Composition Search Space</div>
+        <div class="ctrl-row">
+          <label for="matSlider">Candidate elements considered =</label>
+          <input type="range" id="matSlider" min="2" max="12" value="4">
+          <span class="ctrl-readout" id="matReadout">4</span>
+        </div>
+        <div class="ladder" id="matLadder"></div>
+        <div class="fun-fact" id="matFact"></div>
+      </div>
+      <ul class="points">
+        <li><b>Hamiltonian encoding (Module 8)</b> returns here too — simulating a candidate material's electronic structure via its physical Hamiltonian, the same technique as molecular simulation.</li>
+        <li><b>Combinatorial explosion (Module 7)</b> is the direct reason this search space is intractable classically past a modest number of candidate elements.</li>
+        <li>Target applications include battery electrolytes, superconducting materials, and photovoltaic (solar cell) compounds.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Two modules' worth of ideas — exponential search costs and physics-native encoding — turn out to be exactly what this domain needs, together.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch7">0 / 3</div></div>
+        <div id="quiz-ch7"></div>
+        <div class="chapter-status" id="status-ch7"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 8 -->
+    <section class="chapter reveal" id="ch8">
+      <div class="chapter-head"><div class="chapter-icon">▤</div><div><span class="chapter-num">CHAPTER 08</span><h2>Computer Vision</h2></div></div>
+      <div class="story-panel">"Images look like an obvious fit for amplitude encoding," Maya says, remembering Module 8's exponential compression. "It sounded that way to a lot of people," Dr. Okafor replies. "Then they tried it at real resolution."</div>
+      <p class="body-text">A <b>quanvolutional layer</b> — a fixed, often random small quantum circuit used purely as a feature extractor — feeding into an otherwise classical network is the more common practical approach today, precisely because of the qubit and depth costs below.</p>
+      <div class="spotlight">
+        <div class="sicon">⌗</div>
+        <div class="stext"><b>Platform Feature Spotlight — Quantum Circuit Simulator</b>Build a small quanvolutional filter yourself — a few gates applied to a tiny pixel patch, feeding a classical layer.</div>
+      </div>
+      <div class="visual-box">
+        <div class="visual-label">Pixels vs. Qubits Needed (Amplitude Encoding)</div>
+        <div class="qubit-savings" id="visionSavings"></div>
+      </div>
+      <ul class="points">
+        <li><b>The qubit count looks small</b> — even a 224×224 image needs under 20 qubits via amplitude encoding's exponential compression.</li>
+        <li><b>The real bottleneck is state preparation:</b> loading an arbitrary real image into that state still needs a circuit whose depth scales with the image's size — Module 8's amplitude-encoding "catch," in its sharpest form yet.</li>
+        <li><b>What actually works today:</b> small or heavily downsampled images, or hybrid quanvolutional approaches where quantum circuits handle only a small feature-extraction role.</li>
+        <li>QCNNs (Module 11) are a more structured, and more promising, path forward for genuinely quantum-native image-style processing.</li>
+      </ul>
+      <div class="callout warn"><b>Careful:</b> "Only 18 qubits for a 224×224 image" is technically true and practically misleading — the state-preparation circuit is the part that doesn't scale as nicely.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch8">0 / 3</div></div>
+        <div id="quiz-ch8"></div>
+        <div class="chapter-status" id="status-ch8"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 9 -->
+    <section class="chapter reveal" id="ch9">
+      <div class="chapter-head"><div class="chapter-icon">✎</div><div><span class="chapter-num">CHAPTER 09</span><h2>Natural Language Processing</h2></div></div>
+      <div class="story-panel">Closing chapter. "Language has structure the way a molecule has structure," Dr. Okafor says. "Grammar tells you how words combine into meaning — the same way bonds tell you how atoms combine into a molecule." He sketches a sentence as a small graph.</div>
+      <p class="body-text"><b>Quantum NLP (QNLP)</b> approaches like <b>DisCoCat</b> represent a sentence's grammatical structure compositionally within a quantum circuit — word meanings as quantum states, grammar rules as the entangling gates connecting them.</p>
+      <div class="visual-box">
+        <div class="visual-label">A Sentence as a Structured Circuit</div>
+        <div class="graph-wrap">
+          <svg viewBox="0 0 360 140" width="360" id="nlpSvg"></svg>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>Directly related to Quantum Graph Neural Networks (Module 11):</b> a dependency parse is a graph, and compositional QNLP circuits follow it the same way a molecular ansatz follows bond structure.</li>
+        <li><b>The appeal:</b> classical NLP mostly treats grammar as a statistical pattern to learn; QNLP tries to encode it structurally, by construction.</li>
+        <li><b>Honest status:</b> still very early-stage — small-scale demonstrations on toy datasets, not production-scale language systems.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> The same idea closes this module that opened Module 11's Quantum GNN chapter: when your data has real structure, building a circuit that respects it tends to beat pretending the data is a flat list of numbers.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch9">0 / 3</div></div>
+        <div id="quiz-ch9"></div>
+        <div class="chapter-status" id="status-ch9"></div>
+      </div>
+    </section>
+
+    <!-- FINAL ASSESSMENT -->
+    <section class="chapter reveal" id="final">
+      <div class="final-assess">
+        <div class="final-head">
+          <div class="module-eyebrow">◆ Adaptive Assessment</div>
+          <h2>Module 10 Assessment</h2>
+          <p>Nine synthesis questions, one per chapter. Your result adapts to your whole session — chapters where you struggled above get flagged for review here, regardless of how this final round goes.</p>
+        </div>
+        <div id="quiz-final"></div>
+        <div class="result-panel" id="resultPanel">
+          <div class="result-top">
+            <div>
+              <div class="result-score" id="resultScore">0%</div>
+              <div class="quiz-score" id="resultDetail">0 / 9 correct</div>
+            </div>
+            <div class="result-badge" id="resultBadge"></div>
+          </div>
+          <div id="recommendWrap"></div>
+          <div class="result-actions">
+            <a href="qml-roadmap-landing-page.html#curriculum" class="btn btn-ghost">← Back to Curriculum</a>
+            <a href="#" class="btn btn-primary" id="continueBtn">Continue to Module 11 →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="module-nav" id="moduleNav"></div>
+
+  </main>
+</div>
+
+<script>
+/* ---------------- state ---------------- */
+let state = { xp:0, chapters:{
+  ch1:{correct:0,total:3,done:false}, ch2:{correct:0,total:3,done:false}, ch3:{correct:0,total:3,done:false},
+  ch4:{correct:0,total:3,done:false}, ch5:{correct:0,total:3,done:false}, ch6:{correct:0,total:3,done:false},
+  ch7:{correct:0,total:3,done:false}, ch8:{correct:0,total:3,done:false}, ch9:{correct:0,total:3,done:false}
+}, finalDone:false };
+try{ const saved = localStorage.getItem('qml_module10_state'); if(saved) state = JSON.parse(saved); }catch(e){}
+function saveState(){ try{ localStorage.setItem('qml_module10_state', JSON.stringify(state)); }catch(e){} }
+function addXP(n){ state.xp += n; document.getElementById('xpCount').textContent = state.xp; saveState(); }
+document.getElementById('xpCount').textContent = state.xp;
+
+/* ================= CHAPTER 1: preview grid ================= */
+const encodingPreview = [
+  {en:'01', name:'Healthcare', desc:'Diagnostic classification and risk stratification on high-dimensional clinical data.'},
+  {en:'02', name:'Drug Discovery', desc:'Maya\u2019s own pipeline, zoomed out \u2014 screening, simulation, and classification together.'},
+  {en:'03', name:'Finance', desc:'A proven quadratic speedup for option pricing via amplitude estimation.'},
+  {en:'04', name:'Cybersecurity', desc:'QML defense, and quantum computing\u2019s own threat to classical cryptography.'},
+  {en:'05', name:'Climate Science', desc:'High-dimensional atmospheric data meets pattern recognition and optimization.'},
+  {en:'06', name:'Materials Discovery', desc:'Batteries, superconductors, and solar cells \u2014 drug discovery\u2019s sibling problem.'},
+  {en:'07', name:'Computer Vision', desc:'Amplitude encoding\u2019s compression, and the state-preparation catch that limits it.'},
+  {en:'08', name:'Natural Language Processing', desc:'Grammar as circuit structure \u2014 language\u2019s own version of a molecular graph.'},
+];
+(function(){
+  const grid = document.getElementById('encodingGrid');
+  encodingPreview.forEach(e=>{
+    const card = document.createElement('div');
+    card.className = 'enc-card';
+    card.innerHTML = '<div class="enc-inner">'
+      + '<div class="enc-face enc-front"><div class="en">'+e.en+'</div><h6>'+e.name+'</h6></div>'
+      + '<div class="enc-face enc-back">'+e.desc+'</div>'
+      + '</div>';
+    card.addEventListener('click', ()=>{ card.classList.toggle('flipped'); addXP(1); });
+    grid.appendChild(card);
+  });
+})();
+
+/* ================= CHAPTER 3: drug discovery funnel ================= */
+(function(){
+  const wrap = document.getElementById('drugBars');
+  const stages = [
+    {label:'Virtual compound library', val:100000000, disp:'~10\u2078 compounds'},
+    {label:'Classical pre-screen', val:100000, disp:'~10\u2075 candidates'},
+    {label:'Quantum-simulated candidates', val:200, disp:'~200 candidates'},
+    {label:'Lab-tested finalists', val:10, disp:'~10 compounds'}
+  ];
+  const maxLog = Math.log10(stages[0].val);
+  stages.forEach(s=>{
+    const pct = (Math.log10(s.val)/maxLog)*100;
+    const row = document.createElement('div');
+    row.className = 'cbrow';
+    row.innerHTML = '<div class="cblabel">'+s.label+'</div><div class="cbtrack"><div class="cbfill" style="width:'+pct+'%"></div></div><div class="cbval">'+s.disp+'</div>';
+    wrap.appendChild(row);
+  });
+})();
+
+/* ================= CHAPTER 4: finance amplitude estimation ================= */
+(function(){
+  const slider = document.getElementById('precSlider');
+  const readout = document.getElementById('precReadout');
+  const wrap = document.getElementById('financeBars');
+  function render(prec){
+    wrap.innerHTML = '';
+    const classical = Math.pow(prec, 2) * 40;
+    const quantum = prec * 40;
+    const maxV = Math.pow(10,2)*40;
+    const row1 = document.createElement('div');
+    row1.className = 'cbrow';
+    row1.innerHTML = '<div class="cblabel">Classical Monte Carlo \u00b7 ~1/\u03B5\u00B2</div><div class="cbtrack"><div class="cbfill b" style="width:'+Math.min(100,classical/maxV*100)+'%"></div></div><div class="cbval">'+classical.toLocaleString()+' samples</div>';
+    wrap.appendChild(row1);
+    const row2 = document.createElement('div');
+    row2.className = 'cbrow';
+    row2.innerHTML = '<div class="cblabel">Quantum Amplitude Est. \u00b7 ~1/\u03B5</div><div class="cbtrack"><div class="cbfill" style="width:'+Math.min(100,quantum/maxV*100)+'%"></div></div><div class="cbval">'+quantum.toLocaleString()+' samples</div>';
+    wrap.appendChild(row2);
+  }
+  slider.addEventListener('input', ()=>{ const p = parseInt(slider.value); readout.textContent = p; render(p); });
+  render(4);
+})();
+
+/* ================= CHAPTER 5: AI tutor ================= */
+const tutorQA10 = [
+  {q:"Is QML actually better than classical ML for malware detection today?", a:"Not demonstrably, at production scale, as of this course's writing. Small studies show promise for specific quantum-kernel setups on specific datasets, but there's no broad, reproducible advantage yet over well-tuned classical models — the same honest pattern as Module 7's hype-o-meter."},
+  {q:"What does 'post-quantum cryptography' actually mean?", a:"It's new classical cryptography, specifically designed to stay secure even against an attacker with a large fault-tolerant quantum computer. It's a response to Shor's algorithm (Module 7), not a quantum technology itself — the irony is that the fix for quantum's threat to encryption is still classical math."},
+  {q:"Why would a quantum kernel help detect attacks that classical kernels miss?", a:"The hope is the same as Module 9's kernel chapter: quantum feature maps can access correlations that are awkward to represent classically. Whether that translates into catching real attacks classical methods miss is still an open, actively tested question — not yet a settled result."}
+];
+(function(){
+  const qWrap = document.getElementById('tutorQuestions');
+  const answerBox = document.getElementById('tutorAnswer');
+  tutorQA10.forEach(item=>{
+    const btn = document.createElement('button');
+    btn.className = 'tutor-q-btn';
+    btn.textContent = item.q;
+    btn.addEventListener('click', ()=>{ answerBox.textContent = item.a; answerBox.classList.add('show'); addXP(2); });
+    qWrap.appendChild(btn);
+  });
+})();
+
+/* ================= CHAPTER 7: materials search space ladder ================= */
+(function(){
+  const slider = document.getElementById('matSlider');
+  const readout = document.getElementById('matReadout');
+  const ladder = document.getElementById('matLadder');
+  const fact = document.getElementById('matFact');
+  function formatBig(num){
+    if(num > 1e15) return num.toExponential(2);
+    if(num > 1e6) return (num/1e6).toFixed(1)+' million';
+    if(num > 1e3) return num.toLocaleString();
+    return num.toString();
+  }
+  function render(n){
+    ladder.innerHTML = '';
+    const checkpoints = [];
+    for(let i=2;i<=n;i++) checkpoints.push(i);
+    const combos = checkpoints.map(k=> Math.pow(3,k)); // illustrative: 3 substitution choices per site
+    const maxCombos = Math.max(...combos);
+    checkpoints.forEach((k,idx)=>{
+      const h = Math.max(6, (combos[idx]/maxCombos)*120);
+      const bar = document.createElement('div');
+      bar.className = 'ladder-bar';
+      bar.style.height = h+'px';
+      bar.innerHTML = '<span>'+k+' elem.</span>';
+      ladder.appendChild(bar);
+    });
+    const lastCombos = combos[combos.length-1];
+    fact.textContent = 'At '+n+' candidate elements (illustrative 3 substitution choices per site): ~'+formatBig(lastCombos)+' possible compositions to search.';
+  }
+  slider.addEventListener('input', ()=>{ const n = parseInt(slider.value); readout.textContent = n; render(n); });
+  render(4);
+})();
+
+/* ================= CHAPTER 8: vision qubit savings ================= */
+(function(){
+  const wrap = document.getElementById('visionSavings');
+  const sizes = [{label:'8\u00d78 tiny image', px:64},{label:'28\u00d728 (MNIST-like)', px:784},{label:'224\u00d7224 (real photo)', px:50176}];
+  sizes.forEach(s=>{
+    const q = Math.ceil(Math.log2(s.px));
+    const card = document.createElement('div');
+    card.className = 'savings-card';
+    card.innerHTML = '<div class="sv">'+q+'</div><div class="sl">qubits for<br>'+s.label+'<br>('+s.px.toLocaleString()+' pixels)</div>';
+    wrap.appendChild(card);
+  });
+})();
+
+/* ================= CHAPTER 9: NLP sentence graph ================= */
+(function(){
+  const svg = document.getElementById('nlpSvg');
+  const nodes = [{x:40,y:70,l:'Models'},{x:130,y:30,l:'learn'},{x:220,y:70,l:'quantum'},{x:310,y:30,l:'language'}];
+  const edges = [[0,1],[1,2],[2,3]];
+  let html = '';
+  edges.forEach(e=>{
+    html += '<line class="graph-edge" x1="'+nodes[e[0]].x+'" y1="'+nodes[e[0]].y+'" x2="'+nodes[e[1]].x+'" y2="'+nodes[e[1]].y+'"/>';
+  });
+  nodes.forEach(n=>{
+    html += '<circle class="graph-node" cx="'+n.x+'" cy="'+n.y+'" r="26"/>';
+    html += '<text class="graph-node-label" x="'+(n.x-22)+'" y="'+(n.y+4)+'">'+n.l+'</text>';
+  });
+  svg.innerHTML = html;
+})();
+
+/* ================= quiz data ================= */
+const quizzes = {
+  ch1: [
+    {q:"What is the focus shift in Module 10 compared to Module 9?", opts:["Away from real data entirely","From the core algorithms themselves to eight specific domains where those algorithms get applied to real problems","Back to basic math only","Nothing changes at all"], correct:1, explain:"Same toolbox from Modules 6\u20139, now aimed at real domains one by one."},
+    {q:"How many application domains does this module tour?", opts:["2","8","100","20"], correct:1, explain:"Healthcare, Drug Discovery, Finance, Cybersecurity, Climate Science, Materials Discovery, Computer Vision, and NLP."},
+    {q:"What does Dr. Okafor imply about Maya's own molecule-binding work?", opts:["It was unrelated to any real domain","It was itself a Healthcare/Drug Discovery case study all along","It has no practical application","It only applies to Finance"], correct:1, explain:"Chapter 1's framing device \u2014 her whole running project has been this module's first two chapters in disguise."}
+  ],
+  ch2: [
+    {q:"What kind of healthcare task is highlighted as a potential QML application?", opts:["Only scheduling appointments","Diagnostic classification and patient risk stratification using high-dimensional clinical/genomic data","Printing prescriptions","Building hospital websites"], correct:1, explain:"The pipeline diagram above shows exactly this flow, from patient data to a risk or diagnosis score."},
+    {q:"Why might QML's approach to high-dimensional feature spaces be relevant to healthcare data specifically?", opts:["Healthcare data is always low-dimensional","Clinical and genomic datasets are often extremely high-dimensional, echoing the curse-of-dimensionality theme from Module 7","Dimensionality never matters in medicine","QML avoids all data entirely"], correct:1, explain:"This is the direct link back to Module 7's high-dimensional feature space chapter."},
+    {q:"What is an honest practical challenge for QML in healthcare?", opts:["No challenges exist","Data privacy regulations and typically small clinical dataset sizes make deployment difficult","Hospitals have unlimited quantum hardware already","Healthcare data is never sensitive"], correct:1, explain:"Regulation and data scarcity are real, practical obstacles independent of the underlying algorithm's quality."}
+  ],
+  ch3: [
+    {q:"What technique from Module 8 becomes directly relevant to simulating a candidate drug molecule's energy?", opts:["Basis encoding only","Hamiltonian encoding, since a molecule's behavior is governed by its actual physical Hamiltonian","QRAM exclusively","Data re-uploading only"], correct:1, explain:"This is a near-literal fit, not a forced analogy \u2014 covered directly in Module 8's Hamiltonian encoding chapter."},
+    {q:"What does 'virtual screening' refer to in this context?", opts:["Watching movies about drugs","Narrowing an enormous compound library down to a smaller set of promising candidates before expensive lab testing","Screening job candidates","A type of quantum error correction"], correct:1, explain:"The funnel diagram above shows this narrowing process across several stages."},
+    {q:"What earlier module's story problem does this chapter connect directly back to?", opts:["None, it's unrelated","Maya's own molecule-binding classification problem from Modules 6\u20139","Module 3's math primer","Module 12's capstone only"], correct:1, explain:"This chapter is explicitly framed as 'zooming out' from her existing running example."}
+  ],
+  ch4: [
+    {q:"What real quantum technique offers a proven quadratic speedup for Monte Carlo-style option pricing?", opts:["Quantum amplitude estimation","Classical linear regression","Random guessing","QRAM"], correct:0, explain:"A genuinely proven result, distinguishing it from many of the more speculative claims discussed elsewhere in this course."},
+    {q:"What Module 9 concept could plausibly power quantum-enhanced fraud detection?", opts:["Quantum kernel methods, distinguishing fraudulent from legitimate transaction patterns","Quantum autoencoders only","QRAM exclusively","Basis encoding alone"], correct:0, explain:"The same kernel-based classification idea from Module 9 applies directly to transaction pattern detection."},
+    {q:"What kind of speedup does quantum amplitude estimation offer over classical Monte Carlo sampling?", opts:["No speedup at all","A quadratic reduction in the number of samples needed for a given precision","An infinite speedup with zero samples needed","A speedup only in theory with no mathematical basis"], correct:1, explain:"Roughly 1/\u03B5 samples instead of 1/\u03B5\u00B2 \u2014 exactly what the interactive bars above demonstrate."}
+  ],
+  ch5: [
+    {q:"What is one defensive QML application in cybersecurity mentioned in this chapter?", opts:["Classifying network traffic or files as malicious vs. benign using QSVM/QNN-style models","Deleting all firewalls","Replacing every classical computer","Ignoring all traffic data"], correct:0, explain:"Structurally the same binary classification problem as Maya's molecule work, applied to security data."},
+    {q:"What is the 'flip side' of quantum computing's relationship to cybersecurity, beyond QML defense?", opts:["There is no flip side","Quantum algorithms like Shor's threaten classical cryptography, motivating post-quantum cryptography research","Quantum computing has no relevance to cryptography","Cybersecurity is entirely unrelated to quantum computing"], correct:1, explain:"Dr. Okafor's opening warning \u2014 this domain has an offensive implication for quantum computing, not just a defensive QML angle."},
+    {q:"Why might quantum kernels be useful for detecting complex attack patterns?", opts:["They can't be used for this at all","They can potentially capture complex, high-dimensional pattern interactions the way they did for molecule classification in Module 9","Kernels are only for finance","Kernels eliminate the need for any data"], correct:1, explain:"Same underlying kernel logic from Module 9, applied to a new kind of pattern-matching problem."}
+  ],
+  ch6: [
+    {q:"What makes climate modeling a plausible QML application domain?", opts:["Climate systems are simple and low-dimensional","Climate systems are highly complex and high-dimensional, similar in spirit to the feature-space challenges from Module 7","Climate has no data associated with it","QML has no relevance to physical systems"], correct:1, explain:"The same high-dimensional-data motivation that applies to healthcare data applies here too."},
+    {q:"What is one illustrative QML use case in this domain?", opts:["Quantum optimization for energy grid management or extreme-weather-event prediction from high-dimensional sensor data","Deleting weather satellites","Only classical spreadsheets","Ignoring all climate data"], correct:0, explain:"The two-column comparison above splits this into prediction-focused and optimization-focused use cases."},
+    {q:"What honest caveat applies to climate-focused QML applications, consistent with this course's themes?", opts:["No caveats apply, they are all fully solved","Most of these applications are still early-stage and exploratory, not yet deployed at operational scale","Climate QML has been completely disproven","Climate science has nothing to do with high-dimensional data"], correct:1, explain:"Flagged explicitly as one of the least mature domains covered in this module."}
+  ],
+  ch7: [
+    {q:"What earlier concept explains why materials discovery has such a large search space?", opts:["Materials have only one possible configuration","Combinatorial explosion \u2014 the same exponential growth from Module 7's chessboard story applies to possible material compositions","Materials science has no data","Search spaces are always small"], correct:1, explain:"The ladder visual above shows this exponential growth directly as candidate elements increase."},
+    {q:"What simulation technique connects materials discovery back to Module 8's Hamiltonian encoding?", opts:["None, they are unrelated","Simulating a candidate material's physical properties via its Hamiltonian, the same way as molecular simulation","Only classical spreadsheets","Random number generation"], correct:1, explain:"Materials, like molecules, are governed by real physical Hamiltonians \u2014 the same encoding fits both."},
+    {q:"What kinds of materials are mentioned as target applications?", opts:["Only paper products","Batteries, superconductors, and solar cell materials","Only decorative materials","Materials have no real-world applications"], correct:1, explain:"These are the three illustrative target application areas named in this chapter."}
+  ],
+  ch8: [
+    {q:"What is a 'quanvolutional' layer?", opts:["A purely classical convolution with no quantum component","A fixed, often random quantum circuit used as a feature extractor feeding into a classical network layer","A type of quantum error correction","A method unrelated to images entirely"], correct:1, explain:"This hybrid approach is the more common practical path today, given the state-preparation cost of full quantum image encoding."},
+    {q:"Why is encoding a full high-resolution image directly into a quantum state especially challenging?", opts:["It's trivially easy at any resolution","Even with amplitude encoding's exponential compression, real images still require large qubit counts and deep state-preparation circuits at practical resolutions","Images have no numerical data","Quantum computers can't process any images at all"], correct:1, explain:"The qubit count looks small, but the state-preparation circuit depth is the real, honest bottleneck \u2014 Module 8's amplitude-encoding catch in its sharpest form."},
+    {q:"What does most current QML computer vision work focus on, given this challenge?", opts:["Full-resolution, large-scale image datasets exclusively","Small or downsampled images, or hybrid approaches using quantum circuits for a small feature-extraction role","Nothing at all, image work is impossible","Only text data, never images"], correct:1, explain:"Practical work today mostly sidesteps full-resolution encoding entirely."}
+  ],
+  ch9: [
+    {q:"What is a distinguishing idea behind quantum NLP (QNLP) approaches like DisCoCat?", opts:["Ignoring grammar entirely","Representing a sentence's grammatical structure compositionally within a quantum circuit, mirroring how words combine into meaning","Only counting word frequency","Deleting all sentence structure"], correct:1, explain:"The sentence graph above shows this compositional structure directly."},
+    {q:"What earlier module's architecture is conceptually related to representing sentence structure this way?", opts:["None, it's unrelated","Quantum Graph Neural Networks from Module 11, since grammatical/dependency structure is graph-like","Module 3's math primer","Basis encoding alone"], correct:1, explain:"Both use circuit connectivity to mirror real structure in the data \u2014 bonds for molecules, grammar for sentences."},
+    {q:"What is the honest current state of quantum NLP research?", opts:["Fully deployed at large commercial scale","Still very early-stage, with small-scale demonstrations rather than production systems","Completely disproven as impossible","Identical in every way to classical NLP with no differences"], correct:1, explain:"Consistent with this module's running honesty theme \u2014 promising structure, early-stage results."}
+  ]
+};
+const finalQuiz = [
+  {q:"What is Module 10's overall shift in focus?", opts:["From core QML algorithms to eight real-world domains where those algorithms actually get applied","Away from all previous material","Purely theoretical math with no applications","Only about hardware manufacturing"], correct:0, explain:"Chapter 1's framing carries through every domain chapter that follows."},
+  {q:"What's a genuine practical challenge for healthcare QML, beyond the technology itself?", opts:["Data privacy regulation and small clinical dataset sizes","Healthcare has no data","Hospitals already have unlimited quantum computers","No challenges remain"], correct:0, explain:"Regulatory and data-availability constraints are independent of algorithm quality."},
+  {q:"What Module 8 technique directly supports simulating a candidate molecule's physical behavior?", opts:["Hamiltonian encoding","Basis encoding only","QRAM exclusively","Data re-uploading alone"], correct:0, explain:"A near-literal fit for physically-governed systems like molecules and materials."},
+  {q:"What proven speedup does quantum amplitude estimation offer for option pricing?", opts:["A quadratic reduction in required Monte Carlo samples","No speedup at all","An infinite, unconditional speedup","A speedup only for classical computers"], correct:0, explain:"One of the field's cleanest, most rigorously proven results."},
+  {q:"What's the 'flip side' of quantum computing in cybersecurity beyond QML-based defense?", opts:["Quantum algorithms like Shor's threaten classical cryptography, motivating post-quantum cryptography","There is no flip side","Cybersecurity is unrelated to quantum computing","Quantum computing only helps attackers, never defenders"], correct:0, explain:"Cybersecurity is the one domain in this module with a genuine dual-use tension worth holding onto."},
+  {q:"Why is climate modeling a plausible, if early-stage, QML application domain?", opts:["Climate systems are highly complex and high-dimensional, similar to Module 7's feature-space challenges","Climate systems have no data","Climate modeling has nothing to do with dimensionality","This domain is already fully solved by QML"], correct:0, explain:"High-dimensional, tangled data is the throughline connecting this chapter back to Module 7."},
+  {q:"What earlier concept explains materials discovery's massive search space?", opts:["Combinatorial explosion, the same exponential growth from Module 7's chessboard story","Materials have only one possible configuration","Search spaces are always trivially small","This has nothing to do with computational complexity"], correct:0, explain:"The ladder visual in Chapter 7 demonstrates this exponential growth directly."},
+  {q:"Why does encoding full-resolution images directly into quantum states remain challenging?", opts:["Even with amplitude encoding's compression, practical image resolutions still demand large qubit counts and deep preparation circuits","Images require no numerical encoding at all","Quantum computers cannot represent any visual data","This has already been fully solved at any resolution"], correct:0, explain:"The honest bottleneck is state-preparation circuit depth, not qubit count."},
+  {q:"What idea connects quantum NLP's compositional approach to another Module 11 topic?", opts:["Representing grammatical structure compositionally is conceptually related to Quantum Graph Neural Networks, since sentence structure is graph-like","NLP has no structural component","This is unrelated to any other module","Quantum NLP ignores word order entirely"], correct:0, explain:"This module's closing idea mirrors Module 11's Quantum GNN chapter directly."}
+];
+
+/* ================= render quizzes (shared engine) ================= */
+function renderQuiz(containerId, items, chapterKey){
+  const container = document.getElementById(containerId);
+  items.forEach((item, idx)=>{
+    const qDiv = document.createElement('div');
+    qDiv.className = 'q-item';
+    qDiv.innerHTML = '<div class="q-text">'+(idx+1)+'. '+item.q+'</div>'
+      + '<div class="q-options">'+item.opts.map((o,i)=>'<button class="q-opt" data-i="'+i+'">'+o+'</button>').join('')+'</div>'
+      + '<div class="q-explain">'+item.explain+'</div>';
+    container.appendChild(qDiv);
+    const buttons = qDiv.querySelectorAll('.q-opt');
+    const explainEl = qDiv.querySelector('.q-explain');
+    buttons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = parseInt(btn.dataset.i);
+        buttons.forEach(b=>b.disabled = true);
+        if(i === item.correct){
+          btn.classList.add('correct');
+          if(chapterKey) onCorrect(chapterKey);
+          else onFinalAnswer(idx, true);
+        } else {
+          btn.classList.add('incorrect');
+          buttons[item.correct].classList.add('correct');
+          if(chapterKey) onIncorrect(chapterKey);
+          else onFinalAnswer(idx, false);
+        }
+        explainEl.classList.add('show');
+      });
+    });
+  });
+}
+Object.keys(quizzes).forEach(key=>{ renderQuiz('quiz-'+key, quizzes[key], key); updateChapterScore(key); });
+renderQuiz('quiz-final', finalQuiz, null);
+
+function updateChapterScore(key){
+  const s = state.chapters[key];
+  document.getElementById('score-'+key).textContent = s.correct+' / '+s.total;
+}
+function onCorrect(key){
+  const s = state.chapters[key];
+  s.correct = Math.min(s.correct+1, s.total);
+  addXP(10);
+  checkChapterDone(key);
+  updateChapterScore(key);
+  saveState();
+}
+function onIncorrect(key){
+  const s = state.chapters[key];
+  s.hadMiss = true;
+  checkChapterDone(key);
+  updateChapterScore(key);
+  saveState();
+}
+let answeredCount = { ch1:0, ch2:0, ch3:0, ch4:0, ch5:0, ch6:0, ch7:0, ch8:0, ch9:0 };
+function checkChapterDone(key){
+  answeredCount[key]++;
+  const s = state.chapters[key];
+  if(answeredCount[key] >= s.total){
+    s.done = true;
+    const dot = document.getElementById('dot-'+key);
+    const statusEl = document.getElementById('status-'+key);
+    statusEl.classList.add('show');
+    if(s.hadMiss){
+      dot.classList.add('warn');
+      statusEl.classList.add('review');
+      statusEl.innerHTML = '\u26A0 Review suggested \u2014 you missed at least one question in this chapter.';
+    } else {
+      dot.classList.add('done');
+      statusEl.classList.add('mastered');
+      statusEl.innerHTML = '\u2713 Mastered \u2014 perfect score on this chapter.';
+      addXP(15);
+    }
+    saveState();
+  }
+}
+
+let finalAnswers = [];
+function onFinalAnswer(idx, correct){
+  finalAnswers[idx] = correct;
+  if(finalAnswers.filter(a=>a!==undefined).length === finalQuiz.length){
+    showFinalResult();
+  }
+}
+function showFinalResult(){
+  const correctCount = finalAnswers.filter(a=>a===true).length;
+  const pct = Math.round((correctCount/finalQuiz.length)*100);
+  document.getElementById('resultScore').textContent = pct+'%';
+  document.getElementById('resultDetail').textContent = correctCount+' / '+finalQuiz.length+' correct';
+  const badge = document.getElementById('resultBadge');
+  const pass = pct >= 70;
+  badge.textContent = pass ? 'Passed' : 'Retry Recommended';
+  badge.className = 'result-badge ' + (pass ? 'pass' : 'retry');
+  addXP(correctCount*10 + (pass?25:0));
+
+  const weakChapters = Object.keys(state.chapters).filter(k => state.chapters[k].hadMiss);
+  const wrap = document.getElementById('recommendWrap');
+  if(weakChapters.length === 0 && pass){
+    wrap.innerHTML = '<div class="callout" style="margin-top:4px;"><b>Great work.</b> No flagged chapters and a passing assessment score \u2014 you are ready for Module 11: Advanced Quantum Machine Learning.</div>';
+  } else {
+    const names = { ch1:"From Toolbox to Real Problems", ch2:"Healthcare", ch3:"Drug Discovery", ch4:"Finance", ch5:"Cybersecurity", ch6:"Climate Science", ch7:"Materials Discovery", ch8:"Computer Vision", ch9:"Natural Language Processing" };
+    let html = '<div class="visual-label" style="margin-top:18px;">Recommended Review</div><ul class="recommend-list">';
+    weakChapters.forEach(k=> html += '<li>\u21BA Revisit <b>'+names[k]+'</b> \u2014 a quick-check answer there was missed.</li>');
+    if(!pass){ html += '<li>\u21BA Your assessment score was below 70% \u2014 consider re-reading the callout boxes at the end of each chapter before continuing.</li>'; }
+    html += '</ul>';
+    wrap.innerHTML = html;
+  }
+  document.getElementById('resultPanel').classList.add('show');
+  document.getElementById('dot-final').classList.add(pass ? 'done' : 'warn');
+  state.finalDone = true;
+  saveState();
+}
+
+/* ---------------- scrollspy + progress bar ---------------- */
+const sections = document.querySelectorAll('.chapter');
+const sideLinks = document.querySelectorAll('.side-list a');
+const spyObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      sideLinks.forEach(a=>a.classList.remove('active'));
+      const link = document.querySelector('.side-list a[data-target="'+entry.target.id+'"]');
+      if(link) link.classList.add('active');
+    }
+  });
+},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>spyObserver.observe(s));
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+  document.getElementById('progressFill').style.width = scrolled+'%';
+});
+
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+},{threshold:0.08});
+revealEls.forEach(el=>io.observe(el));
+
+/* ---------------- prev/next module nav, from the shared registry ---------------- */
+(function(){
+  const { prev, next } = qmlGetAdjacentModules(10);
+  const wrap = document.getElementById('moduleNav');
+  function cardHTML(mod, dir){
+    if(!mod){
+      return '<div class="mn-card disabled '+dir+'"><span class="mn-eyebrow">'+(dir==='next'?'Up Next':'Previous')+'</span><span class="mn-title">\u2014 none \u2014</span></div>';
+    }
+    const available = !!mod.file;
+    const arrow = dir==='prev' ? '\u2190 ' : '';
+    const arrowEnd = dir==='next' ? ' \u2192' : '';
+    const eyebrow = (dir==='prev' ? 'Previous \u2014 Module '+mod.id : 'Up Next \u2014 Module '+mod.id) + (available ? '' : ' (Coming Soon)');
+    if(available){
+      return '<a class="mn-card enabled '+dir+'" href="'+mod.file+'">'
+        + '<span class="mn-eyebrow">'+eyebrow+'</span>'
+        + '<span class="mn-title">'+arrow+mod.title+arrowEnd+'</span>'
+        + '<span class="mn-arrow">Open tutorial</span>'
+        + '</a>';
+    }
+    return '<div class="mn-card disabled '+dir+'">'
+      + '<span class="mn-eyebrow">'+eyebrow+'</span>'
+      + '<span class="mn-title">'+mod.title+'</span>'
+      + '<span class="mn-arrow">Not published yet</span>'
+      + '</div>';
+  }
+  wrap.innerHTML = cardHTML(prev,'prev') + cardHTML(next,'next');
+
+  const continueBtn = document.getElementById('continueBtn');
+  if(continueBtn){
+    if(next && next.file){
+      continueBtn.href = next.file;
+      continueBtn.textContent = 'Continue to Module '+next.id+' \u2192';
+    } else if(next){
+      continueBtn.href = 'qml-roadmap-landing-page.html#curriculum';
+      continueBtn.textContent = 'Module '+next.id+' — Coming Soon';
+      continueBtn.style.opacity = '0.6';
+    }
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 1 — Introduction to Artificial Intelligence | QML Curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="modules-registry.js"></script>
+<style>
+:root{
+  --bg:#070b14; --bg-2:#0b111f; --panel:#0e1526; --panel-2:#101a2e;
+  --line:rgba(148,178,224,0.14); --line-strong:rgba(148,178,224,0.28);
+  --ink:#e9eef8; --ink-dim:#9fb0c9; --ink-faint:#5f7089;
+  --cyan:#5ad1e6; --cyan-dim:rgba(90,209,230,0.14);
+  --violet:#b39bff; --violet-dim:rgba(179,155,255,0.14);
+  --amber:#f2a341; --amber-dim:rgba(242,163,65,0.14);
+  --green:#5ee6a0; --green-dim:rgba(94,230,160,0.14);
+  --red:#f2726a; --red-dim:rgba(242,114,106,0.14);
+  --blue:#4fa3f7;
+  --serif:'Fraunces', Georgia, serif; --sans:'Inter', -apple-system, sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.7;}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto !important;}}
+.progress-rail{position:fixed; top:0; left:0; right:0; height:3px; background:var(--line); z-index:100;}
+.progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--violet),var(--amber)); transition:width .1s linear;}
+header{position:sticky; top:3px; z-index:60; backdrop-filter:blur(14px); background:rgba(7,11,20,0.82); border-bottom:1px solid var(--line);}
+.nav-wrap{max-width:1280px; margin:0 auto; padding:14px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+.back-link{display:flex; align-items:center; gap:8px; color:var(--ink-dim); text-decoration:none; font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; transition:color .2s;}
+.back-link:hover{color:var(--cyan);}
+.crumb{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); letter-spacing:0.06em; text-transform:uppercase;}
+.crumb b{color:var(--cyan);}
+.xp-badge{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12.5px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; color:var(--amber); background:var(--amber-dim);}
+.layout{max-width:1280px; margin:0 auto; padding:52px 32px 120px; display:grid; grid-template-columns:250px 1fr; gap:56px;}
+.sidebar{position:sticky; top:80px; align-self:start; height:fit-content;}
+.side-title{font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;}
+.side-list{list-style:none; display:flex; flex-direction:column; gap:2px;}
+.side-list a{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink-dim); font-size:13px; padding:9px 12px; border-radius:8px; border-left:2px solid transparent; transition:background .2s, color .2s, border-color .2s;}
+.side-list a:hover{background:var(--panel);}
+.side-list a.active{color:var(--ink); background:var(--panel); border-left-color:var(--cyan);}
+.side-dot{width:7px; height:7px; border-radius:50%; background:#2a3550; flex-shrink:0; transition:background .3s;}
+.side-dot.done{background:var(--green); box-shadow:0 0 6px var(--green);}
+.side-dot.warn{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+.tut-hero{margin-bottom:44px;}
+.module-eyebrow{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--cyan); background:var(--cyan-dim); margin-bottom:20px;}
+.tut-hero h1{font-family:var(--serif); font-weight:600; font-size:clamp(32px,4vw,46px); line-height:1.1; letter-spacing:-0.01em;}
+.tut-hero p.lede{margin-top:16px; color:var(--ink-dim); font-size:16px; max-width:660px;}
+.chip-row{display:flex; gap:8px; margin-top:22px; flex-wrap:wrap;}
+.chip{font-family:var(--mono); font-size:10.5px; letter-spacing:0.04em; color:var(--ink-faint); border:1px solid var(--line); padding:5px 11px; border-radius:100px;}
+.character-card{margin-top:28px; display:flex; gap:18px; align-items:center; padding:20px 22px; background:linear-gradient(120deg, rgba(90,209,230,0.08), rgba(179,155,255,0.05)); border:1px solid var(--line-strong); border-radius:14px;}
+.avatar-ring{width:56px; height:56px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1.5px solid var(--cyan); font-family:var(--serif); font-size:22px; color:var(--cyan);}
+.character-card .cname{font-weight:700; font-size:14.5px; color:var(--ink);}
+.character-card .crole{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:2px;}
+.character-card p{font-size:13.5px; color:var(--ink-dim); margin-top:6px;}
+.chapter{margin-bottom:80px; scroll-margin-top:90px;}
+.chapter-head{display:flex; align-items:center; gap:14px; margin-bottom:20px;}
+.chapter-icon{width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1px solid var(--line-strong); font-size:18px; color:var(--cyan); flex-shrink:0;}
+.chapter-num{font-family:var(--mono); font-size:12px; color:var(--ink-faint); letter-spacing:0.08em; display:block;}
+.chapter h2{font-family:var(--serif); font-weight:600; font-size:clamp(23px,2.8vw,30px); letter-spacing:-0.01em;}
+.story-panel{position:relative; margin:18px 0 24px; padding:20px 24px 20px 50px; border-radius:12px; background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--cyan); font-family:var(--serif); font-style:italic; font-size:15px; color:var(--ink-dim); line-height:1.7;}
+.story-panel::before{content:'\201C'; position:absolute; left:16px; top:6px; font-size:34px; color:var(--cyan); font-style:normal; opacity:0.6;}
+.story-panel b{color:var(--ink); font-style:normal;}
+.chapter > p.body-text{color:var(--ink-dim); font-size:15px; margin-bottom:16px;}
+.chapter > p.body-text b{color:var(--ink); font-weight:600;}
+.chapter ul.points{margin:16px 0 20px 0; padding-left:0; list-style:none; display:flex; flex-direction:column; gap:10px;}
+.chapter ul.points li{display:flex; gap:10px; font-size:14px; color:var(--ink-dim); padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px;}
+.chapter ul.points li::before{content:'\25C6'; color:var(--cyan); font-size:8px; margin-top:5px; flex-shrink:0;}
+.callout{margin:22px 0; padding:16px 18px; border-radius:10px; border-left:3px solid var(--violet); background:var(--violet-dim); font-size:13.5px; color:var(--ink-dim);}
+.callout b{color:var(--ink);}
+.visual-box{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:26px; margin:24px 0; overflow-x:auto;}
+.visual-label{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+
+/* flip-card grid (reused everywhere) */
+.encoding-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+.enc-card{perspective:1000px; height:120px; cursor:pointer;}
+.enc-inner{position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d;}
+.enc-card.flipped .enc-inner{transform:rotateY(180deg);}
+.enc-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:center; border:1px solid var(--line-strong);}
+.enc-front{background:var(--panel-2);}
+.enc-front .en{font-family:var(--mono); font-size:9.5px; color:var(--ink-faint); margin-bottom:4px;}
+.enc-front h6{font-size:12.5px; font-weight:700; color:var(--ink);}
+.enc-back{background:var(--panel); transform:rotateY(180deg); font-size:11px; color:var(--ink-dim); line-height:1.5;}
+@media (max-width:900px){.encoding-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:480px){.encoding-grid{grid-template-columns:1fr;}}
+
+/* "spot the AI" cards */
+.spot-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+@media (max-width:640px){.spot-grid{grid-template-columns:1fr;}}
+.spot-card{background:var(--panel-2); border:1px solid var(--line-strong); border-radius:12px; padding:16px 18px; cursor:pointer; transition:border-color .2s;}
+.spot-card:hover{border-color:var(--line-strong);}
+.spot-q{font-size:13.5px; color:var(--ink); font-weight:600; margin-bottom:8px;}
+.spot-btns{display:flex; gap:8px;}
+.spot-btn{font-family:var(--mono); font-size:11.5px; padding:7px 14px; border-radius:100px; border:1px solid var(--line-strong); background:transparent; color:var(--ink-dim); cursor:pointer; transition:all .2s;}
+.spot-btn.correct{background:var(--green-dim); border-color:var(--green); color:var(--green);}
+.spot-btn.incorrect{background:var(--red-dim); border-color:var(--red); color:var(--red);}
+.spot-explain{margin-top:10px; font-size:12px; color:var(--ink-faint); display:none;}
+.spot-explain.show{display:block;}
+
+/* timeline (reused) */
+.timeline{display:flex; gap:0; min-width:640px; position:relative; padding-top:10px;}
+.timeline::before{content:''; position:absolute; top:26px; left:0; right:0; height:2px; background:var(--line);}
+.tl-item{flex:1; text-align:center; position:relative;}
+.tl-dot{width:14px; height:14px; border-radius:50%; background:var(--panel); border:2px solid var(--cyan); margin:0 auto 14px; position:relative; z-index:2;}
+.tl-item:nth-child(even) .tl-dot{border-color:var(--violet);}
+.tl-year{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-bottom:4px;}
+.tl-label{font-size:12px; color:var(--ink-dim); max-width:110px; margin:0 auto;}
+
+/* type ladder (types of AI) */
+.ladder-cards{display:flex; flex-direction:column; gap:10px;}
+.ladder-card{padding:14px 18px; border-radius:10px; border:1px solid var(--line); background:var(--panel-2); display:flex; align-items:center; gap:14px;}
+.ladder-card .lc-tag{font-family:var(--mono); font-size:10px; letter-spacing:0.05em; text-transform:uppercase; padding:4px 10px; border-radius:100px; flex-shrink:0;}
+.lc-tag.narrow{background:var(--green-dim); color:var(--green);}
+.lc-tag.general{background:var(--amber-dim); color:var(--amber);}
+.lc-tag.super{background:var(--red-dim); color:var(--red);}
+.ladder-card h6{font-size:13.5px; font-weight:700; color:var(--ink);}
+.ladder-card p{font-size:12px; color:var(--ink-faint); margin-top:2px;}
+
+/* horizon cards (future of AI, reused from module 12) */
+.horizon-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+@media (max-width:800px){.horizon-grid{grid-template-columns:1fr;}}
+.horizon-card{background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:18px;}
+.horizon-card h5{font-family:var(--mono); font-size:11.5px; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink); margin-bottom:10px;}
+.horizon-card ul{list-style:none; display:flex; flex-direction:column; gap:8px;}
+.horizon-card li{font-size:12.5px; color:var(--ink-dim);}
+.htag{font-family:var(--mono); font-size:9px; letter-spacing:0.05em; text-transform:uppercase; padding:2px 7px; border-radius:100px; margin-right:6px; display:inline-block;}
+.htag.plausible{background:var(--cyan-dim); color:var(--cyan);}
+.htag.speculative{background:var(--amber-dim); color:var(--amber);}
+
+/* quiz (shared) */
+.quiz-box{margin-top:28px; background:var(--panel); border:1px solid var(--line-strong); border-radius:14px; padding:24px;}
+.quiz-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
+.quiz-title{font-family:var(--mono); font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--cyan); display:flex; align-items:center; gap:8px;}
+.quiz-score{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);}
+.q-item{margin-bottom:22px;}
+.q-item:last-child{margin-bottom:0;}
+.q-text{font-size:14px; font-weight:600; margin-bottom:12px; color:var(--ink);}
+.q-options{display:flex; flex-direction:column; gap:8px;}
+.q-opt{text-align:left; padding:11px 14px; border-radius:9px; border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-dim); font-size:13px; cursor:pointer; transition:border-color .2s, background .2s, color .2s; font-family:var(--sans);}
+.q-opt:hover:not(:disabled){border-color:var(--ink-dim); color:var(--ink);}
+.q-opt.correct{border-color:var(--green); background:var(--green-dim); color:var(--green);}
+.q-opt.incorrect{border-color:var(--red); background:var(--red-dim); color:var(--red);}
+.q-opt:disabled{cursor:default;}
+.q-explain{margin-top:10px; font-size:12.5px; color:var(--ink-dim); padding:11px 14px; border-radius:8px; background:var(--panel-2); border-left:2px solid var(--cyan); display:none;}
+.q-explain.show{display:block;}
+.chapter-status{margin-top:16px; padding:10px 14px; border-radius:8px; font-family:var(--mono); font-size:11.5px; display:none; align-items:center; gap:8px;}
+.chapter-status.show{display:flex;}
+.chapter-status.mastered{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.35);}
+.chapter-status.review{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.35);}
+.final-assess{margin-top:20px; background:linear-gradient(180deg,var(--panel-2),var(--panel)); border:1px solid var(--line-strong); border-radius:16px; padding:34px;}
+.final-head{margin-bottom:26px;}
+.final-head .module-eyebrow{color:var(--amber); border-color:var(--line-strong); background:var(--amber-dim);}
+.final-head h2{font-family:var(--serif); font-size:clamp(26px,3vw,34px); font-weight:600;}
+.final-head p{color:var(--ink-dim); margin-top:10px; font-size:14.5px;}
+.result-panel{margin-top:28px; padding:24px; border-radius:12px; border:1px solid var(--line-strong); background:var(--bg); display:none;}
+.result-panel.show{display:block;}
+.result-top{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:18px;}
+.result-score{font-family:var(--serif); font-size:44px; font-weight:600;}
+.result-badge{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; padding:6px 14px; border-radius:100px;}
+.result-badge.pass{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.4);}
+.result-badge.retry{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.4);}
+.recommend-list{list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+.recommend-list li{font-size:13px; color:var(--ink-dim); padding:10px 12px; background:var(--panel-2); border-radius:8px; border:1px solid var(--line);}
+.result-actions{display:flex; gap:12px; margin-top:22px; flex-wrap:wrap;}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:9px; font-size:13.5px; font-weight:600; text-decoration:none; cursor:pointer; border:1px solid transparent; transition:transform .2s, box-shadow .2s;}
+.btn-primary{background:var(--blue); color:#04101f;}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 26px -8px rgba(79,163,247,0.5);}
+.btn-ghost{background:transparent; border-color:var(--line-strong); color:var(--ink);}
+.btn-ghost:hover{border-color:var(--ink-dim); transform:translateY(-2px);}
+.reveal{opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease;}
+.reveal.in{opacity:1; transform:translateY(0);}
+.module-nav{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:70px; padding-top:36px; border-top:1px solid var(--line);}
+.mn-card{display:flex; flex-direction:column; gap:6px; padding:20px 22px; border-radius:14px; background:var(--panel); border:1px solid var(--line); text-decoration:none; transition:border-color .25s, transform .25s;}
+.mn-card.enabled:hover{border-color:var(--line-strong); transform:translateY(-3px);}
+.mn-card.disabled{opacity:0.5; cursor:default;}
+.mn-card.next{align-items:flex-end; text-align:right;}
+.mn-eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint);}
+.mn-title{font-family:var(--serif); font-size:16px; font-weight:600; color:var(--ink);}
+.mn-arrow{font-family:var(--mono); font-size:12px; color:var(--cyan);}
+@media (max-width:700px){.module-nav{grid-template-columns:1fr;}}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static; display:flex; overflow-x:auto; gap:4px; padding-bottom:10px;}
+  .side-list{flex-direction:row;}
+  .side-list a{white-space:nowrap;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-rail"><div class="progress-fill" id="progressFill"></div></div>
+
+<header>
+  <div class="nav-wrap">
+    <a class="back-link" href="qml-roadmap-landing-page.html#curriculum">← Back to Curriculum</a>
+    <div class="crumb">LEVEL 1 · BEGINNER — <b>MODULE 1</b></div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a class="back-link" href="progress-hub.html">My Progress</a>
+      <div class="xp-badge">⚡ <span id="xpCount">0</span> XP</div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="side-title">Module 1 Chapters</div>
+    <ul class="side-list" id="sideList">
+      <li><a href="#ch1" data-target="ch1"><span class="side-dot" id="dot-ch1"></span>What is AI?</a></li>
+      <li><a href="#ch2" data-target="ch2"><span class="side-dot" id="dot-ch2"></span>History and Evolution of AI</a></li>
+      <li><a href="#ch3" data-target="ch3"><span class="side-dot" id="dot-ch3"></span>Types of AI</a></li>
+      <li><a href="#ch4" data-target="ch4"><span class="side-dot" id="dot-ch4"></span>AI Applications</a></li>
+      <li><a href="#ch5" data-target="ch5"><span class="side-dot" id="dot-ch5"></span>Future of AI</a></li>
+      <li><a href="#final" data-target="final"><span class="side-dot" id="dot-final"></span>Module Assessment</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <div class="tut-hero reveal">
+      <div class="module-eyebrow">◆ Module 1 · Beginner</div>
+      <h1>Introduction to Artificial Intelligence</h1>
+      <p class="lede">No math, no code, no assumptions — just the first honest answer to a question everyone asks eventually: what actually is AI, and how did we get here?</p>
+      <div class="chip-row">
+        <span class="chip">5 Chapters</span>
+        <span class="chip">Zero Prior Knowledge Needed</span>
+        <span class="chip">15 Quick-Check Questions</span>
+        <span class="chip">1 Adaptive Assessment</span>
+        <span class="chip">~30 min</span>
+      </div>
+      <div class="character-card">
+        <div class="avatar-ring">A</div>
+        <div>
+          <div class="cname">Meet Alex</div>
+          <div class="crole">Curious Beginner · Day One</div>
+          <p>Alex has heard "AI" used to describe everything from a chess app to the end of the world, and wants to know what the word actually means before believing either headline.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAPTER 1 -->
+    <section class="chapter reveal" id="ch1">
+      <div class="chapter-head"><div class="chapter-icon">?</div><div><span class="chapter-num">CHAPTER 01</span><h2>What is AI?</h2></div></div>
+      <div class="story-panel">Alex asks a friend who works in tech: "So what actually <i>is</i> AI?" The friend laughs. <b>"Honestly? The definition keeps moving."</b> Whatever computers can't quite do yet gets called AI; the moment it becomes routine, people stop calling it that.</div>
+      <p class="body-text"><b>Artificial Intelligence</b> is the field of building systems that perform tasks which normally require human intelligence — recognizing images, understanding language, making decisions, learning from experience. It is a moving target on purpose: yesterday's cutting-edge AI (like a chess engine) is today's unremarkable software feature.</p>
+      <p class="body-text">Try the game below — for each example, guess whether it counts as "AI" before checking the answer.</p>
+      <div class="visual-box">
+        <div class="visual-label">Spot the AI</div>
+        <div class="spot-grid" id="spotGrid"></div>
+      </div>
+      <ul class="points">
+        <li><b>AI is not one thing.</b> It is an umbrella term covering many different techniques aimed at the same broad goal: making machines act intelligently.</li>
+        <li><b>"Intelligent" is doing a lot of work in that sentence.</b> Most AI systems are narrowly skilled at one task, not broadly smart the way a person is.</li>
+        <li><b>The "AI effect":</b> once a capability becomes common and well-understood, people often stop calling it AI at all — a moving goalpost worth noticing.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Before worrying about whether AI is good or bad, get comfortable with the fact that the word itself is a fuzzy, shifting category — not a single technology.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch1">0 / 3</div></div>
+        <div id="quiz-ch1"></div>
+        <div class="chapter-status" id="status-ch1"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 2 -->
+    <section class="chapter reveal" id="ch2">
+      <div class="chapter-head"><div class="chapter-icon">◷</div><div><span class="chapter-num">CHAPTER 02</span><h2>History and Evolution of AI</h2></div></div>
+      <div class="story-panel">Alex assumed AI was a recent invention — maybe ten years old. The friend pulls up a timeline going back over seventy years, full of excitement, disappointment, and quiet comebacks. <b>"AI has boomed and gone bust more than once already,"</b> the friend says. "This isn't its first rodeo."</div>
+      <p class="body-text">The field has moved in waves — bursts of excitement (and funding) followed by "AI winters" when progress stalled and interest cooled, followed eventually by a fresh breakthrough that restarted everything.</p>
+      <div class="visual-box">
+        <div class="visual-label">Seven Decades, at a Glance</div>
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">1950</div><div class="tl-label">Turing asks "Can machines think?"</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">1956</div><div class="tl-label">Dartmouth Conference coins "Artificial Intelligence"</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">1970s-80s</div><div class="tl-label">First "AI winters" as early hype outran results</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">1997</div><div class="tl-label">Deep Blue beats world chess champion Kasparov</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2012</div><div class="tl-label">Deep learning breaks through on image recognition</div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2020s</div><div class="tl-label">Large language models reach the mainstream</div></div>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>1956</b> is usually treated as AI's official "birth" — the Dartmouth Conference, where the term itself was coined.</li>
+        <li><b>AI winters</b> happened when early promises (like fully automated translation) outran what the technology of the time could deliver.</li>
+        <li><b>2012 onward</b> marked a real, lasting shift — deep learning finally delivered on decades-old ambitions, thanks to more data and more computing power arriving at once.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> AI's history is not a straight line of progress — it is a story of overpromising, disappointment, and eventually, real breakthroughs arriving later than expected but bigger than hoped.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch2">0 / 3</div></div>
+        <div id="quiz-ch2"></div>
+        <div class="chapter-status" id="status-ch2"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 3 -->
+    <section class="chapter reveal" id="ch3">
+      <div class="chapter-head"><div class="chapter-icon">▤</div><div><span class="chapter-num">CHAPTER 03</span><h2>Types of AI</h2></div></div>
+      <div class="story-panel">"Every AI you've ever used," the friend says, "is what's called <b>Narrow AI</b>." Alex looks confused — narrow doesn't sound like the word people use for AI that seems to write essays and hold conversations. "That's exactly the confusion this chapter is going to clear up."</div>
+      <p class="body-text">The most useful split isn't about how impressive a system seems — it's about how broadly its intelligence actually generalizes.</p>
+      <div class="visual-box">
+        <div class="visual-label">Three Categories, Only One of Which Exists Today</div>
+        <div class="ladder-cards">
+          <div class="ladder-card"><span class="lc-tag narrow">Exists Today</span><div><h6>Narrow AI (ANI)</h6><p>Skilled at one specific task — chess, translation, image recognition, even writing text — but with no general understanding outside that task. Every AI system in use today, including large language models, falls in this category.</p></div></div>
+          <div class="ladder-card"><span class="lc-tag general">Hypothetical</span><div><h6>General AI (AGI)</h6><p>Would match human-level intelligence across essentially any task, the way a person can learn to cook, do math, and hold a conversation without being separately "trained" for each. This does not exist yet, despite how some marketing language talks about current systems.</p></div></div>
+          <div class="ladder-card"><span class="lc-tag super">Speculative</span><div><h6>Superintelligence (ASI)</h6><p>A hypothetical intelligence exceeding human ability across every domain. Purely speculative and often the subject of debate among researchers about if or when it might be possible.</p></div></div>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>Narrow AI</b> can look extremely impressive within its lane and still have zero understanding outside it.</li>
+        <li><b>General AI</b> is the sci-fi idea of a single system that can do what any human can do — genuinely useful as a concept, not something in production today.</li>
+        <li>Confusing narrow AI's fluency (like a chatbot's conversational skill) for general intelligence is one of the most common misunderstandings about the field.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> When someone says "AI," ask yourself which type they actually mean — the gap between narrow and general AI is the single most important distinction in this whole field.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch3">0 / 3</div></div>
+        <div id="quiz-ch3"></div>
+        <div class="chapter-status" id="status-ch3"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 4 -->
+    <section class="chapter reveal" id="ch4">
+      <div class="chapter-head"><div class="chapter-icon">⬡</div><div><span class="chapter-num">CHAPTER 04</span><h2>AI Applications</h2></div></div>
+      <div class="story-panel">"Once you know to look for it," the friend says, "narrow AI is everywhere — not just in flashy demos." Alex starts noticing it in the next five minutes: the phone's keyboard predicting words, a streaming app's recommendations, a spam folder quietly doing its job.</div>
+      <p class="body-text">Narrow AI has quietly become infrastructure across nearly every industry. Tap each card below.</p>
+      <div class="visual-box">
+        <div class="visual-label">Where AI Already Shows Up — Tap Each Card</div>
+        <div class="encoding-grid" id="applicationsGrid"></div>
+      </div>
+      <ul class="points">
+        <li><b>Most AI applications are invisible by design</b> — spam filters and fraud detection work best when you never notice them at all.</li>
+        <li><b>The same underlying techniques repeat across industries</b> — pattern recognition and prediction show up in healthcare, finance, and entertainment alike.</li>
+        <li>This course is specifically about the machine learning techniques (Module 2 onward) that power almost every example above.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> AI is less a single dramatic invention and more a toolkit that has quietly spread into nearly every industry, one narrow task at a time.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch4">0 / 3</div></div>
+        <div id="quiz-ch4"></div>
+        <div class="chapter-status" id="status-ch4"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 5 -->
+    <section class="chapter reveal" id="ch5">
+      <div class="chapter-head"><div class="chapter-icon">◑</div><div><span class="chapter-num">CHAPTER 05</span><h2>Future of AI</h2></div></div>
+      <div class="story-panel">Last question before Alex moves on: "So where is this all going?" The friend pauses. <b>"I'll tell you what I think — and exactly how sure I am about each part,"</b> the same honesty this whole course tries to model, right from Module 1.</div>
+      <p class="body-text">Every item below is labeled by confidence, not certainty.</p>
+      <div class="visual-box">
+        <div class="visual-label">Three Horizons, Honestly Labeled</div>
+        <div class="horizon-grid">
+          <div class="horizon-card">
+            <h5>Near-Term</h5>
+            <ul>
+              <li><span class="htag plausible">Plausible</span>AI tools becoming a normal part of everyday work, the way spreadsheets did</li>
+              <li><span class="htag plausible">Plausible</span>Continued rapid improvement in language and image generation</li>
+            </ul>
+          </div>
+          <div class="horizon-card">
+            <h5>Mid-Term</h5>
+            <ul>
+              <li><span class="htag speculative">Speculative</span>AI systems handling increasingly complex, multi-step tasks reliably</li>
+              <li><span class="htag speculative">Speculative</span>Clearer regulation and standards as adoption grows</li>
+            </ul>
+          </div>
+          <div class="horizon-card">
+            <h5>Long-Term</h5>
+            <ul>
+              <li><span class="htag speculative">Speculative</span>Progress toward more general-purpose AI capabilities</li>
+              <li><span class="htag speculative">Speculative</span>Continued, genuine scientific disagreement about timelines</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>Nobody knows for certain</b> — reputable researchers disagree meaningfully about how fast capabilities will improve.</li>
+        <li><b>Confident predictions in either direction</b> (utopia or catastrophe) deserve extra scrutiny — this field has a long history of both being wrong.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> The most trustworthy answer to "what happens next with AI" is usually the one that admits genuine uncertainty — a habit worth carrying through the rest of this course.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch5">0 / 3</div></div>
+        <div id="quiz-ch5"></div>
+        <div class="chapter-status" id="status-ch5"></div>
+      </div>
+    </section>
+
+    <!-- FINAL ASSESSMENT -->
+    <section class="chapter reveal" id="final">
+      <div class="final-assess">
+        <div class="final-head">
+          <div class="module-eyebrow">◆ Adaptive Assessment</div>
+          <h2>Module 1 Assessment</h2>
+          <p>Five synthesis questions, one per chapter. Your result adapts to your whole session — chapters where you struggled above get flagged for review here.</p>
+        </div>
+        <div id="quiz-final"></div>
+        <div class="result-panel" id="resultPanel">
+          <div class="result-top">
+            <div><div class="result-score" id="resultScore">0%</div><div class="quiz-score" id="resultDetail">0 / 5 correct</div></div>
+            <div class="result-badge" id="resultBadge"></div>
+          </div>
+          <div id="recommendWrap"></div>
+          <div class="result-actions">
+            <a href="qml-roadmap-landing-page.html#curriculum" class="btn btn-ghost">← Back to Curriculum</a>
+            <a href="#" class="btn btn-primary" id="continueBtn">Continue to Module 2 →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="module-nav" id="moduleNav"></div>
+  </main>
+</div>
+
+<script>
+let state = { xp:0, chapters:{
+  ch1:{correct:0,total:3,done:false}, ch2:{correct:0,total:3,done:false}, ch3:{correct:0,total:3,done:false},
+  ch4:{correct:0,total:3,done:false}, ch5:{correct:0,total:3,done:false}
+}, finalDone:false };
+try{ const saved = localStorage.getItem('qml_module1_state'); if(saved) state = JSON.parse(saved); }catch(e){}
+function saveState(){ try{ localStorage.setItem('qml_module1_state', JSON.stringify(state)); }catch(e){} }
+function addXP(n){ state.xp += n; document.getElementById('xpCount').textContent = state.xp; saveState(); }
+document.getElementById('xpCount').textContent = state.xp;
+
+/* CH1: Spot the AI */
+const spotItems = [
+  {q:"A spam filter that learns which emails you mark as junk", isAI:true, explain:"Yes — it learns patterns from your behavior rather than following a fixed list of rules."},
+  {q:"A basic calculator adding two numbers", isAI:false, explain:"No — it follows a fixed arithmetic rule with no learning or pattern recognition involved."},
+  {q:"A streaming app recommending what to watch next", isAI:true, explain:"Yes — recommendation systems learn patterns from viewing history to make predictions."},
+  {q:"A digital alarm clock going off at a set time", isAI:false, explain:"No — it is just a timer following a fixed instruction, not adapting to anything."},
+  {q:"A photo app that automatically recognizes faces", isAI:true, explain:"Yes — face recognition uses learned patterns from many training images."},
+  {q:"A thermostat that turns on the heat below a set temperature", isAI:false, explain:"No — this is a simple fixed rule (if below X, turn on), not a learned pattern."}
+];
+(function(){
+  const grid = document.getElementById('spotGrid');
+  spotItems.forEach((item,idx)=>{
+    const card = document.createElement('div');
+    card.className = 'spot-card';
+    card.innerHTML = '<div class="spot-q">'+item.q+'</div>'
+      + '<div class="spot-btns"><button class="spot-btn" data-ans="true">AI</button><button class="spot-btn" data-ans="false">Not AI</button></div>'
+      + '<div class="spot-explain">'+item.explain+'</div>';
+    grid.appendChild(card);
+    const btns = card.querySelectorAll('.spot-btn');
+    const explain = card.querySelector('.spot-explain');
+    btns.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const guess = btn.dataset.ans === 'true';
+        btns.forEach(b=>b.disabled=true);
+        if(guess === item.isAI){ btn.classList.add('correct'); addXP(2); }
+        else {
+          btn.classList.add('incorrect');
+          btns.forEach(b=>{ if((b.dataset.ans==='true')===item.isAI) b.classList.add('correct'); });
+        }
+        explain.classList.add('show');
+      });
+    });
+  });
+})();
+
+/* CH4: applications flip grid */
+const applicationsData = [
+  {en:'01', name:'Healthcare', desc:'Diagnostic imaging assistance and early disease detection from patient data.'},
+  {en:'02', name:'Transportation', desc:'Route optimization, traffic prediction, and driver-assist / autonomous vehicle features.'},
+  {en:'03', name:'Finance', desc:'Fraud detection, algorithmic trading, and credit risk scoring.'},
+  {en:'04', name:'Entertainment', desc:'Recommendation systems for music, video, and social media feeds.'},
+  {en:'05', name:'Retail', desc:'Demand forecasting, personalized product suggestions, and inventory management.'},
+  {en:'06', name:'Customer Service', desc:'Chatbots and automated support routing for common questions.'},
+  {en:'07', name:'Agriculture', desc:'Crop health monitoring and yield prediction from satellite and sensor data.'},
+  {en:'08', name:'Security', desc:'Anomaly detection in network traffic and access patterns.'}
+];
+(function(){
+  const grid = document.getElementById('applicationsGrid');
+  applicationsData.forEach(e=>{
+    const card = document.createElement('div');
+    card.className = 'enc-card';
+    card.innerHTML = '<div class="enc-inner">'
+      + '<div class="enc-face enc-front"><div class="en">'+e.en+'</div><h6>'+e.name+'</h6></div>'
+      + '<div class="enc-face enc-back">'+e.desc+'</div>'
+      + '</div>';
+    card.addEventListener('click', ()=>{ card.classList.toggle('flipped'); addXP(1); });
+    grid.appendChild(card);
+  });
+})();
+
+/* quiz data */
+const quizzes = {
+  ch1: [
+    {q:"Why is the definition of AI described as a 'moving target'?", opts:["It never changes at all","Once a capability becomes routine and well-understood, people often stop calling it AI","AI is a fixed, permanent legal term","It only refers to robots"], correct:1, explain:"This is the 'AI effect' — yesterday's cutting-edge AI often becomes 'just software' once it's common."},
+    {q:"What does the Spot the AI game mainly illustrate?", opts:["That all software is AI","That AI specifically involves learning patterns from data or experience, not just following a fixed rule","That calculators are the most advanced AI","That AI cannot be identified at all"], correct:1, explain:"The key distinction throughout the game was learned/adaptive behavior versus a fixed, unchanging rule."},
+    {q:"Is a basic calculator considered AI in this chapter's framing?", opts:["Yes, always","No — it follows a fixed rule with no learning involved","Only on weekends","Only if it has a screen"], correct:1, explain:"Fixed arithmetic operations don't involve learning from data, so they don't fit this chapter's definition of AI."}
+  ],
+  ch2: [
+    {q:"What event is usually treated as AI's official 'birth' as a field?", opts:["The invention of the smartphone","The 1956 Dartmouth Conference, where the term was coined","The release of the first video game","World War II"], correct:1, explain:"This is where the term 'Artificial Intelligence' itself was first coined."},
+    {q:"What was an 'AI winter'?", opts:["A season when AI researchers took vacation","A period when early hype outran results, funding dried up, and progress stalled","A type of weather-prediction AI","A yearly AI conference"], correct:1, explain:"AI winters happened when overpromising met underdelivering, more than once in the field's history."},
+    {q:"What made 2012 a major turning point for AI?", opts:["Nothing significant happened","Deep learning broke through on image recognition, thanks to more data and computing power","The first computer was invented","AI research was banned"], correct:1, explain:"This is widely seen as the start of the current, sustained deep learning boom."}
+  ],
+  ch3: [
+    {q:"What category does every AI system in use today, including chatbots, fall into?", opts:["Superintelligence (ASI)","Narrow AI (ANI)","General AI (AGI)","None of these categories exist yet"], correct:1, explain:"Even very fluent systems remain narrow — skilled at specific tasks, without general, human-like understanding."},
+    {q:"What would General AI (AGI) be able to do that Narrow AI cannot?", opts:["Nothing different at all","Match human-level intelligence and learn across essentially any task, not just one","Only play chess","Only exist in movies"], correct:1, explain:"AGI is the hypothetical ability to generalize across tasks the way a person naturally does."},
+    {q:"What is a common misunderstanding this chapter warns about?", opts:["That narrow AI exists","Mistaking a narrow AI's fluency (like conversational skill) for general intelligence","That AI has no types at all","That AGI already exists everywhere"], correct:1, explain:"A system sounding impressively human doesn't mean it has general, human-like intelligence underneath."}
+  ],
+  ch4: [
+    {q:"Why are most successful AI applications described as 'invisible by design'?", opts:["They are illegal to mention","They work best when you never notice them, like spam filters or fraud detection running quietly","They don't actually exist","They are always visible and loud"], correct:1, explain:"Good spam filtering or fraud detection is often only noticed when it fails, not when it succeeds."},
+    {q:"What do healthcare, finance, and entertainment AI applications have in common, per this chapter?", opts:["Nothing at all","They often rely on the same underlying pattern-recognition and prediction techniques, applied to different data","They are entirely unrelated technologies","They all require the exact same dataset"], correct:1, explain:"The same core toolkit (covered starting in Module 2) repeats across very different industries."},
+    {q:"What does this course focus on that powers most of these applications?", opts:["Web design only","Machine learning techniques, starting in Module 2","Only quantum computing","Nothing related to any application"], correct:1, explain:"Module 2 onward zooms into exactly the machine learning ideas behind these narrow AI applications."}
+  ],
+  ch5: [
+    {q:"How does this chapter frame predictions about AI's future?", opts:["As guaranteed facts","As labeled, varying-confidence possibilities, not certainties","As entirely impossible to discuss","As already fully realized today"], correct:1, explain:"Every item in the horizon cards carries an explicit Plausible or Speculative tag."},
+    {q:"What is a plausible near-term development mentioned in this chapter?", opts:["Guaranteed superintelligence within a year","AI tools becoming a normal part of everyday work, similar to how spreadsheets did","The end of all uncertainty about AI","Complete agreement among all researchers"], correct:1, explain:"Listed in the Near-Term horizon card, tagged Plausible."},
+    {q:"Why does this chapter avoid confident long-term predictions?", opts:["Because confident predictions are always right","Because genuine honesty means labeling speculation as speculation, especially on a topic experts genuinely disagree about","Long-term predictions are irrelevant","This chapter secretly guarantees a specific outcome"], correct:1, explain:"Reputable researchers meaningfully disagree on AI timelines — a good reason for humility here."}
+  ]
+};
+const finalQuiz = [
+  {q:"What is the best one-line definition of AI from this module?", opts:["A single, fixed piece of software that never changes","A broad, shifting field of systems built to perform tasks that normally require human intelligence","Only robots with human faces","A legal category with a fixed definition"], correct:1, explain:"Chapter 1's central, deliberately broad definition."},
+  {q:"What pattern describes AI's historical progress?", opts:["A single steady line of improvement with no setbacks","Waves of hype and 'AI winters' followed eventually by real breakthroughs","No history exists before 2020","Constant, unbroken decline"], correct:1, explain:"Chapter 2's timeline shows booms, busts, and eventual real progress."},
+  {q:"What is the most important type distinction covered in this module?", opts:["Between fast AI and slow AI","Between Narrow AI, which exists today, and General AI, which does not yet","Between red AI and blue AI","There is no meaningful distinction"], correct:1, explain:"Chapter 3's central point, and one of the most common sources of public confusion about AI."},
+  {q:"What do most successful real-world AI applications have in common?", opts:["They are always dramatic and visible","They often work quietly in the background across many industries, built on shared pattern-recognition techniques","They only exist in research labs","They require no data at all"], correct:1, explain:"Chapter 4's tour across healthcare, finance, transportation, and more."},
+  {q:"How should predictions about AI's future be treated, per this module?", opts:["As guaranteed outcomes","As labeled possibilities of varying confidence, given genuine expert disagreement","As entirely fictional and irrelevant","As already resolved with total certainty"], correct:1, explain:"Chapter 5's honest framing, a habit this course returns to again and again."}
+];
+
+function renderQuiz(containerId, items, chapterKey){
+  const container = document.getElementById(containerId);
+  items.forEach((item, idx)=>{
+    const qDiv = document.createElement('div');
+    qDiv.className = 'q-item';
+    qDiv.innerHTML = '<div class="q-text">'+(idx+1)+'. '+item.q+'</div>'
+      + '<div class="q-options">'+item.opts.map((o,i)=>'<button class="q-opt" data-i="'+i+'">'+o+'</button>').join('')+'</div>'
+      + '<div class="q-explain">'+item.explain+'</div>';
+    container.appendChild(qDiv);
+    const buttons = qDiv.querySelectorAll('.q-opt');
+    const explainEl = qDiv.querySelector('.q-explain');
+    buttons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = parseInt(btn.dataset.i);
+        buttons.forEach(b=>b.disabled = true);
+        if(i === item.correct){
+          btn.classList.add('correct');
+          if(chapterKey) onCorrect(chapterKey); else onFinalAnswer(idx, true);
+        } else {
+          btn.classList.add('incorrect');
+          buttons[item.correct].classList.add('correct');
+          if(chapterKey) onIncorrect(chapterKey); else onFinalAnswer(idx, false);
+        }
+        explainEl.classList.add('show');
+      });
+    });
+  });
+}
+Object.keys(quizzes).forEach(key=>{ renderQuiz('quiz-'+key, quizzes[key], key); updateChapterScore(key); });
+renderQuiz('quiz-final', finalQuiz, null);
+
+function updateChapterScore(key){ document.getElementById('score-'+key).textContent = state.chapters[key].correct+' / '+state.chapters[key].total; }
+function onCorrect(key){ const s=state.chapters[key]; s.correct=Math.min(s.correct+1,s.total); addXP(10); checkChapterDone(key); updateChapterScore(key); saveState(); }
+function onIncorrect(key){ state.chapters[key].hadMiss=true; checkChapterDone(key); updateChapterScore(key); saveState(); }
+let answeredCount = { ch1:0, ch2:0, ch3:0, ch4:0, ch5:0 };
+function checkChapterDone(key){
+  answeredCount[key]++;
+  const s = state.chapters[key];
+  if(answeredCount[key] >= s.total){
+    s.done = true;
+    const dot = document.getElementById('dot-'+key), statusEl = document.getElementById('status-'+key);
+    statusEl.classList.add('show');
+    if(s.hadMiss){ dot.classList.add('warn'); statusEl.classList.add('review'); statusEl.innerHTML='\u26A0 Review suggested \u2014 you missed at least one question in this chapter.'; }
+    else { dot.classList.add('done'); statusEl.classList.add('mastered'); statusEl.innerHTML='\u2713 Mastered \u2014 perfect score on this chapter.'; addXP(15); }
+    saveState();
+  }
+}
+let finalAnswers = [];
+function onFinalAnswer(idx, correct){
+  finalAnswers[idx]=correct;
+  if(finalAnswers.filter(a=>a!==undefined).length === finalQuiz.length) showFinalResult();
+}
+function showFinalResult(){
+  const correctCount = finalAnswers.filter(a=>a===true).length;
+  const pct = Math.round((correctCount/finalQuiz.length)*100);
+  document.getElementById('resultScore').textContent = pct+'%';
+  document.getElementById('resultDetail').textContent = correctCount+' / '+finalQuiz.length+' correct';
+  const badge = document.getElementById('resultBadge');
+  const pass = pct >= 70;
+  badge.textContent = pass ? 'Passed' : 'Retry Recommended';
+  badge.className = 'result-badge ' + (pass ? 'pass' : 'retry');
+  addXP(correctCount*10 + (pass?25:0));
+  const weakChapters = Object.keys(state.chapters).filter(k => state.chapters[k].hadMiss);
+  const wrap = document.getElementById('recommendWrap');
+  if(weakChapters.length === 0 && pass){
+    wrap.innerHTML = '<div class="callout" style="margin-top:4px;"><b>Great work.</b> No flagged chapters and a passing score \u2014 you are ready for Module 2: Why Machine Learning?</div>';
+  } else {
+    const names = { ch1:"What is AI?", ch2:"History and Evolution of AI", ch3:"Types of AI", ch4:"AI Applications", ch5:"Future of AI" };
+    let html = '<div class="visual-label" style="margin-top:18px;">Recommended Review</div><ul class="recommend-list">';
+    weakChapters.forEach(k=> html += '<li>\u21BA Revisit <b>'+names[k]+'</b> \u2014 a quick-check answer there was missed.</li>');
+    if(!pass){ html += '<li>\u21BA Your assessment score was below 70% \u2014 consider re-reading the callout boxes first.</li>'; }
+    html += '</ul>';
+    wrap.innerHTML = html;
+  }
+  document.getElementById('resultPanel').classList.add('show');
+  document.getElementById('dot-final').classList.add(pass ? 'done' : 'warn');
+  state.finalDone = true;
+  saveState();
+}
+
+const sections = document.querySelectorAll('.chapter');
+const sideLinks = document.querySelectorAll('.side-list a');
+const spyObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      sideLinks.forEach(a=>a.classList.remove('active'));
+      const link = document.querySelector('.side-list a[data-target="'+entry.target.id+'"]');
+      if(link) link.classList.add('active');
+    }
+  });
+},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>spyObserver.observe(s));
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  document.getElementById('progressFill').style.width = ((h.scrollTop)/(h.scrollHeight-h.clientHeight)*100)+'%';
+});
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{ entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }); },{threshold:0.08});
+revealEls.forEach(el=>io.observe(el));
+
+(function(){
+  const { prev, next } = qmlGetAdjacentModules(1);
+  const wrap = document.getElementById('moduleNav');
+  function cardHTML(mod, dir){
+    if(!mod) return '<div class="mn-card disabled '+dir+'"><span class="mn-eyebrow">'+(dir==='next'?'Up Next':'Previous')+'</span><span class="mn-title">\u2014 none \u2014</span></div>';
+    const available = !!mod.file;
+    const arrow = dir==='prev' ? '\u2190 ' : ''; const arrowEnd = dir==='next' ? ' \u2192' : '';
+    const eyebrow = (dir==='prev' ? 'Previous \u2014 Module '+mod.id : 'Up Next \u2014 Module '+mod.id) + (available ? '' : ' (Coming Soon)');
+    if(available) return '<a class="mn-card enabled '+dir+'" href="'+mod.file+'"><span class="mn-eyebrow">'+eyebrow+'</span><span class="mn-title">'+arrow+mod.title+arrowEnd+'</span><span class="mn-arrow">Open tutorial</span></a>';
+    return '<div class="mn-card disabled '+dir+'"><span class="mn-eyebrow">'+eyebrow+'</span><span class="mn-title">'+mod.title+'</span><span class="mn-arrow">Not published yet</span></div>';
+  }
+  wrap.innerHTML = cardHTML(prev,'prev') + cardHTML(next,'next');
+  const continueBtn = document.getElementById('continueBtn');
+  if(continueBtn){
+    if(next && next.file){ continueBtn.href = next.file; continueBtn.textContent = 'Continue to Module '+next.id+' \u2192'; }
+    else if(next){ continueBtn.href = 'qml-roadmap-landing-page.html#curriculum'; continueBtn.textContent = 'Module '+next.id+' — Coming Soon'; continueBtn.style.opacity='0.6'; }
+  }
+})();
+</script>
+
+</body>
+</html>

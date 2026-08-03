@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 11 — Advanced Quantum Machine Learning | QML Curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="modules-registry.js"></script>
+<style>
+:root{
+  --bg:#070b14; --bg-2:#0b111f; --panel:#0e1526; --panel-2:#101a2e;
+  --line:rgba(148,178,224,0.14); --line-strong:rgba(148,178,224,0.28);
+  --ink:#e9eef8; --ink-dim:#9fb0c9; --ink-faint:#5f7089;
+  --cyan:#5ad1e6; --cyan-dim:rgba(90,209,230,0.14);
+  --violet:#b39bff; --violet-dim:rgba(179,155,255,0.14);
+  --amber:#f2a341; --amber-dim:rgba(242,163,65,0.14);
+  --green:#5ee6a0; --green-dim:rgba(94,230,160,0.14);
+  --red:#f2726a; --red-dim:rgba(242,114,106,0.14);
+  --blue:#4fa3f7;
+  --serif:'Fraunces', Georgia, serif; --sans:'Inter', -apple-system, sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.7;}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto !important;}}
+
+.progress-rail{position:fixed; top:0; left:0; right:0; height:3px; background:var(--line); z-index:100;}
+.progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--violet),var(--amber)); transition:width .1s linear;}
+
+header{position:sticky; top:3px; z-index:60; backdrop-filter:blur(14px); background:rgba(7,11,20,0.82); border-bottom:1px solid var(--line);}
+.nav-wrap{max-width:1280px; margin:0 auto; padding:14px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+.back-link{display:flex; align-items:center; gap:8px; color:var(--ink-dim); text-decoration:none; font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; transition:color .2s;}
+.back-link:hover{color:var(--cyan);}
+.crumb{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); letter-spacing:0.06em; text-transform:uppercase;}
+.crumb b{color:var(--amber);}
+.xp-badge{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12.5px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; color:var(--amber); background:var(--amber-dim);}
+
+.layout{max-width:1280px; margin:0 auto; padding:52px 32px 120px; display:grid; grid-template-columns:260px 1fr; gap:56px;}
+.sidebar{position:sticky; top:80px; align-self:start; height:fit-content; max-height:calc(100vh - 100px); overflow-y:auto;}
+.side-title{font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;}
+.side-list{list-style:none; display:flex; flex-direction:column; gap:1px;}
+.side-list a{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink-dim); font-size:12.5px; padding:8px 12px; border-radius:8px; border-left:2px solid transparent; transition:background .2s, color .2s, border-color .2s;}
+.side-list a:hover{background:var(--panel);}
+.side-list a.active{color:var(--ink); background:var(--panel); border-left-color:var(--amber);}
+.side-dot{width:7px; height:7px; border-radius:50%; background:#2a3550; flex-shrink:0; transition:background .3s;}
+.side-dot.done{background:var(--green); box-shadow:0 0 6px var(--green);}
+.side-dot.warn{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+
+.tut-hero{margin-bottom:44px;}
+.module-eyebrow{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--amber); background:var(--amber-dim); margin-bottom:20px;}
+.tut-hero h1{font-family:var(--serif); font-weight:600; font-size:clamp(30px,4vw,44px); line-height:1.1; letter-spacing:-0.01em;}
+.tut-hero p.lede{margin-top:16px; color:var(--ink-dim); font-size:16px; max-width:660px;}
+.chip-row{display:flex; gap:8px; margin-top:22px; flex-wrap:wrap;}
+.chip{font-family:var(--mono); font-size:10.5px; letter-spacing:0.04em; color:var(--ink-faint); border:1px solid var(--line); padding:5px 11px; border-radius:100px;}
+
+.character-card{margin-top:28px; display:flex; gap:18px; align-items:center; padding:20px 22px; background:linear-gradient(120deg, rgba(242,163,65,0.08), rgba(90,209,230,0.05)); border:1px solid var(--line-strong); border-radius:14px;}
+.avatar-ring{width:56px; height:56px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1.5px solid var(--amber); font-family:var(--serif); font-size:22px; color:var(--amber);}
+.character-card .cname{font-weight:700; font-size:14.5px; color:var(--ink);}
+.character-card .crole{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:2px;}
+.character-card p{font-size:13.5px; color:var(--ink-dim); margin-top:6px;}
+
+.chapter{margin-bottom:80px; scroll-margin-top:90px;}
+.chapter-head{display:flex; align-items:center; gap:14px; margin-bottom:20px;}
+.chapter-icon{width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1px solid var(--line-strong); font-size:18px; color:var(--amber); flex-shrink:0;}
+.chapter-num{font-family:var(--mono); font-size:12px; color:var(--ink-faint); letter-spacing:0.08em; display:block;}
+.chapter h2{font-family:var(--serif); font-weight:600; font-size:clamp(23px,2.8vw,30px); letter-spacing:-0.01em;}
+
+.story-panel{position:relative; margin:18px 0 24px; padding:22px 26px 22px 52px; border-radius:12px; background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--amber); font-family:var(--serif); font-style:italic; font-size:15.5px; color:var(--ink-dim); line-height:1.75;}
+.story-panel::before{content:'\201C'; position:absolute; left:16px; top:8px; font-size:38px; color:var(--amber); font-style:normal; opacity:0.6;}
+.story-panel b{color:var(--ink); font-style:normal;}
+
+.chapter > p.body-text{color:var(--ink-dim); font-size:15px; margin-bottom:16px;}
+.chapter > p.body-text b{color:var(--ink); font-weight:600;}
+.chapter ul.points{margin:16px 0 20px 0; padding-left:0; list-style:none; display:flex; flex-direction:column; gap:10px;}
+.chapter ul.points li{display:flex; gap:10px; font-size:14px; color:var(--ink-dim); padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px;}
+.chapter ul.points li::before{content:'\25C6'; color:var(--amber); font-size:8px; margin-top:5px; flex-shrink:0;}
+.callout{margin:22px 0; padding:16px 18px; border-radius:10px; border-left:3px solid var(--cyan); background:var(--cyan-dim); font-size:13.5px; color:var(--ink-dim);}
+.callout b{color:var(--ink);}
+.callout.warn{border-left-color:var(--amber); background:var(--amber-dim);}
+
+.spotlight{display:flex; align-items:center; gap:14px; margin:22px 0; padding:16px 18px; border-radius:12px; background:var(--violet-dim); border:1px solid rgba(179,155,255,0.35);}
+.spotlight .sicon{font-size:20px; color:var(--violet); flex-shrink:0;}
+.spotlight .stext{font-size:12.5px; color:var(--ink-dim);}
+.spotlight .stext b{color:var(--violet); font-family:var(--mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; display:block; margin-bottom:3px;}
+
+.visual-box{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:26px; margin:24px 0; overflow-x:auto;}
+.visual-label{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+
+.ctrl-row{display:flex; align-items:center; gap:16px; margin-bottom:20px; flex-wrap:wrap;}
+.ctrl-row label{font-family:var(--mono); font-size:12px; color:var(--ink-dim);}
+.ctrl-row input[type=range]{width:200px; accent-color:var(--amber);}
+.ctrl-readout{font-family:var(--serif); font-size:18px; color:var(--amber); min-width:44px; display:inline-block; text-align:center;}
+.toggle-btn{font-family:var(--mono); font-size:11px; letter-spacing:0.05em; text-transform:uppercase; padding:8px 16px; border-radius:100px; border:1px solid var(--line-strong); background:transparent; color:var(--ink-dim); cursor:pointer; transition:all .2s;}
+.toggle-btn.active{color:var(--amber); border-color:var(--amber); background:var(--amber-dim);}
+
+/* Ch1: preview grid (flip cards) */
+.encoding-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+.enc-card{perspective:1000px; height:120px; cursor:pointer;}
+.enc-inner{position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d;}
+.enc-card.flipped .enc-inner{transform:rotateY(180deg);}
+.enc-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:center; border:1px solid var(--line-strong);}
+.enc-front{background:var(--panel-2);}
+.enc-front .en{font-family:var(--mono); font-size:9.5px; color:var(--ink-faint); margin-bottom:4px;}
+.enc-front h6{font-size:12.5px; font-weight:700; color:var(--ink);}
+.enc-back{background:var(--panel); transform:rotateY(180deg); font-size:11px; color:var(--ink-dim); line-height:1.5;}
+@media (max-width:900px){.encoding-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:480px){.encoding-grid{grid-template-columns:1fr;}}
+
+/* Ch2: QCNN shrink diagram */
+.compare-bars{display:flex; flex-direction:column; gap:14px;}
+.cbrow{display:grid; grid-template-columns:170px 1fr 90px; align-items:center; gap:14px;}
+.cbrow .cblabel{font-family:var(--mono); font-size:11.5px; color:var(--ink-dim);}
+.cbtrack{height:10px; background:var(--panel-2); border-radius:6px; overflow:hidden; border:1px solid var(--line);}
+.cbfill{height:100%; border-radius:6px; transition:width .5s ease; background:var(--cyan);}
+.cbfill.pool{background:var(--violet);}
+.cbval{font-family:var(--mono); font-size:11.5px; color:var(--ink); text-align:right;}
+
+/* Ch3: barren plateau experiment */
+.grad-bars{display:flex; align-items:flex-end; gap:10px; height:180px; overflow-x:auto; padding-top:24px; border-bottom:1px solid var(--line);}
+.grad-col{display:flex; flex-direction:column; align-items:center; flex-shrink:0; width:44px;}
+.grad-bar{width:28px; border-radius:5px 5px 0 0; background:linear-gradient(180deg,var(--cyan),var(--red)); transition:height .5s ease; min-height:2px;}
+.grad-val{font-family:var(--mono); font-size:9px; color:var(--ink-faint); margin-bottom:4px; white-space:nowrap;}
+.grad-lbl{font-family:var(--mono); font-size:10px; color:var(--ink-dim); margin-top:6px;}
+.grad-summary{margin-top:16px; font-family:var(--mono); font-size:12.5px; color:var(--ink-dim); text-align:center; min-height:20px;}
+
+/* Ch4: loop diagram (reused pattern) */
+.loop-wrap{display:flex; justify-content:center;}
+.loop-node{fill:var(--panel-2); stroke:var(--line-strong); stroke-width:1.4;}
+.loop-text{font-family:var(--mono); font-size:10.5px; fill:var(--ink-dim);}
+.loop-arrow{stroke:var(--ink-faint); stroke-width:1.4; fill:none;}
+.loop-pulse{fill:var(--amber); filter:drop-shadow(0 0 5px var(--amber));}
+
+/* Ch5: QGAN distribution match */
+.dist-pair{display:flex; gap:30px; flex-wrap:wrap;}
+.dist-col{flex:1; min-width:220px;}
+.dist-col-label{font-family:var(--mono); font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:10px;}
+.dist-bars{display:flex; align-items:flex-end; gap:8px; height:110px; border-bottom:1px solid var(--line);}
+.dist-bar{flex:1; border-radius:5px 5px 0 0; position:relative; transition:height .5s ease;}
+.dist-bar.target{background:var(--cyan); opacity:0.5;}
+.dist-bar.gen{background:var(--amber);}
+
+/* Ch6: interaction graph (reused pattern) */
+.graph-wrap{display:flex; justify-content:center;}
+.graph-node{fill:var(--panel-2); stroke:var(--line-strong); stroke-width:1.4;}
+.graph-node-label{font-family:var(--mono); font-size:11px; fill:var(--ink-dim);}
+.graph-edge{stroke:var(--violet); stroke-width:1.6; opacity:0; transition:opacity .3s;}
+.graph-edge.on{opacity:1;}
+
+/* Ch7: ZNE chart */
+.zne-wrap{display:flex; justify-content:center;}
+
+/* Ch8: decay curve */
+.decay-wrap{display:flex; justify-content:center;}
+.tutor-widget{background:var(--panel); border:1px solid var(--line-strong); border-radius:14px; padding:22px; margin:24px 0;}
+.tutor-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+.tutor-avatar{width:32px; height:32px; border-radius:9px; background:var(--violet-dim); color:var(--violet); display:flex; align-items:center; justify-content:center; font-size:15px;}
+.tutor-title{font-family:var(--mono); font-size:12px; letter-spacing:0.04em; color:var(--ink);}
+.tutor-note{font-size:11.5px; color:var(--ink-faint); margin-bottom:16px;}
+.tutor-questions{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;}
+.tutor-q-btn{font-family:var(--sans); font-size:12.5px; padding:9px 14px; border-radius:100px; border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-dim); cursor:pointer; transition:all .2s;}
+.tutor-q-btn:hover{border-color:var(--violet); color:var(--ink);}
+.tutor-answer{display:none; padding:14px 16px; border-radius:10px; background:var(--panel-2); border-left:3px solid var(--violet); font-size:13px; color:var(--ink-dim); line-height:1.6;}
+.tutor-answer.show{display:block; animation:fadein .3s ease;}
+@keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+/* quiz (shared pattern) */
+.quiz-box{margin-top:28px; background:var(--panel); border:1px solid var(--line-strong); border-radius:14px; padding:24px;}
+.quiz-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
+.quiz-title{font-family:var(--mono); font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--amber); display:flex; align-items:center; gap:8px;}
+.quiz-score{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);}
+.q-item{margin-bottom:22px;}
+.q-item:last-child{margin-bottom:0;}
+.q-text{font-size:14px; font-weight:600; margin-bottom:12px; color:var(--ink);}
+.q-options{display:flex; flex-direction:column; gap:8px;}
+.q-opt{text-align:left; padding:11px 14px; border-radius:9px; border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-dim); font-size:13px; cursor:pointer; transition:border-color .2s, background .2s, color .2s; font-family:var(--sans);}
+.q-opt:hover:not(:disabled){border-color:var(--ink-dim); color:var(--ink);}
+.q-opt.correct{border-color:var(--green); background:var(--green-dim); color:var(--green);}
+.q-opt.incorrect{border-color:var(--red); background:var(--red-dim); color:var(--red);}
+.q-opt:disabled{cursor:default;}
+.q-explain{margin-top:10px; font-size:12.5px; color:var(--ink-dim); padding:11px 14px; border-radius:8px; background:var(--panel-2); border-left:2px solid var(--amber); display:none;}
+.q-explain.show{display:block;}
+.chapter-status{margin-top:16px; padding:10px 14px; border-radius:8px; font-family:var(--mono); font-size:11.5px; display:none; align-items:center; gap:8px;}
+.chapter-status.show{display:flex;}
+.chapter-status.mastered{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.35);}
+.chapter-status.review{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.35);}
+
+.final-assess{margin-top:20px; background:linear-gradient(180deg,var(--panel-2),var(--panel)); border:1px solid var(--line-strong); border-radius:16px; padding:34px;}
+.final-head{margin-bottom:26px;}
+.final-head .module-eyebrow{color:var(--amber); border-color:var(--line-strong); background:var(--amber-dim);}
+.final-head h2{font-family:var(--serif); font-size:clamp(26px,3vw,34px); font-weight:600;}
+.final-head p{color:var(--ink-dim); margin-top:10px; font-size:14.5px;}
+.result-panel{margin-top:28px; padding:24px; border-radius:12px; border:1px solid var(--line-strong); background:var(--bg); display:none;}
+.result-panel.show{display:block;}
+.result-top{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:18px;}
+.result-score{font-family:var(--serif); font-size:44px; font-weight:600;}
+.result-badge{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; padding:6px 14px; border-radius:100px;}
+.result-badge.pass{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.4);}
+.result-badge.retry{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.4);}
+.recommend-list{list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+.recommend-list li{font-size:13px; color:var(--ink-dim); padding:10px 12px; background:var(--panel-2); border-radius:8px; border:1px solid var(--line);}
+.result-actions{display:flex; gap:12px; margin-top:22px; flex-wrap:wrap;}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:9px; font-size:13.5px; font-weight:600; text-decoration:none; cursor:pointer; border:1px solid transparent; transition:transform .2s, box-shadow .2s;}
+.btn-primary{background:var(--blue); color:#04101f;}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 26px -8px rgba(79,163,247,0.5);}
+.btn-ghost{background:transparent; border-color:var(--line-strong); color:var(--ink);}
+.btn-ghost:hover{border-color:var(--ink-dim); transform:translateY(-2px);}
+.btn-amber{background:var(--amber-dim); border-color:var(--amber); color:var(--amber);}
+
+.reveal{opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease;}
+.reveal.in{opacity:1; transform:translateY(0);}
+
+.module-nav{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:70px; padding-top:36px; border-top:1px solid var(--line);}
+.mn-card{display:flex; flex-direction:column; gap:6px; padding:20px 22px; border-radius:14px; background:var(--panel); border:1px solid var(--line); text-decoration:none; transition:border-color .25s, transform .25s;}
+.mn-card.enabled:hover{border-color:var(--line-strong); transform:translateY(-3px);}
+.mn-card.disabled{opacity:0.5; cursor:default;}
+.mn-card.next{align-items:flex-end; text-align:right;}
+.mn-eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint);}
+.mn-title{font-family:var(--serif); font-size:16px; font-weight:600; color:var(--ink);}
+.mn-arrow{font-family:var(--mono); font-size:12px; color:var(--amber);}
+@media (max-width:700px){.module-nav{grid-template-columns:1fr;}}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static; display:flex; overflow-x:auto; gap:4px; padding-bottom:10px; max-height:none;}
+  .side-list{flex-direction:row;}
+  .side-list a{white-space:nowrap;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-rail"><div class="progress-fill" id="progressFill"></div></div>
+
+<header>
+  <div class="nav-wrap">
+    <a class="back-link" href="qml-roadmap-landing-page.html#curriculum">← Back to Curriculum</a>
+    <div class="crumb">LEVEL 3 · ADVANCED — <b>MODULE 11</b></div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a class="back-link" href="progress-hub.html">My Progress</a>
+      <div class="xp-badge">⚡ <span id="xpCount">0</span> XP</div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="side-title">Module 11 Chapters</div>
+    <ul class="side-list" id="sideList">
+      <li><a href="#ch1" data-target="ch1"><span class="side-dot" id="dot-ch1"></span>The Frontier</a></li>
+      <li><a href="#ch2" data-target="ch2"><span class="side-dot" id="dot-ch2"></span>Quantum CNNs</a></li>
+      <li><a href="#ch3" data-target="ch3"><span class="side-dot" id="dot-ch3"></span>Barren Plateaus, Hands-On</a></li>
+      <li><a href="#ch4" data-target="ch4"><span class="side-dot" id="dot-ch4"></span>Quantum Reinforcement Learning</a></li>
+      <li><a href="#ch5" data-target="ch5"><span class="side-dot" id="dot-ch5"></span>Quantum Generative Models</a></li>
+      <li><a href="#ch6" data-target="ch6"><span class="side-dot" id="dot-ch6"></span>Quantum Graph Neural Networks</a></li>
+      <li><a href="#ch7" data-target="ch7"><span class="side-dot" id="dot-ch7"></span>Quantum Error Mitigation</a></li>
+      <li><a href="#ch8" data-target="ch8"><span class="side-dot" id="dot-ch8"></span>Noise in Quantum Systems</a></li>
+      <li><a href="#ch9" data-target="ch9"><span class="side-dot" id="dot-ch9"></span>Fault-Tolerant Quantum Computing</a></li>
+      <li><a href="#final" data-target="final"><span class="side-dot" id="dot-final"></span>Module Assessment</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <div class="tut-hero reveal">
+      <div class="module-eyebrow">◆ Module 11 · Advanced</div>
+      <h1>Advanced Quantum Machine Learning</h1>
+      <p class="lede">Two promises get kept in this module: the QCNN Module 9 owed you, and the barren plateau Module 7 said you'd "feel firsthand." Then five more frontier topics — where QML meets the real, messy limits of today's hardware.</p>
+      <div class="chip-row">
+        <span class="chip">9 Chapters</span>
+        <span class="chip">1 Real Gradient Experiment</span>
+        <span class="chip">27 Quick-Check Questions</span>
+        <span class="chip">1 Adaptive Assessment</span>
+        <span class="chip">~60 min</span>
+      </div>
+      <div class="character-card">
+        <div class="avatar-ring">M</div>
+        <div>
+          <div class="cname">Maya &amp; Dr. Okafor, continued</div>
+          <div class="crole">Same lab, the frontier now</div>
+          <p>Maya's toured real-world applications in Module 10. Now she wants to know what's actually still unsolved — and what the people working on it are doing about it.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAPTER 1 -->
+    <section class="chapter reveal" id="ch1">
+      <div class="chapter-head"><div class="chapter-icon">⬡</div><div><span class="chapter-num">CHAPTER 01</span><h2>The Frontier</h2></div></div>
+      <div class="story-panel">"Everything so far has been settled enough to teach cleanly," Dr. Okafor says. "This module is different. Every topic here is still being actively argued about in real papers, right now." Maya isn't sure whether that should worry her or excite her. <b>"Both,"</b> he says. "That's what advanced actually means."</div>
+      <p class="body-text">This module tours eight frontier topics — some are architectures (QCNN, quantum GNNs), some are hard practical problems (barren plateaus, noise, error mitigation), and some are open engineering goals (fault tolerance). All of them build directly on the algorithms and honest challenges from Modules 6 through 9.</p>
+      <div class="visual-box">
+        <div class="visual-label">The Frontier Map — Tap Each Card</div>
+        <div class="encoding-grid" id="encodingGrid"></div>
+      </div>
+      <div class="callout"><b>Takeaway:</b> "Advanced" doesn't mean disconnected from everything before it — it means the same ideas, pushed to where the answers aren't fully written yet.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch1">0 / 3</div></div>
+        <div id="quiz-ch1"></div>
+        <div class="chapter-status" id="status-ch1"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 2 -->
+    <section class="chapter reveal" id="ch2">
+      <div class="chapter-head"><div class="chapter-icon">▦</div><div><span class="chapter-num">CHAPTER 02</span><h2>Quantum Convolutional Neural Networks</h2></div></div>
+      <div class="story-panel">"I promised you these back in Module 9," Dr. Okafor says. "QCNNs — and they're worth the wait, because they fix something almost nothing else in this course does: they're provably resistant to barren plateaus, under the right conditions." He'll make her feel exactly what that means next chapter. First, the architecture.</div>
+      <p class="body-text">A <b>Quantum Convolutional Neural Network</b> borrows classical CNNs' core trick: alternate <b>convolutional layers</b> (a small, weight-shared two-qubit gate applied identically across many sites) with <b>pooling layers</b> (measure or trace out half the qubits, shrinking the circuit). Repeat until only a handful of qubits remain for a final classification.</p>
+      <div class="spotlight">
+        <div class="sicon">⌗</div>
+        <div class="stext"><b>Platform Feature Spotlight — Quantum Circuit Simulator</b>Build a small QCNN-style reduction yourself: place identical gates across every wire, then use CNOT+measurement to simulate a pooling step.</div>
+      </div>
+      <div class="visual-box">
+        <div class="visual-label">Qubits Remaining Through the Network</div>
+        <div class="compare-bars" id="qcnnBars"></div>
+      </div>
+      <ul class="points">
+        <li><b>Weight sharing:</b> the same small gate (and its parameters) is reused across all sites in a convolutional layer — far fewer parameters than a generic ansatz.</li>
+        <li><b>Pooling shrinks the circuit</b>, roughly halving active qubits at each step — visibly fewer resources needed as the network gets "deeper."</li>
+        <li><b>The genuinely good news:</b> Cong, Choi &amp; Lukin (2019) proved that, under reasonable conditions, QCNNs avoid the exponentially-vanishing-gradient problem that plagues generic deep ansätze — a rare unconditionally positive trainability result.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> QCNNs aren't just "CNNs but quantum" for the sake of it — the structure itself is what buys better trainability. Next chapter shows you exactly what they're avoiding.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch2">0 / 3</div></div>
+        <div id="quiz-ch2"></div>
+        <div class="chapter-status" id="status-ch2"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 3 -->
+    <section class="chapter reveal" id="ch3">
+      <div class="chapter-head"><div class="chapter-icon">∇</div><div><span class="chapter-num">CHAPTER 03</span><h2>Barren Plateaus, Hands-On</h2></div></div>
+      <div class="story-panel">"Module 7 told you barren plateaus were real," Dr. Okafor says. "Module 9 told you deeper circuits make it worse. Today you're going to compute one yourself — the actual gradient, on an actual random circuit, growing an actual qubit at a time." No metaphor this time. Real numbers.</div>
+      <p class="body-text">This experiment uses the <b>parameter-shift rule</b> from Module 9: for a gate parameter θ, the exact gradient of a measured expectation value is <b>[⟨Z⟩(θ+π/2) − ⟨Z⟩(θ−π/2)] / 2</b> — no approximation, just two circuit evaluations. Hit run: for each qubit count, the tool builds a random layered circuit, computes this gradient for many random parameter settings, and averages the magnitude.</p>
+      <div class="visual-box">
+        <div class="visual-label">Average |Gradient| vs. Qubit Count <button class="toggle-btn active" id="runGradBtn" onclick="runGradientExperiment()">▶ Run Experiment</button></div>
+        <div class="grad-bars" id="gradBars"></div>
+        <div class="grad-summary" id="gradSummary">Click "Run Experiment" — this computes a real gradient via the parameter-shift rule, live, in your browser.</div>
+      </div>
+      <ul class="points">
+        <li><b>This is a real computation</b>, not a canned animation — full complex state-vector simulation, exact parameter-shift gradients, dozens of random trials per qubit count.</li>
+        <li><b>The trend (McClean et al., 2018):</b> for generic, sufficiently deep random circuits, the variance of the gradient shrinks exponentially as qubit count grows — the "plateau" in barren plateau.</li>
+        <li><b>Why it matters:</b> a vanishingly small gradient gives a classical optimizer almost no signal to follow, no matter how good the optimizer is.</li>
+        <li><b>Why QCNNs (previous chapter) dodge this:</b> their structured, shallow, weight-shared design avoids the generic-random-circuit conditions that cause the plateau in the first place.</li>
+      </ul>
+      <div class="callout warn"><b>Careful:</b> Only ~25–40 random trials run here for speed — the trend is real and reproducible, but a single run can show some noise between adjacent qubit counts. Run it again and watch the shape hold.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch3">0 / 3</div></div>
+        <div id="quiz-ch3"></div>
+        <div class="chapter-status" id="status-ch3"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 4 -->
+    <section class="chapter reveal" id="ch4">
+      <div class="chapter-head"><div class="chapter-icon">⟲</div><div><span class="chapter-num">CHAPTER 04</span><h2>Quantum Reinforcement Learning</h2></div></div>
+      <div class="story-panel">"Different problem shape now," Dr. Okafor says. "Not 'classify this molecule' — 'decide what to do next, over and over, to maximize a reward.'" He sketches the same agent-environment loop from any RL textbook, then swaps one box for a quantum circuit.</div>
+      <p class="body-text">In <b>quantum reinforcement learning</b>, a parameterized quantum circuit represents the agent's <b>policy</b>: given a state, it produces action probabilities from measurement outcomes. Training uses policy-gradient methods — updating the circuit's parameters using gradients computed exactly the way you just computed them in Chapter 3.</p>
+      <div class="visual-box">
+        <div class="visual-label">Quantum Policy in the RL Loop</div>
+        <div class="loop-wrap">
+          <svg viewBox="0 0 460 200" width="460">
+            <defs><marker id="arrow11" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L6,3 L0,6 Z" fill="#5f7089"/></marker></defs>
+            <rect class="loop-node" x="15" y="75" width="130" height="50" rx="10"/>
+            <text class="loop-text" x="30" y="98">Quantum</text>
+            <text class="loop-text" x="30" y="112">Policy Circuit</text>
+            <rect class="loop-node" x="315" y="75" width="130" height="50" rx="10"/>
+            <text class="loop-text" x="345" y="105">Environment</text>
+            <path class="loop-arrow" d="M145,90 L315,90" marker-end="url(#arrow11)"/>
+            <text class="loop-text" x="180" y="82">action (measured)</text>
+            <path class="loop-arrow" d="M315,112 L145,112" marker-end="url(#arrow11)"/>
+            <text class="loop-text" x="190" y="135">state + reward</text>
+            <text class="loop-text" x="205" y="170">parameter-shift gradient updates the policy</text>
+            <circle class="loop-pulse" r="4"><animateMotion dur="2.4s" repeatCount="indefinite" path="M145,90 L315,90"/></circle>
+            <circle class="loop-pulse" r="4"><animateMotion dur="2.4s" repeatCount="indefinite" begin="1.2s" path="M315,112 L145,112"/></circle>
+          </svg>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>The policy is quantum</b>: measurement outcomes of the circuit become action probabilities, the same way a VQC's measurement became a class score in Module 9.</li>
+        <li><b>Training reuses Chapter 3's exact mechanism</b> — parameter-shift gradients feeding a classical optimizer, just applied to a reward signal instead of a labeled loss.</li>
+        <li><b>Honest status:</b> largely exploratory and small-scale today. Real results exist on toy environments; scaling to complex, real-world control tasks remains open.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Quantum RL isn't a different algorithm family so much as the same hybrid loop, aimed at a different kind of feedback signal.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch4">0 / 3</div></div>
+        <div id="quiz-ch4"></div>
+        <div class="chapter-status" id="status-ch4"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 5 -->
+    <section class="chapter reveal" id="ch5">
+      <div class="chapter-head"><div class="chapter-icon">⇄</div><div><span class="chapter-num">CHAPTER 05</span><h2>Quantum Generative Models</h2></div></div>
+      <div class="story-panel">"Remember QSample encoding, matching a quantum state to a probability distribution?" Dr. Okafor asks. Maya nods — Module 8. "Now imagine training a circuit to find that match itself, instead of being handed it." He introduces the quantum GAN — a generator racing a discriminator, exactly like its classical namesake.</div>
+      <p class="body-text">A <b>Quantum GAN (QGAN)</b> keeps the classical GAN's adversarial structure: a <b>generator</b> (here, a quantum circuit) tries to produce samples indistinguishable from real data; a <b>discriminator</b> (classical or quantum) tries to tell them apart. Hit train and watch the generated distribution chase the target.</p>
+      <div class="spotlight">
+        <div class="sicon">▤</div>
+        <div class="stext"><b>Platform Feature Spotlight — QML Playground</b>The full QML Playground lets you swap in a real dataset here and watch an actual QGAN converge over hundreds of iterations, not just this illustrative demo.</div>
+      </div>
+      <div class="visual-box">
+        <div class="visual-label">Generator vs. Target Distribution <button class="toggle-btn active" id="trainGanBtn" onclick="trainQGAN()">▶ Train Generator</button></div>
+        <div class="dist-pair">
+          <div class="dist-col">
+            <div class="dist-col-label">Target (Real Data)</div>
+            <div class="dist-bars" id="ganTarget"></div>
+          </div>
+          <div class="dist-col">
+            <div class="dist-col-label">Generator's Current Output</div>
+            <div class="dist-bars" id="ganGen"></div>
+          </div>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>Same goal as QSample encoding (Module 8)</b> — reproducing a target distribution — but here the circuit <i>learns</i> the match rather than being constructed to guarantee it.</li>
+        <li><b>The generator is quantum; the discriminator can be either</b> — classical discriminators are common since they're easier to train reliably today.</li>
+        <li><b>Known challenge:</b> QGANs inherit classical GANs' notorious training instability, and can additionally run into barren-plateau-style trainability issues as circuits scale.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Generative modeling and distribution-matching keep reappearing in this course under different names — QSample encoding, now QGANs — because it's one of the field's genuinely recurring problems.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch5">0 / 3</div></div>
+        <div id="quiz-ch5"></div>
+        <div class="chapter-status" id="status-ch5"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 6 -->
+    <section class="chapter reveal" id="ch6">
+      <div class="chapter-head"><div class="chapter-icon">◈</div><div><span class="chapter-num">CHAPTER 06</span><h2>Quantum Graph Neural Networks</h2></div></div>
+      <div class="story-panel">Dr. Okafor pulls up Maya's molecule again. "Every ansatz you've built so far entangles qubits in whatever pattern I told you to. But your molecule already has a structure — atoms and bonds. Why not let the circuit see it?"</div>
+      <p class="body-text">A <b>Quantum Graph Neural Network</b> places entangling gates according to a real graph's edges — molecular bonds, social connections, whatever the data's actual structure is — instead of a fixed, arbitrary layout. Toggle below to see the difference.</p>
+      <div class="visual-box">
+        <div class="visual-label">Fixed Layout vs. Graph-Structured Ansatz <button class="toggle-btn active" id="gnnToggle" onclick="toggleGNN()">Show Graph-Structured</button></div>
+        <div class="graph-wrap">
+          <svg viewBox="0 0 360 220" width="360" id="gnnSvg"></svg>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>Message passing, quantum-style:</b> classical GNNs update each node using its neighbors' information; a quantum GNN's entangling gates play the same role, following the same connectivity.</li>
+        <li><b>Permutation invariance matters:</b> a molecule's real properties don't depend on which order you happened to number its atoms — a well-designed graph ansatz respects that symmetry directly.</li>
+        <li>Directly useful for exactly the kind of structured chemistry and materials data Maya's been working with since Module 1.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Respecting your data's real structure in the circuit itself, rather than flattening everything into a generic layout, is a theme worth remembering well beyond this one architecture.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch6">0 / 3</div></div>
+        <div id="quiz-ch6"></div>
+        <div class="chapter-status" id="status-ch6"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 7 -->
+    <section class="chapter reveal" id="ch7">
+      <div class="chapter-head"><div class="chapter-icon">⚙</div><div><span class="chapter-num">CHAPTER 07</span><h2>Quantum Error Mitigation</h2></div></div>
+      <div class="story-panel">"We can't fully fix hardware noise yet," Dr. Okafor says. "That's next chapter's problem, and the one after that. But we can often see through it statistically." He walks Maya through the field's workhorse technique: run the same circuit at deliberately worse noise levels, then extrapolate backward.</div>
+      <p class="body-text"><b>Zero-noise extrapolation (ZNE)</b> amplifies a circuit's noise by known factors (1×, 2×, 3×...), measures the resulting (increasingly wrong) expectation values, then fits a curve back to an estimated value at zero noise. Toggle the extrapolation below.</p>
+      <div class="spotlight">
+        <div class="sicon">▧</div>
+        <div class="stext"><b>Platform Feature Spotlight — Research Hub</b>ZNE is one of several active error-mitigation techniques tracked in the Research Hub, alongside probabilistic error cancellation and readout-error correction.</div>
+      </div>
+      <div class="visual-box">
+        <div class="visual-label">Zero-Noise Extrapolation <button class="toggle-btn active" id="zneToggle" onclick="toggleZNE()">Show Extrapolation</button></div>
+        <div class="zne-wrap">
+          <svg viewBox="0 0 400 200" width="400" height="200" id="zneSvg"></svg>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>Not the same as error correction</b> (next-next chapter) — ZNE is a statistical, post-processing estimate on today's noisy hardware, not a way to make the hardware itself error-free.</li>
+        <li><b>Readout error mitigation</b> is a related, simpler technique: calibrate a device's measurement bias directly and correct for it.</li>
+        <li>Currently one of the most practically useful tools for getting believable results out of real NISQ hardware.</li>
+      </ul>
+      <div class="callout warn"><b>Careful:</b> Mitigation improves an estimate — it doesn't guarantee the true value, and it costs extra circuit runs at each noise level.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch7">0 / 3</div></div>
+        <div id="quiz-ch7"></div>
+        <div class="chapter-status" id="status-ch7"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 8 -->
+    <section class="chapter reveal" id="ch8">
+      <div class="chapter-head"><div class="chapter-icon">∿</div><div><span class="chapter-num">CHAPTER 08</span><h2>Noise in Quantum Systems</h2></div></div>
+      <div class="story-panel">"Let's actually name what we're fighting," Dr. Okafor says. He introduces the physical vocabulary behind every "NISQ" mention since Module 7: qubits don't just sit there — they decay, and the clock is always running.</div>
+      <p class="body-text">Two numbers dominate the conversation: <b>T1</b> (energy relaxation — how long before a qubit decays from |1⟩ toward |0⟩) and <b>T2</b> (dephasing — how long phase information between |0⟩ and |1⟩ survives). Drag the slider to watch fidelity decay as circuit time increases.</p>
+      <div class="visual-box">
+        <div class="visual-label">Coherence Decay</div>
+        <div class="ctrl-row">
+          <label for="decaySlider">Elapsed time (in units of T1) =</label>
+          <input type="range" id="decaySlider" min="0" max="300" value="0">
+          <span class="ctrl-readout" id="decayReadout">0.00</span>
+        </div>
+        <div class="decay-wrap">
+          <svg viewBox="0 0 400 160" width="400" height="160" id="decaySvg"></svg>
+        </div>
+        <div class="grad-summary" id="decayReadoutText">Fidelity: 100% — no time has passed yet.</div>
+      </div>
+      <div class="tutor-widget">
+        <div class="tutor-head"><div class="tutor-avatar">✺</div><div class="tutor-title">Ask the Quantum Tutor</div></div>
+        <div class="tutor-note">Demo preview — tap a question below.</div>
+        <div class="tutor-questions" id="tutorQuestions"></div>
+        <div class="tutor-answer" id="tutorAnswer"></div>
+      </div>
+      <ul class="points">
+        <li><b>Gate errors</b> — imperfect control pulses mean every gate is a slightly-wrong rotation, not the exact one you asked for.</li>
+        <li><b>Readout errors</b> — the measurement itself can misreport a qubit's state.</li>
+        <li><b>Crosstalk</b> — operations on one qubit can leak, unintentionally disturbing its neighbors.</li>
+        <li><b>Why circuit depth is precious:</b> every additional gate or time step gives all of the above more opportunity to accumulate before your final measurement — the direct physical reason angle encoding's shallow circuits (Module 8) matter.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> "NISQ" has been a name in this course since Module 7. This chapter is what it actually feels like, in physical terms.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch8">0 / 3</div></div>
+        <div id="quiz-ch8"></div>
+        <div class="chapter-status" id="status-ch8"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 9 -->
+    <section class="chapter reveal" id="ch9">
+      <div class="chapter-head"><div class="chapter-icon">▣</div><div><span class="chapter-num">CHAPTER 09</span><h2>Fault-Tolerant Quantum Computing</h2></div></div>
+      <div class="story-panel">Closing chapter. "Everything in this module so far has been about coping with noise," Dr. Okafor says. "This is about not needing to cope anymore." He describes a future where errors get caught and corrected mid-computation, without ever looking directly at the fragile data itself.</div>
+      <p class="body-text">The core idea: encode one <b>logical qubit</b> redundantly across many <b>physical qubits</b> (e.g., a surface code). Special <b>syndrome measurements</b> detect that an error happened — and which one — without directly measuring (and destroying) the encoded information, so it can be corrected on the fly.</p>
+      <div class="visual-box">
+        <div class="visual-label">Illustrative Physical-Qubit Overhead*</div>
+        <div class="compare-bars" id="ftBars"></div>
+        <div class="grad-summary" style="text-align:left; margin-top:6px;">* Illustrative figures for common near-term surface-code estimates — exact overhead depends heavily on target error rate and code choice.</div>
+      </div>
+      <ul class="points">
+        <li><b>The threshold theorem:</b> if the physical error rate stays below a certain threshold, arbitrarily long, reliable computation becomes possible in principle — errors get corrected faster than they accumulate.</li>
+        <li><b>The catch, honestly stated:</b> current estimates require a substantial number of physical qubits per logical qubit — often in the hundreds to thousands — keeping large-scale fault tolerance a future milestone, not a present reality.</li>
+        <li>This is the actual destination all of NISQ-era research (Chapters 3, 7, and 8 of this module included) is working toward.</li>
+      </ul>
+      <div class="callout warn"><b>Careful:</b> "Fault-tolerant quantum computing has been achieved" and "fault-tolerant quantum computing is a well-defined, actively-pursued engineering target" are very different claims. This course only supports the second one.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch9">0 / 3</div></div>
+        <div id="quiz-ch9"></div>
+        <div class="chapter-status" id="status-ch9"></div>
+      </div>
+    </section>
+
+    <!-- FINAL ASSESSMENT -->
+    <section class="chapter reveal" id="final">
+      <div class="final-assess">
+        <div class="final-head">
+          <div class="module-eyebrow">◆ Adaptive Assessment</div>
+          <h2>Module 11 Assessment</h2>
+          <p>Nine synthesis questions, one per chapter. Your result adapts to your whole session — chapters where you struggled above get flagged for review here, regardless of how this final round goes.</p>
+        </div>
+        <div id="quiz-final"></div>
+        <div class="result-panel" id="resultPanel">
+          <div class="result-top">
+            <div>
+              <div class="result-score" id="resultScore">0%</div>
+              <div class="quiz-score" id="resultDetail">0 / 9 correct</div>
+            </div>
+            <div class="result-badge" id="resultBadge"></div>
+          </div>
+          <div id="recommendWrap"></div>
+          <div class="result-actions">
+            <a href="qml-roadmap-landing-page.html#curriculum" class="btn btn-ghost">← Back to Curriculum</a>
+            <a href="#" class="btn btn-primary" id="continueBtn">Continue to Module 12 →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="module-nav" id="moduleNav"></div>
+
+  </main>
+</div>
+
+<script>
+/* ---------------- state ---------------- */
+let state = { xp:0, chapters:{
+  ch1:{correct:0,total:3,done:false}, ch2:{correct:0,total:3,done:false}, ch3:{correct:0,total:3,done:false},
+  ch4:{correct:0,total:3,done:false}, ch5:{correct:0,total:3,done:false}, ch6:{correct:0,total:3,done:false},
+  ch7:{correct:0,total:3,done:false}, ch8:{correct:0,total:3,done:false}, ch9:{correct:0,total:3,done:false}
+}, finalDone:false };
+try{ const saved = localStorage.getItem('qml_module11_state'); if(saved) state = JSON.parse(saved); }catch(e){}
+function saveState(){ try{ localStorage.setItem('qml_module11_state', JSON.stringify(state)); }catch(e){} }
+function addXP(n){ state.xp += n; document.getElementById('xpCount').textContent = state.xp; saveState(); }
+document.getElementById('xpCount').textContent = state.xp;
+
+/* ================= CHAPTER 1: preview grid ================= */
+const encodingPreview = [
+  {en:'01', name:'Quantum CNNs', desc:'Convolution + pooling for qubits \u2014 and a genuine fix for barren plateaus.'},
+  {en:'02', name:'Barren Plateaus', desc:'A real, live gradient experiment you run yourself.'},
+  {en:'03', name:'Quantum RL', desc:'A quantum circuit as the policy in an agent-environment loop.'},
+  {en:'04', name:'Quantum Generative Models', desc:'A quantum generator racing a discriminator, QGAN-style.'},
+  {en:'05', name:'Quantum Graph NNs', desc:'Entangling gates that mirror a molecule\u2019s real bond structure.'},
+  {en:'06', name:'Error Mitigation', desc:'Zero-noise extrapolation and friends \u2014 statistical fixes for noisy hardware.'},
+  {en:'07', name:'Noise in Quantum Systems', desc:'T1, T2, gate errors, and why circuit depth is precious.'},
+  {en:'08', name:'Fault-Tolerant QC', desc:'Logical qubits, syndrome measurement, and the threshold theorem.'},
+];
+(function(){
+  const grid = document.getElementById('encodingGrid');
+  encodingPreview.forEach(e=>{
+    const card = document.createElement('div');
+    card.className = 'enc-card';
+    card.innerHTML = '<div class="enc-inner">'
+      + '<div class="enc-face enc-front"><div class="en">'+e.en+'</div><h6>'+e.name+'</h6></div>'
+      + '<div class="enc-face enc-back">'+e.desc+'</div>'
+      + '</div>';
+    card.addEventListener('click', ()=>{ card.classList.toggle('flipped'); addXP(1); });
+    grid.appendChild(card);
+  });
+})();
+
+/* ================= CHAPTER 2: QCNN shrink bars ================= */
+(function(){
+  const wrap = document.getElementById('qcnnBars');
+  const stages = [
+    {label:'Input layer', n:16, cls:''},
+    {label:'Conv + Pool 1', n:8, cls:'pool'},
+    {label:'Conv + Pool 2', n:4, cls:'pool'},
+    {label:'Conv + Pool 3', n:2, cls:'pool'},
+    {label:'Final readout', n:1, cls:'pool'}
+  ];
+  stages.forEach(s=>{
+    const row = document.createElement('div');
+    row.className = 'cbrow';
+    row.innerHTML = '<div class="cblabel">'+s.label+'</div><div class="cbtrack"><div class="cbfill '+s.cls+'" style="width:'+(s.n/16*100)+'%"></div></div><div class="cbval">'+s.n+' qubit'+(s.n>1?'s':'')+'</div>';
+    wrap.appendChild(row);
+  });
+})();
+
+/* ================= CHAPTER 3: real barren plateau gradient experiment ================= */
+function cx(re,im){ return {re:re||0, im:im||0}; }
+function cAddQ(a,b){ return cx(a.re+b.re, a.im+b.im); }
+function cMulQ(a,b){ return cx(a.re*b.re-a.im*b.im, a.re*b.im+a.im*b.re); }
+function matRyQ(t){ const c=Math.cos(t/2), s=Math.sin(t/2); return [[cx(c,0), cx(-s,0)], [cx(s,0), cx(c,0)]]; }
+function applySingleGateQ(re, im, mat, qubit, n){
+  const mask = 1 << (n-1-qubit); const d = 1<<n;
+  for(let i=0;i<d;i++){
+    if((i & mask)===0){
+      const j = i | mask;
+      const a = cx(re[i], im[i]); const b = cx(re[j], im[j]);
+      const newA = cAddQ(cMulQ(mat[0][0],a), cMulQ(mat[0][1],b));
+      const newB = cAddQ(cMulQ(mat[1][0],a), cMulQ(mat[1][1],b));
+      re[i]=newA.re; im[i]=newA.im; re[j]=newB.re; im[j]=newB.im;
+    }
+  }
+}
+function applyCNOTQ(re, im, control, target, n){
+  const cmask = 1<<(n-1-control), tmask = 1<<(n-1-target); const d = 1<<n;
+  for(let i=0;i<d;i++){
+    if((i & cmask)!==0 && (i & tmask)===0){
+      const j = i | tmask;
+      const tr=re[i], ti=im[i]; re[i]=re[j]; im[i]=im[j]; re[j]=tr; im[j]=ti;
+    }
+  }
+}
+function computeExpZ0Q(n, layers, params){
+  const d = 1<<n;
+  const re = new Float64Array(d), im = new Float64Array(d);
+  re[0]=1;
+  let pi=0;
+  for(let L=0; L<layers; L++){
+    for(let q=0;q<n;q++){ applySingleGateQ(re, im, matRyQ(params[pi++]), q, n); }
+    for(let q=0;q<n;q++){ applyCNOTQ(re, im, q, (q+1)%n, n); }
+  }
+  let exp = 0;
+  for(let i=0;i<d;i++){
+    const prob = re[i]*re[i]+im[i]*im[i];
+    const bit0 = (i & (1<<(n-1))) !== 0;
+    exp += prob * (bit0 ? -1 : 1);
+  }
+  return exp;
+}
+function computeGradientQ(n, layers, params, idx){
+  const pPlus = params.slice(); pPlus[idx] += Math.PI/2;
+  const pMinus = params.slice(); pMinus[idx] -= Math.PI/2;
+  return (computeExpZ0Q(n,layers,pPlus) - computeExpZ0Q(n,layers,pMinus))/2;
+}
+function runGradientExperiment(){
+  const btn = document.getElementById('runGradBtn');
+  btn.disabled = true; btn.textContent = 'Running\u2026';
+  const bars = document.getElementById('gradBars');
+  bars.innerHTML = '';
+  const qubitCounts = [2,3,4,5,6,7,8];
+  const layers = 4, trials = 30;
+  const results = [];
+  qubitCounts.forEach(n=>{
+    let sum = 0;
+    for(let t=0;t<trials;t++){
+      const params = [];
+      for(let i=0;i<n*layers;i++) params.push(Math.random()*2*Math.PI);
+      sum += Math.abs(computeGradientQ(n, layers, params, 0));
+    }
+    results.push(sum/trials);
+  });
+  const maxVal = Math.max(...results);
+  qubitCounts.forEach((n,idx)=>{
+    setTimeout(()=>{
+      const col = document.createElement('div');
+      col.className = 'grad-col';
+      const h = Math.max(3, (results[idx]/maxVal)*150);
+      col.innerHTML = '<div class="grad-val">'+results[idx].toFixed(4)+'</div><div class="grad-bar" style="height:'+h+'px;"></div><div class="grad-lbl">'+n+'q</div>';
+      bars.appendChild(col);
+      if(idx === qubitCounts.length-1){
+        const ratio = (results[0]/results[results.length-1]).toFixed(1);
+        document.getElementById('gradSummary').textContent = 'Gradient at 2 qubits was ~'+ratio+'\u00D7 larger than at '+qubitCounts[qubitCounts.length-1]+' qubits, in this run \u2014 the plateau, live.';
+        btn.disabled = false; btn.textContent = '\u21BA Run Again';
+        addXP(5);
+      }
+    }, idx*180);
+  });
+}
+
+/* ================= CHAPTER 5: QGAN distribution training ================= */
+(function(){
+  const target = [0.28,0.12,0.22,0.08,0.18,0.12];
+  let gen = [0.16,0.16,0.17,0.17,0.17,0.17];
+  const targetWrap = document.getElementById('ganTarget');
+  const genWrap = document.getElementById('ganGen');
+  function render(){
+    targetWrap.innerHTML = target.map(v=>'<div class="dist-bar target" style="height:'+(v*300)+'px;"></div>').join('');
+    genWrap.innerHTML = gen.map(v=>'<div class="dist-bar gen" style="height:'+(v*300)+'px;"></div>').join('');
+  }
+  render();
+  window.trainQGAN = function(){
+    const btn = document.getElementById('trainGanBtn');
+    btn.disabled = true; btn.textContent = 'Training\u2026';
+    let step = 0;
+    function tick(){
+      step++;
+      gen = gen.map((v,i)=> v + (target[i]-v)*0.35 + (Math.random()-0.5)*0.01);
+      const sum = gen.reduce((a,b)=>a+b,0);
+      gen = gen.map(v=>Math.max(0.01,v/sum));
+      render();
+      if(step<8) setTimeout(tick, 200);
+      else { btn.disabled=false; btn.textContent = '\u25B6 Train Again'; addXP(4); }
+    }
+    tick();
+  };
+})();
+
+/* ================= CHAPTER 6: GNN graph toggle ================= */
+let gnnGraphMode = false;
+function buildGNN(){
+  const svg = document.getElementById('gnnSvg');
+  const nodes = [{x:60,y:110,l:'C1'},{x:150,y:50,l:'C2'},{x:240,y:110,l:'O'},{x:150,y:170,l:'H'},{x:310,y:60,l:'C3'}];
+  const fixedEdges = [[0,1],[1,2],[2,3],[3,4],[4,0]]; // arbitrary ring, ignoring real structure
+  const realEdges = [[0,1],[1,2],[1,3],[1,4]]; // actual bond-like structure (branching)
+  let html = '';
+  fixedEdges.forEach((e,idx)=>{
+    html += '<line class="graph-edge fixed" id="fedge'+idx+'" x1="'+nodes[e[0]].x+'" y1="'+nodes[e[0]].y+'" x2="'+nodes[e[1]].x+'" y2="'+nodes[e[1]].y+'"/>';
+  });
+  realEdges.forEach((e,idx)=>{
+    html += '<line class="graph-edge real" id="redge'+idx+'" x1="'+nodes[e[0]].x+'" y1="'+nodes[e[0]].y+'" x2="'+nodes[e[1]].x+'" y2="'+nodes[e[1]].y+'"/>';
+  });
+  nodes.forEach((n,i)=>{
+    html += '<circle class="graph-node" cx="'+n.x+'" cy="'+n.y+'" r="18"/>';
+    html += '<text class="graph-node-label" x="'+(n.x-9)+'" y="'+(n.y+5)+'">'+n.l+'</text>';
+  });
+  svg.innerHTML = html;
+  updateGNNDisplay();
+}
+function updateGNNDisplay(){
+  document.querySelectorAll('.graph-edge.fixed').forEach(e=> e.classList.toggle('on', !gnnGraphMode));
+  document.querySelectorAll('.graph-edge.real').forEach(e=> e.classList.toggle('on', gnnGraphMode));
+}
+buildGNN();
+function toggleGNN(){
+  gnnGraphMode = !gnnGraphMode;
+  document.getElementById('gnnToggle').textContent = gnnGraphMode ? 'Show Fixed Layout' : 'Show Graph-Structured';
+  updateGNNDisplay();
+  addXP(1);
+}
+
+/* ================= CHAPTER 7: ZNE chart ================= */
+let zneShowExtrap = false;
+function buildZNE(){
+  const svg = document.getElementById('zneSvg');
+  const trueVal = 0.82;
+  const points = [{x:1, y:0.72},{x:2, y:0.63},{x:3, y:0.54}];
+  const originX = 40, originY = 160, scaleX = 100, scaleY = 140;
+  function px(x){ return originX + x*scaleX*0.9; }
+  function py(y){ return originY - y*scaleY; }
+  let html = '<line x1="'+originX+'" y1="10" x2="'+originX+'" y2="'+originY+'" stroke="var(--line-strong)" stroke-width="1"/>';
+  html += '<line x1="'+originX+'" y1="'+originY+'" x2="380" y2="'+originY+'" stroke="var(--line-strong)" stroke-width="1"/>';
+  html += '<text x="4" y="'+(py(trueVal)+4)+'" font-family="JetBrains Mono" font-size="9" fill="#5ee6a0">true</text>';
+  html += '<line x1="'+originX+'" y1="'+py(trueVal)+'" x2="380" y2="'+py(trueVal)+'" stroke="var(--green)" stroke-width="1" stroke-dasharray="4 3" opacity="0.6"/>';
+  points.forEach(p=>{
+    html += '<circle cx="'+px(p.x)+'" cy="'+py(p.y)+'" r="5" fill="var(--red)"/>';
+    html += '<text x="'+(px(p.x)-8)+'" y="'+(py(p.y)-12)+'" font-family="JetBrains Mono" font-size="9" fill="#f2726a">'+p.x+'\u00D7</text>';
+  });
+  let path = 'M '+px(points[0].x)+' '+py(points[0].y);
+  points.slice(1).forEach(p=> path += ' L '+px(p.x)+' '+py(p.y));
+  html += '<path d="'+path+'" fill="none" stroke="var(--red)" stroke-width="1.5" opacity="0.6"/>';
+  if(zneShowExtrap){
+    const slope = (points[2].y - points[0].y) / (points[2].x - points[0].x);
+    const extrapY = points[0].y - slope*points[0].x;
+    html += '<line x1="'+px(0)+'" y1="'+py(extrapY)+'" x2="'+px(points[0].x)+'" y2="'+py(points[0].y)+'" stroke="var(--amber)" stroke-width="1.5" stroke-dasharray="3 3"/>';
+    html += '<circle cx="'+px(0)+'" cy="'+py(extrapY)+'" r="6" fill="var(--amber)"/>';
+    html += '<text x="'+(px(0)-2)+'" y="'+(py(extrapY)-12)+'" font-family="JetBrains Mono" font-size="10" fill="#f2a341">est. '+extrapY.toFixed(2)+'</text>';
+  }
+  html += '<text x="'+(px(0)-2)+'" y="'+(originY+18)+'" font-family="JetBrains Mono" font-size="9" fill="#5f7089">0\u00D7</text>';
+  html += '<text x="'+(px(3)-6)+'" y="'+(originY+18)+'" font-family="JetBrains Mono" font-size="9" fill="#5f7089">noise factor</text>';
+  svg.innerHTML = html;
+}
+buildZNE();
+function toggleZNE(){
+  zneShowExtrap = !zneShowExtrap;
+  document.getElementById('zneToggle').textContent = zneShowExtrap ? 'Hide Extrapolation' : 'Show Extrapolation';
+  buildZNE();
+  addXP(1);
+}
+
+/* ================= CHAPTER 8: decay curve + tutor ================= */
+(function(){
+  const slider = document.getElementById('decaySlider');
+  const svg = document.getElementById('decaySvg');
+  function draw(tRatio){
+    const originX = 30, originY = 130, w = 350, h = 110;
+    let path = 'M '+originX+' '+(originY - h);
+    for(let x=0; x<=300; x+=3){
+      const t = x/100;
+      const fid = Math.exp(-t);
+      path += ' L '+(originX+x)+' '+(originY - fid*h);
+    }
+    const curT = tRatio;
+    const curFid = Math.exp(-curT);
+    const markerX = originX + curT*100;
+    const markerY = originY - curFid*h;
+    let html = '<line x1="'+originX+'" y1="'+(originY-h)+'" x2="'+originX+'" y2="'+originY+'" stroke="var(--line-strong)" stroke-width="1"/>';
+    html += '<line x1="'+originX+'" y1="'+originY+'" x2="'+(originX+300)+'" y2="'+originY+'" stroke="var(--line-strong)" stroke-width="1"/>';
+    html += '<path d="'+path+'" fill="none" stroke="var(--cyan)" stroke-width="2"/>';
+    html += '<circle cx="'+markerX+'" cy="'+markerY+'" r="6" fill="var(--amber)"/>';
+    svg.innerHTML = html;
+    document.getElementById('decayReadout').textContent = curT.toFixed(2);
+    document.getElementById('decayReadoutText').textContent = 'Fidelity: '+(curFid*100).toFixed(1)+'% \u2014 '+(curT<0.3?'barely any time has passed.':curT<1.2?'meaningful decay, still usable.':curT<2?'most coherence is gone.':'essentially fully decohered.');
+  }
+  slider.addEventListener('input', ()=> draw(parseInt(slider.value)/100));
+  draw(0);
+})();
+const tutorQA11 = [
+  {q:"Is T1 or T2 usually the bigger practical problem?", a:"It depends on the hardware, but T2 (dephasing) is very often shorter than T1 (relaxation) in real devices, because phase information is fragile — even interactions that don't flip a qubit's energy state can still scramble its phase. Both ultimately limit how many gates you can chain before results become unreliable."},
+  {q:"Does error mitigation (Chapter 7) fix noise, or just work around it?", a:"Work around it. Zero-noise extrapolation and friends are statistical estimation techniques applied on top of noisy hardware — they don't change the physical qubits at all. Full error correction (next chapter) is the one that actually intercepts and fixes errors during the computation itself."},
+  {q:"Why does more circuit depth make noise worse in a predictable way?", a:"Roughly speaking, each gate and each unit of idle time gives decoherence another chance to act, so error probability compounds across the circuit — which is exactly why shallow-circuit methods like angle encoding (Module 8) and QCNNs (this module) are so valuable on today's hardware."}
+];
+(function(){
+  const qWrap = document.getElementById('tutorQuestions');
+  const answerBox = document.getElementById('tutorAnswer');
+  tutorQA11.forEach(item=>{
+    const btn = document.createElement('button');
+    btn.className = 'tutor-q-btn';
+    btn.textContent = item.q;
+    btn.addEventListener('click', ()=>{ answerBox.textContent = item.a; answerBox.classList.add('show'); addXP(2); });
+    qWrap.appendChild(btn);
+  });
+})();
+
+/* ================= CHAPTER 9: fault-tolerant overhead bars ================= */
+(function(){
+  const wrap = document.getElementById('ftBars');
+  const rows = [
+    {label:'Near-term error rate', n:'~1,000+ physical qubits / logical qubit', pct:95},
+    {label:'Improved hardware', n:'~100s physical qubits / logical qubit', pct:55},
+    {label:'Long-term target', n:'~10s physical qubits / logical qubit', pct:20}
+  ];
+  rows.forEach(r=>{
+    const row = document.createElement('div');
+    row.className = 'cbrow';
+    row.innerHTML = '<div class="cblabel">'+r.label+'</div><div class="cbtrack"><div class="cbfill" style="width:'+r.pct+'%; background:var(--amber);"></div></div><div class="cbval" style="text-align:left; font-size:10.5px;">'+r.n+'</div>';
+    wrap.appendChild(row);
+  });
+})();
+
+/* ================= quiz data ================= */
+const quizzes = {
+  ch1: [
+    {q:"What connects every topic in this module, according to the intro?", opts:["They're all about quantum error correction only","They represent the frontier where QML algorithms meet the messy realities of real quantum hardware and open research questions","They are all fully solved with no open problems","They only apply to classical computers"], correct:1, explain:"Dr. Okafor's framing: these are active research topics, not settled textbook material."},
+    {q:"How many major topics does this module tour?", opts:["2","8","50","3"], correct:1, explain:"QCNN, Barren Plateaus, Quantum RL, QGAN, Quantum GNN, Error Mitigation, Noise, and Fault-Tolerant QC \u2014 eight in total."},
+    {q:"What does Dr. Okafor imply about this being 'advanced' material?", opts:["It requires memorizing more vocabulary only","It builds directly on the core algorithms and honest challenges from earlier modules, applied to harder, less-settled problems","It has nothing to do with anything learned so far","It is purely theoretical with no practical relevance"], correct:1, explain:"Every chapter explicitly ties back to Modules 6\u20139 \u2014 nothing here is disconnected from the earlier material."}
+  ],
+  ch2: [
+    {q:"What classical architecture does a QCNN take structural inspiration from?", opts:["Classical convolutional neural networks (CNNs)","Classical decision trees","Classical database indexes","Classical spreadsheets"], correct:0, explain:"Convolution (weight-shared local gates) and pooling (shrinking the circuit) both borrow directly from classical CNN design."},
+    {q:"What happens to the number of active qubits as a QCNN moves through its pooling layers?", opts:["It doubles at every layer","It shrinks, roughly halving at each pooling step, similar to classical CNN pooling","It stays exactly constant","It becomes infinite"], correct:1, explain:"The bar chart above shows this directly \u2014 16 qubits down to 1 across successive pooling steps."},
+    {q:"What genuinely positive theoretical result is associated with QCNNs?", opts:["They are proven to always be faster than classical CNNs","Under certain conditions, they are proven to avoid the barren plateau problem that plagues generic deep ans\u00E4tze","They eliminate the need for any qubits","They require no training at all"], correct:1, explain:"Cong, Choi & Lukin (2019) established this as a genuine, unconditional trainability advantage for the QCNN structure."}
+  ],
+  ch3: [
+    {q:"What does the parameter-shift rule let you compute?", opts:["The exact ground state energy","A gradient of a quantum circuit's output with respect to a gate parameter, using two circuit evaluations","The total number of qubits","A classical loss function with no quantum computer involved"], correct:1, explain:"[\u27E8Z\u27E9(\u03B8+\u03C0/2) \u2212 \u27E8Z\u27E9(\u03B8\u2212\u03C0/2)] / 2 \u2014 exact, not approximate, and exactly what the experiment above computed."},
+    {q:"What trend does the live gradient-magnitude experiment in this chapter demonstrate?", opts:["Gradient magnitude stays exactly constant regardless of qubit count","Average gradient magnitude shrinks as qubit count grows, for randomly-initialized layered circuits","Gradient magnitude increases without bound as qubits increase","Gradients are impossible to compute on quantum circuits"], correct:1, explain:"This is the barren plateau phenomenon, computed live rather than just described."},
+    {q:"Why does this shrinking gradient matter practically?", opts:["It doesn't matter at all","Vanishingly small gradients starve a classical optimizer of any useful training signal, making the circuit hard or impossible to train","It only matters for classical neural networks","It means the circuit is perfectly trained already"], correct:1, explain:"No usable gradient signal means the classical half of the hybrid loop has nothing to work with."}
+  ],
+  ch4: [
+    {q:"In quantum reinforcement learning, what typically gets represented by a parameterized quantum circuit?", opts:["The reward signal only","The agent's policy (or value function), producing actions from measurement outcomes","The environment's physics","The classical dataset"], correct:1, explain:"The circuit plays the role of the policy in the loop diagram above \u2014 measurement outcomes become actions."},
+    {q:"What training method commonly updates a quantum RL policy's parameters?", opts:["No training is needed","Policy-gradient-style updates using parameter-shift gradients, similar to the mechanism from the barren plateau chapter","Manually hand-tuning by trial and error only","A method unrelated to gradients entirely"], correct:1, explain:"The exact gradient mechanism from Chapter 3 reappears here, applied to a reward signal instead of a labeled loss."},
+    {q:"What is the current honest state of quantum reinforcement learning research?", opts:["Fully mature and deployed at industrial scale","Largely exploratory and small-scale, with real but early results","Completely disproven as impossible","Identical to classical RL with no differences at all"], correct:1, explain:"Consistent with this course's running theme: real progress, genuinely early stage."}
+  ],
+  ch5: [
+    {q:"In a QGAN, what does the quantum generator try to do?", opts:["Classify data into fixed categories","Produce samples whose distribution matches a real target data distribution, closely related to QSample encoding","Delete training data","Replace the discriminator entirely"], correct:1, explain:"The dual bar chart above shows the generator's output distribution converging toward the target during training."},
+    {q:"What classical concept does a QGAN directly inherit its overall structure from?", opts:["Classical decision trees","The generator-discriminator adversarial training setup from classical GANs","Classical linear regression","Classical database queries"], correct:1, explain:"Same adversarial race, with a quantum circuit standing in as (at least) the generator."},
+    {q:"What known challenge do QGANs inherit or amplify compared to classical GANs?", opts:["None, they are strictly easier to train","Training instability, potentially compounded by barren-plateau-style trainability issues","Complete immunity to any training problems","A requirement for zero qubits"], correct:1, explain:"QGANs face classical GANs' well-known instability, plus the quantum-specific trainability concerns from earlier chapters."}
+  ],
+  ch6: [
+    {q:"Why is a graph-structured ansatz especially natural for molecule data?", opts:["Molecules have no structure at all","A molecule is literally a graph of atoms (nodes) and bonds (edges), which the ansatz's entangling gates can mirror directly","Graphs are unrelated to chemistry","It requires ignoring the molecule's actual structure"], correct:1, explain:"The toggle above shows exactly this contrast \u2014 an arbitrary ring layout versus gates placed on real bonds."},
+    {q:"What classical architecture inspires quantum graph neural networks?", opts:["Classical convolutional neural networks only","Classical graph neural networks and their message-passing structure","Classical spreadsheets","Classical sorting algorithms"], correct:1, explain:"Message passing between connected nodes has a direct quantum analog via entangling gates along real edges."},
+    {q:"Why does permutation invariance matter for a molecular GNN-style ansatz?", opts:["It doesn't matter at all","A molecule's physical properties shouldn't depend on the arbitrary order its atoms happen to be numbered in","Permutation invariance makes circuits slower for no benefit","It only matters for classical data"], correct:1, explain:"A good graph-structured design respects this symmetry directly, rather than accidentally depending on atom-numbering choices."}
+  ],
+  ch7: [
+    {q:"What does zero-noise extrapolation (ZNE) do?", opts:["Eliminates all noise directly during computation","Deliberately runs a circuit at multiple amplified noise levels, then extrapolates the results back to an estimated zero-noise value","Increases qubit count to reduce noise","Ignores noise entirely"], correct:1, explain:"The chart above shows exactly this \u2014 three noisy measurements, extrapolated back to an estimate at 0\u00D7 noise."},
+    {q:"What is the fundamental difference between error mitigation and full quantum error correction?", opts:["They are exactly identical","Error mitigation is a statistical, post-processing approach for near-term noisy hardware, not a way to make hardware itself error-free like full error correction aims to","Error mitigation requires more qubits than error correction","Error correction is only theoretical and never implemented"], correct:1, explain:"This distinction sets up Chapter 9 directly \u2014 mitigation copes with noise; correction aims to remove the need to cope."},
+    {q:"What kind of technique is readout error mitigation?", opts:["A way to speed up classical computers","A calibration-based correction for measurement bias in a quantum device","A method for generating random numbers","A way to eliminate the need for qubits"], correct:1, explain:"It corrects for known, calibratable bias in how a device reports measurement outcomes."}
+  ],
+  ch8: [
+    {q:"What does T1 time typically describe?", opts:["The circuit's total runtime","Energy relaxation \u2014 how long a qubit takes to decay from |1\u27E9 toward |0\u27E9","The number of qubits available","A classical algorithm's runtime"], correct:1, explain:"T1 is the timescale of the decay curve you dragged the slider through above."},
+    {q:"What does T2 (dephasing) describe, distinct from T1?", opts:["The same thing as T1 exactly","Loss of phase information between |0\u27E9 and |1\u27E9, distinct from energy relaxation","A measure of qubit count","A purely classical phenomenon"], correct:1, explain:"Dephasing can scramble the relative phase without necessarily flipping the qubit's energy state \u2014 a genuinely separate process from T1."},
+    {q:"Why does circuit depth matter so much on NISQ hardware, tying back to earlier modules?", opts:["Depth is irrelevant to noise","Every additional gate/time step gives noise more opportunity to accumulate before the final measurement","Deeper circuits are always more accurate","Circuit depth only matters for classical circuits"], correct:1, explain:"This is the direct physical reason shallow encodings (Module 8) and QCNNs (this module) are so valuable right now."}
+  ],
+  ch9: [
+    {q:"What is the basic idea behind quantum error correction in a fault-tolerant architecture?", opts:["Simply ignoring errors entirely","Encoding one logical qubit redundantly across many physical qubits, detecting and correcting errors via syndrome measurements without directly measuring the encoded data","Using only a single physical qubit for everything","Avoiding qubits altogether"], correct:1, explain:"Syndrome measurements reveal that (and where) an error happened without collapsing the fragile encoded information itself."},
+    {q:"What does the threshold theorem roughly state?", opts:["Errors can never be corrected under any circumstances","If physical error rates are below a certain threshold, arbitrarily long fault-tolerant computation becomes possible in principle","All quantum computers are already fault-tolerant today","Thresholds are irrelevant to quantum computing"], correct:1, explain:"This is the theoretical foundation that makes large-scale fault tolerance a well-defined, achievable goal in principle."},
+    {q:"What is a sobering, honest practical challenge of fault-tolerant quantum computing today?", opts:["No challenges remain, it's fully solved","Current estimates require a large overhead of physical qubits per logical qubit, keeping large-scale fault tolerance a future goal rather than a present reality","Fault tolerance requires zero physical qubits","Fault tolerance has already been achieved on every laptop"], correct:1, explain:"The overhead bar chart above shows this directly \u2014 hundreds to thousands of physical qubits per logical qubit in near-term estimates."}
+  ]
+};
+const finalQuiz = [
+  {q:"What ties every topic in Module 11 together?", opts:["They're all frontier QML topics grappling with real hardware limits and open research questions","They're all fully solved classical algorithms","They have no relationship to previous modules","They only concern quantum cryptography"], correct:0, explain:"Chapter 1's framing carries through every chapter that follows."},
+  {q:"What structural trick does a QCNN use, borrowed from classical CNNs?", opts:["Fully-connected layers only","Convolutional (weight-shared) layers alternating with pooling layers that reduce qubit count","Random gate placement with no structure","Infinite qubit layers"], correct:1, explain:"Weight-sharing plus pooling is the whole architecture, and the source of its barren-plateau resistance."},
+  {q:"What did the live gradient experiment in this module demonstrate about randomly-initialized deep circuits?", opts:["Gradients grow without bound as qubits increase","Average gradient magnitude shrinks as qubit count grows, making training harder","Gradients are always exactly zero regardless of circuit","Gradients have nothing to do with trainability"], correct:1, explain:"A real, live-computed demonstration of the barren plateau phenomenon."},
+  {q:"What does a quantum RL policy circuit typically produce?", opts:["A classical dataset directly","Actions (or action probabilities) derived from measurement outcomes of a parameterized circuit","A fixed, untrainable output","Nothing usable"], correct:1, explain:"The same measurement-to-decision pattern from VQCs, redirected at an RL loop."},
+  {q:"What does a QGAN's generator aim to match?", opts:["A fixed random number","A real target data distribution, via samples from a trained quantum circuit","The discriminator's own parameters exactly","Nothing at all"], correct:1, explain:"Distribution-matching, learned adversarially rather than constructed directly like QSample encoding."},
+  {q:"Why does a quantum GNN-style ansatz mirror a molecule's actual bond graph?", opts:["To ignore the molecule's real structure","Because the molecule's physical structure is a graph, and respecting it directly in the circuit is more physically meaningful than a generic fixed layout","Bond structure is irrelevant to any quantum algorithm","It has nothing to do with permutation invariance"], correct:1, explain:"Structure-respecting design was this chapter's central theme."},
+  {q:"What is the core idea of zero-noise extrapolation?", opts:["Eliminate noise directly with more qubits","Deliberately measure at amplified noise levels, then extrapolate back toward the zero-noise estimate","Increase circuit depth to reduce noise","Ignore noisy results entirely"], correct:1, explain:"A statistical estimate, not a hardware fix \u2014 the key distinction from full error correction."},
+  {q:"What do T1 and T2 together describe?", opts:["Circuit runtime only","The two main decoherence processes \u2014 energy relaxation and dephasing \u2014 that degrade a qubit's state over time","Qubit count","A purely classical phenomenon"], correct:1, explain:"The physical vocabulary behind every 'NISQ' mention since Module 7."},
+  {q:"What does the threshold theorem promise, and what's the catch discussed in this module?", opts:["Arbitrarily long fault-tolerant computation is possible below a physical error-rate threshold, but current physical-qubit overhead estimates remain large","Fault tolerance has already been fully achieved with no remaining challenges","The threshold theorem has been disproven","Thresholds don't apply to real hardware"], correct:0, explain:"The promise and the honest catch, both from Chapter 9's closing argument."}
+];
+
+/* ================= render quizzes (shared engine) ================= */
+function renderQuiz(containerId, items, chapterKey){
+  const container = document.getElementById(containerId);
+  items.forEach((item, idx)=>{
+    const qDiv = document.createElement('div');
+    qDiv.className = 'q-item';
+    qDiv.innerHTML = '<div class="q-text">'+(idx+1)+'. '+item.q+'</div>'
+      + '<div class="q-options">'+item.opts.map((o,i)=>'<button class="q-opt" data-i="'+i+'">'+o+'</button>').join('')+'</div>'
+      + '<div class="q-explain">'+item.explain+'</div>';
+    container.appendChild(qDiv);
+    const buttons = qDiv.querySelectorAll('.q-opt');
+    const explainEl = qDiv.querySelector('.q-explain');
+    buttons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = parseInt(btn.dataset.i);
+        buttons.forEach(b=>b.disabled = true);
+        if(i === item.correct){
+          btn.classList.add('correct');
+          if(chapterKey) onCorrect(chapterKey);
+          else onFinalAnswer(idx, true);
+        } else {
+          btn.classList.add('incorrect');
+          buttons[item.correct].classList.add('correct');
+          if(chapterKey) onIncorrect(chapterKey);
+          else onFinalAnswer(idx, false);
+        }
+        explainEl.classList.add('show');
+      });
+    });
+  });
+}
+Object.keys(quizzes).forEach(key=>{ renderQuiz('quiz-'+key, quizzes[key], key); updateChapterScore(key); });
+renderQuiz('quiz-final', finalQuiz, null);
+
+function updateChapterScore(key){
+  const s = state.chapters[key];
+  document.getElementById('score-'+key).textContent = s.correct+' / '+s.total;
+}
+function onCorrect(key){
+  const s = state.chapters[key];
+  s.correct = Math.min(s.correct+1, s.total);
+  addXP(10);
+  checkChapterDone(key);
+  updateChapterScore(key);
+  saveState();
+}
+function onIncorrect(key){
+  const s = state.chapters[key];
+  s.hadMiss = true;
+  checkChapterDone(key);
+  updateChapterScore(key);
+  saveState();
+}
+let answeredCount = { ch1:0, ch2:0, ch3:0, ch4:0, ch5:0, ch6:0, ch7:0, ch8:0, ch9:0 };
+function checkChapterDone(key){
+  answeredCount[key]++;
+  const s = state.chapters[key];
+  if(answeredCount[key] >= s.total){
+    s.done = true;
+    const dot = document.getElementById('dot-'+key);
+    const statusEl = document.getElementById('status-'+key);
+    statusEl.classList.add('show');
+    if(s.hadMiss){
+      dot.classList.add('warn');
+      statusEl.classList.add('review');
+      statusEl.innerHTML = '\u26A0 Review suggested \u2014 you missed at least one question in this chapter.';
+    } else {
+      dot.classList.add('done');
+      statusEl.classList.add('mastered');
+      statusEl.innerHTML = '\u2713 Mastered \u2014 perfect score on this chapter.';
+      addXP(15);
+    }
+    saveState();
+  }
+}
+
+let finalAnswers = [];
+function onFinalAnswer(idx, correct){
+  finalAnswers[idx] = correct;
+  if(finalAnswers.filter(a=>a!==undefined).length === finalQuiz.length){
+    showFinalResult();
+  }
+}
+function showFinalResult(){
+  const correctCount = finalAnswers.filter(a=>a===true).length;
+  const pct = Math.round((correctCount/finalQuiz.length)*100);
+  document.getElementById('resultScore').textContent = pct+'%';
+  document.getElementById('resultDetail').textContent = correctCount+' / '+finalQuiz.length+' correct';
+  const badge = document.getElementById('resultBadge');
+  const pass = pct >= 70;
+  badge.textContent = pass ? 'Passed' : 'Retry Recommended';
+  badge.className = 'result-badge ' + (pass ? 'pass' : 'retry');
+  addXP(correctCount*10 + (pass?25:0));
+
+  const weakChapters = Object.keys(state.chapters).filter(k => state.chapters[k].hadMiss);
+  const wrap = document.getElementById('recommendWrap');
+  if(weakChapters.length === 0 && pass){
+    wrap.innerHTML = '<div class="callout" style="margin-top:4px;"><b>Great work.</b> No flagged chapters and a passing assessment score \u2014 you are ready for Module 12: Research &amp; Capstone Project.</div>';
+  } else {
+    const names = { ch1:"The Frontier", ch2:"Quantum Convolutional Neural Networks", ch3:"Barren Plateaus, Hands-On", ch4:"Quantum Reinforcement Learning", ch5:"Quantum Generative Models", ch6:"Quantum Graph Neural Networks", ch7:"Quantum Error Mitigation", ch8:"Noise in Quantum Systems", ch9:"Fault-Tolerant Quantum Computing" };
+    let html = '<div class="visual-label" style="margin-top:18px;">Recommended Review</div><ul class="recommend-list">';
+    weakChapters.forEach(k=> html += '<li>\u21BA Revisit <b>'+names[k]+'</b> \u2014 a quick-check answer there was missed.</li>');
+    if(!pass){ html += '<li>\u21BA Your assessment score was below 70% \u2014 consider re-reading the callout boxes at the end of each chapter before continuing.</li>'; }
+    html += '</ul>';
+    wrap.innerHTML = html;
+  }
+  document.getElementById('resultPanel').classList.add('show');
+  document.getElementById('dot-final').classList.add(pass ? 'done' : 'warn');
+  state.finalDone = true;
+  saveState();
+}
+
+/* ---------------- scrollspy + progress bar ---------------- */
+const sections = document.querySelectorAll('.chapter');
+const sideLinks = document.querySelectorAll('.side-list a');
+const spyObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      sideLinks.forEach(a=>a.classList.remove('active'));
+      const link = document.querySelector('.side-list a[data-target="'+entry.target.id+'"]');
+      if(link) link.classList.add('active');
+    }
+  });
+},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>spyObserver.observe(s));
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+  document.getElementById('progressFill').style.width = scrolled+'%';
+});
+
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+},{threshold:0.08});
+revealEls.forEach(el=>io.observe(el));
+
+/* ---------------- prev/next module nav, from the shared registry ---------------- */
+(function(){
+  const { prev, next } = qmlGetAdjacentModules(11);
+  const wrap = document.getElementById('moduleNav');
+  function cardHTML(mod, dir){
+    if(!mod){
+      return '<div class="mn-card disabled '+dir+'"><span class="mn-eyebrow">'+(dir==='next'?'Up Next':'Previous')+'</span><span class="mn-title">\u2014 none \u2014</span></div>';
+    }
+    const available = !!mod.file;
+    const arrow = dir==='prev' ? '\u2190 ' : '';
+    const arrowEnd = dir==='next' ? ' \u2192' : '';
+    const eyebrow = (dir==='prev' ? 'Previous \u2014 Module '+mod.id : 'Up Next \u2014 Module '+mod.id) + (available ? '' : ' (Coming Soon)');
+    if(available){
+      return '<a class="mn-card enabled '+dir+'" href="'+mod.file+'">'
+        + '<span class="mn-eyebrow">'+eyebrow+'</span>'
+        + '<span class="mn-title">'+arrow+mod.title+arrowEnd+'</span>'
+        + '<span class="mn-arrow">Open tutorial</span>'
+        + '</a>';
+    }
+    return '<div class="mn-card disabled '+dir+'">'
+      + '<span class="mn-eyebrow">'+eyebrow+'</span>'
+      + '<span class="mn-title">'+mod.title+'</span>'
+      + '<span class="mn-arrow">Not published yet</span>'
+      + '</div>';
+  }
+  wrap.innerHTML = cardHTML(prev,'prev') + cardHTML(next,'next');
+
+  const continueBtn = document.getElementById('continueBtn');
+  if(continueBtn){
+    if(next && next.file){
+      continueBtn.href = next.file;
+      continueBtn.textContent = 'Continue to Module '+next.id+' \u2192';
+    } else if(next){
+      continueBtn.href = 'qml-roadmap-landing-page.html#curriculum';
+      continueBtn.textContent = 'Module '+next.id+' — Coming Soon';
+      continueBtn.style.opacity = '0.6';
+    }
+  }
+})();
+</script>
+
+</body>
+</html>

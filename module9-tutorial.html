@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 9 — Variational Quantum Circuits &amp; Core QML Algorithms | QML Curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="modules-registry.js"></script>
+<style>
+:root{
+  --bg:#070b14; --bg-2:#0b111f; --panel:#0e1526; --panel-2:#101a2e;
+  --line:rgba(148,178,224,0.14); --line-strong:rgba(148,178,224,0.28);
+  --ink:#e9eef8; --ink-dim:#9fb0c9; --ink-faint:#5f7089;
+  --cyan:#5ad1e6; --cyan-dim:rgba(90,209,230,0.14);
+  --violet:#b39bff; --violet-dim:rgba(179,155,255,0.14);
+  --amber:#f2a341; --amber-dim:rgba(242,163,65,0.14);
+  --green:#5ee6a0; --green-dim:rgba(94,230,160,0.14);
+  --red:#f2726a; --red-dim:rgba(242,114,106,0.14);
+  --blue:#4fa3f7;
+  --serif:'Fraunces', Georgia, serif; --sans:'Inter', -apple-system, sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.7;}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto !important;}}
+
+.progress-rail{position:fixed; top:0; left:0; right:0; height:3px; background:var(--line); z-index:100;}
+.progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--violet),var(--amber)); transition:width .1s linear;}
+
+header{position:sticky; top:3px; z-index:60; backdrop-filter:blur(14px); background:rgba(7,11,20,0.82); border-bottom:1px solid var(--line);}
+.nav-wrap{max-width:1280px; margin:0 auto; padding:14px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+.back-link{display:flex; align-items:center; gap:8px; color:var(--ink-dim); text-decoration:none; font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; transition:color .2s;}
+.back-link:hover{color:var(--cyan);}
+.crumb{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); letter-spacing:0.06em; text-transform:uppercase;}
+.crumb b{color:var(--violet);}
+.xp-badge{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12.5px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; color:var(--amber); background:var(--amber-dim);}
+
+.layout{max-width:1280px; margin:0 auto; padding:52px 32px 120px; display:grid; grid-template-columns:250px 1fr; gap:56px;}
+.sidebar{position:sticky; top:80px; align-self:start; height:fit-content; max-height:calc(100vh - 100px); overflow-y:auto;}
+.side-title{font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;}
+.side-list{list-style:none; display:flex; flex-direction:column; gap:1px;}
+.side-list a{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink-dim); font-size:12.5px; padding:8px 12px; border-radius:8px; border-left:2px solid transparent; transition:background .2s, color .2s, border-color .2s;}
+.side-list a:hover{background:var(--panel);}
+.side-list a.active{color:var(--ink); background:var(--panel); border-left-color:var(--cyan);}
+.side-dot{width:7px; height:7px; border-radius:50%; background:#2a3550; flex-shrink:0; transition:background .3s;}
+.side-dot.done{background:var(--green); box-shadow:0 0 6px var(--green);}
+.side-dot.warn{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+
+.tut-hero{margin-bottom:44px;}
+.module-eyebrow{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--violet); background:var(--violet-dim); margin-bottom:20px;}
+.tut-hero h1{font-family:var(--serif); font-weight:600; font-size:clamp(30px,4vw,44px); line-height:1.1; letter-spacing:-0.01em;}
+.tut-hero p.lede{margin-top:16px; color:var(--ink-dim); font-size:16px; max-width:660px;}
+.chip-row{display:flex; gap:8px; margin-top:22px; flex-wrap:wrap;}
+.chip{font-family:var(--mono); font-size:10.5px; letter-spacing:0.04em; color:var(--ink-faint); border:1px solid var(--line); padding:5px 11px; border-radius:100px;}
+
+.character-card{margin-top:28px; display:flex; gap:18px; align-items:center; padding:20px 22px; background:linear-gradient(120deg, rgba(179,155,255,0.08), rgba(90,209,230,0.05)); border:1px solid var(--line-strong); border-radius:14px;}
+.avatar-ring{width:56px; height:56px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1.5px solid var(--violet); font-family:var(--serif); font-size:22px; color:var(--violet);}
+.character-card .cname{font-weight:700; font-size:14.5px; color:var(--ink);}
+.character-card .crole{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:2px;}
+.character-card p{font-size:13.5px; color:var(--ink-dim); margin-top:6px;}
+
+.chapter{margin-bottom:80px; scroll-margin-top:90px;}
+.chapter-head{display:flex; align-items:center; gap:14px; margin-bottom:20px;}
+.chapter-icon{width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1px solid var(--line-strong); font-size:18px; color:var(--cyan); flex-shrink:0;}
+.chapter-num{font-family:var(--mono); font-size:12px; color:var(--ink-faint); letter-spacing:0.08em; display:block;}
+.chapter h2{font-family:var(--serif); font-weight:600; font-size:clamp(23px,2.8vw,30px); letter-spacing:-0.01em;}
+
+.story-panel{position:relative; margin:18px 0 24px; padding:22px 26px 22px 52px; border-radius:12px; background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--violet); font-family:var(--serif); font-style:italic; font-size:15.5px; color:var(--ink-dim); line-height:1.75;}
+.story-panel::before{content:'\201C'; position:absolute; left:16px; top:8px; font-size:38px; color:var(--violet); font-style:normal; opacity:0.6;}
+.story-panel b{color:var(--ink); font-style:normal;}
+
+.chapter > p.body-text{color:var(--ink-dim); font-size:15px; margin-bottom:16px;}
+.chapter > p.body-text b{color:var(--ink); font-weight:600;}
+.chapter ul.points{margin:16px 0 20px 0; padding-left:0; list-style:none; display:flex; flex-direction:column; gap:10px;}
+.chapter ul.points li{display:flex; gap:10px; font-size:14px; color:var(--ink-dim); padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px;}
+.chapter ul.points li::before{content:'\25C6'; color:var(--violet); font-size:8px; margin-top:5px; flex-shrink:0;}
+.callout{margin:22px 0; padding:16px 18px; border-radius:10px; border-left:3px solid var(--cyan); background:var(--cyan-dim); font-size:13.5px; color:var(--ink-dim);}
+.callout b{color:var(--ink);}
+.callout.warn{border-left-color:var(--amber); background:var(--amber-dim);}
+
+.spotlight{display:flex; align-items:center; gap:14px; margin:22px 0; padding:16px 18px; border-radius:12px; background:var(--amber-dim); border:1px solid rgba(242,163,65,0.35);}
+.spotlight .sicon{font-size:20px; color:var(--amber); flex-shrink:0;}
+.spotlight .stext{font-size:12.5px; color:var(--ink-dim);}
+.spotlight .stext b{color:var(--amber); font-family:var(--mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; display:block; margin-bottom:3px;}
+
+.visual-box{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:26px; margin:24px 0; overflow-x:auto;}
+.visual-label{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px; display:flex; align-items:center; justify-content:space-between;}
+
+.code-block{background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:16px 18px; font-family:var(--mono); font-size:12.5px; line-height:1.7; overflow-x:auto; margin-top:14px;}
+.code-block .kw{color:var(--violet);}
+.code-block .fn{color:var(--cyan);}
+.code-block .cm{color:var(--ink-faint);}
+.code-block .st{color:var(--green);}
+.code-block .nm{color:var(--amber);}
+
+.ctrl-row{display:flex; align-items:center; gap:16px; margin-bottom:20px; flex-wrap:wrap;}
+.ctrl-row label{font-family:var(--mono); font-size:12px; color:var(--ink-dim);}
+.ctrl-row input[type=range]{width:200px; accent-color:var(--cyan);}
+.ctrl-readout{font-family:var(--serif); font-size:18px; color:var(--cyan); min-width:32px; display:inline-block; text-align:center;}
+
+/* Ch1: algorithm preview grid (flip cards) */
+.encoding-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+.enc-card{perspective:1000px; height:120px; cursor:pointer;}
+.enc-inner{position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d;}
+.enc-card.flipped .enc-inner{transform:rotateY(180deg);}
+.enc-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:center; border:1px solid var(--line-strong);}
+.enc-front{background:var(--panel-2);}
+.enc-front .en{font-family:var(--mono); font-size:9.5px; color:var(--ink-faint); margin-bottom:4px;}
+.enc-front h6{font-size:12.5px; font-weight:700; color:var(--ink);}
+.enc-back{background:var(--panel); transform:rotateY(180deg); font-size:11px; color:var(--ink-dim); line-height:1.5;}
+@media (max-width:900px){.encoding-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:480px){.encoding-grid{grid-template-columns:1fr;}}
+
+/* Ch1: hybrid loop mini diagram */
+.loop-wrap{display:flex; justify-content:center;}
+.loop-node{fill:var(--panel-2); stroke:var(--line-strong); stroke-width:1.4;}
+.loop-text{font-family:var(--mono); font-size:10.5px; fill:var(--ink-dim);}
+.loop-arrow{stroke:var(--ink-faint); stroke-width:1.4; fill:none;}
+.loop-pulse{fill:var(--cyan); filter:drop-shadow(0 0 5px var(--cyan));}
+
+/* Ch2: PQC circuit builder */
+.pqc-wrap{display:flex; justify-content:center; overflow-x:auto;}
+.pqc-gate{fill:var(--panel-2); stroke:var(--line-strong); stroke-width:1.2;}
+.pqc-gate.ent{fill:var(--violet-dim); stroke:var(--violet);}
+.pqc-label{font-family:var(--mono); font-size:10px; fill:var(--ink-dim);}
+.pqc-wire{stroke:rgba(148,178,224,0.35); stroke-width:1.4;}
+
+/* Ch3: VQC pipeline + training curve */
+.pipeline-row{display:flex; align-items:center; gap:0; justify-content:center; flex-wrap:wrap; margin-bottom:20px;}
+.pipe-step{padding:14px 18px; background:var(--panel-2); border:1px solid var(--line-strong); border-radius:10px; text-align:center; min-width:110px;}
+.pipe-step .pn{font-family:var(--mono); font-size:9.5px; color:var(--ink-faint); text-transform:uppercase;}
+.pipe-step .pl{font-size:12.5px; font-weight:700; color:var(--ink); margin-top:4px;}
+.pipe-arrow{font-family:var(--mono); color:var(--cyan); font-size:16px; padding:0 8px;}
+.train-plot-wrap{display:flex; justify-content:center;}
+
+/* Ch4: kernel heatmap */
+.kernel-grid{display:inline-grid; grid-template-columns:repeat(6,32px); gap:2px;}
+.kernel-cell{width:32px; height:32px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:9px; color:rgba(7,11,20,0.7);}
+.kernel-wrap{display:flex; justify-content:center; gap:40px; flex-wrap:wrap;}
+.kernel-col{text-align:center;}
+.kernel-col-label{font-family:var(--mono); font-size:10.5px; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:10px;}
+
+/* Ch5: classical vs quantum NN comparison */
+.nn-compare{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+.nn-col{padding:18px; background:var(--panel-2); border-radius:10px; border:1px solid var(--line);}
+.nn-col h5{font-family:var(--mono); font-size:11.5px; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px;}
+.nn-col.classical h5{color:var(--amber);}
+.nn-col.quantum h5{color:var(--cyan);}
+.nn-map-row{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--line); font-size:12.5px; color:var(--ink-dim);}
+.nn-map-row:last-child{border-bottom:none;}
+@media (max-width:700px){.nn-compare{grid-template-columns:1fr;}}
+
+/* Ch6: expressivity vs generalization curve */
+.curve-wrap{display:flex; justify-content:center;}
+
+/* Ch7: PCA compare bars (reused pattern) */
+.compare-bars{display:flex; flex-direction:column; gap:14px;}
+.cbrow{display:grid; grid-template-columns:170px 1fr 130px; align-items:center; gap:14px;}
+.cbrow .cblabel{font-family:var(--mono); font-size:11.5px; color:var(--ink-dim);}
+.cbtrack{height:10px; background:var(--panel-2); border-radius:6px; overflow:hidden; border:1px solid var(--line);}
+.cbfill{height:100%; border-radius:6px; transition:width .5s ease;}
+.cbfill.standard{background:var(--amber);}
+.cbfill.dense{background:var(--cyan);}
+.cbval{font-family:var(--mono); font-size:11.5px; color:var(--ink); text-align:right;}
+
+/* Ch8: autoencoder diagram */
+.ae-wrap{display:flex; justify-content:center;}
+.ae-qubit{fill:var(--panel-2); stroke:var(--line-strong); stroke-width:1.4;}
+.ae-qubit.latent{stroke:var(--cyan); fill:var(--cyan-dim);}
+.ae-qubit.trash{stroke:var(--red); fill:var(--red-dim);}
+
+.tutor-widget{background:var(--panel); border:1px solid var(--line-strong); border-radius:14px; padding:22px; margin:24px 0;}
+.tutor-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+.tutor-avatar{width:32px; height:32px; border-radius:9px; background:var(--violet-dim); color:var(--violet); display:flex; align-items:center; justify-content:center; font-size:15px;}
+.tutor-title{font-family:var(--mono); font-size:12px; letter-spacing:0.04em; color:var(--ink);}
+.tutor-note{font-size:11.5px; color:var(--ink-faint); margin-bottom:16px;}
+.tutor-questions{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;}
+.tutor-q-btn{font-family:var(--sans); font-size:12.5px; padding:9px 14px; border-radius:100px; border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-dim); cursor:pointer; transition:all .2s;}
+.tutor-q-btn:hover{border-color:var(--violet); color:var(--ink);}
+.tutor-answer{display:none; padding:14px 16px; border-radius:10px; background:var(--panel-2); border-left:3px solid var(--violet); font-size:13px; color:var(--ink-dim); line-height:1.6;}
+.tutor-answer.show{display:block; animation:fadein .3s ease;}
+@keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+.quiz-box{margin-top:28px; background:var(--panel); border:1px solid var(--line-strong); border-radius:14px; padding:24px;}
+.quiz-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
+.quiz-title{font-family:var(--mono); font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--cyan); display:flex; align-items:center; gap:8px;}
+.quiz-score{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);}
+.q-item{margin-bottom:22px;}
+.q-item:last-child{margin-bottom:0;}
+.q-text{font-size:14px; font-weight:600; margin-bottom:12px; color:var(--ink);}
+.q-options{display:flex; flex-direction:column; gap:8px;}
+.q-opt{text-align:left; padding:11px 14px; border-radius:9px; border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-dim); font-size:13px; cursor:pointer; transition:border-color .2s, background .2s, color .2s; font-family:var(--sans);}
+.q-opt:hover:not(:disabled){border-color:var(--ink-dim); color:var(--ink);}
+.q-opt.correct{border-color:var(--green); background:var(--green-dim); color:var(--green);}
+.q-opt.incorrect{border-color:var(--red); background:var(--red-dim); color:var(--red);}
+.q-opt:disabled{cursor:default;}
+.q-explain{margin-top:10px; font-size:12.5px; color:var(--ink-dim); padding:11px 14px; border-radius:8px; background:var(--panel-2); border-left:2px solid var(--cyan); display:none;}
+.q-explain.show{display:block;}
+.chapter-status{margin-top:16px; padding:10px 14px; border-radius:8px; font-family:var(--mono); font-size:11.5px; display:none; align-items:center; gap:8px;}
+.chapter-status.show{display:flex;}
+.chapter-status.mastered{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.35);}
+.chapter-status.review{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.35);}
+
+.final-assess{margin-top:20px; background:linear-gradient(180deg,var(--panel-2),var(--panel)); border:1px solid var(--line-strong); border-radius:16px; padding:34px;}
+.final-head{margin-bottom:26px;}
+.final-head .module-eyebrow{color:var(--amber); border-color:var(--line-strong); background:var(--amber-dim);}
+.final-head h2{font-family:var(--serif); font-size:clamp(26px,3vw,34px); font-weight:600;}
+.final-head p{color:var(--ink-dim); margin-top:10px; font-size:14.5px;}
+.result-panel{margin-top:28px; padding:24px; border-radius:12px; border:1px solid var(--line-strong); background:var(--bg); display:none;}
+.result-panel.show{display:block;}
+.result-top{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:18px;}
+.result-score{font-family:var(--serif); font-size:44px; font-weight:600;}
+.result-badge{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; padding:6px 14px; border-radius:100px;}
+.result-badge.pass{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.4);}
+.result-badge.retry{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.4);}
+.recommend-list{list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+.recommend-list li{font-size:13px; color:var(--ink-dim); padding:10px 12px; background:var(--panel-2); border-radius:8px; border:1px solid var(--line);}
+.result-actions{display:flex; gap:12px; margin-top:22px; flex-wrap:wrap;}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:9px; font-size:13.5px; font-weight:600; text-decoration:none; cursor:pointer; border:1px solid transparent; transition:transform .2s, box-shadow .2s;}
+.btn-primary{background:var(--blue); color:#04101f;}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 26px -8px rgba(79,163,247,0.5);}
+.btn-ghost{background:transparent; border-color:var(--line-strong); color:var(--ink);}
+.btn-ghost:hover{border-color:var(--ink-dim); transform:translateY(-2px);}
+.toggle-btn{font-family:var(--mono); font-size:11px; letter-spacing:0.05em; text-transform:uppercase; padding:8px 16px; border-radius:100px; border:1px solid var(--line-strong); background:transparent; color:var(--ink-dim); cursor:pointer; transition:all .2s;}
+.toggle-btn.active{color:var(--cyan); border-color:var(--cyan); background:var(--cyan-dim);}
+
+.reveal{opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease;}
+.reveal.in{opacity:1; transform:translateY(0);}
+
+.module-nav{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:70px; padding-top:36px; border-top:1px solid var(--line);}
+.mn-card{display:flex; flex-direction:column; gap:6px; padding:20px 22px; border-radius:14px; background:var(--panel); border:1px solid var(--line); text-decoration:none; transition:border-color .25s, transform .25s;}
+.mn-card.enabled:hover{border-color:var(--line-strong); transform:translateY(-3px);}
+.mn-card.disabled{opacity:0.5; cursor:default;}
+.mn-card.next{align-items:flex-end; text-align:right;}
+.mn-eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint);}
+.mn-title{font-family:var(--serif); font-size:16px; font-weight:600; color:var(--ink);}
+.mn-arrow{font-family:var(--mono); font-size:12px; color:var(--cyan);}
+@media (max-width:700px){.module-nav{grid-template-columns:1fr;}}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static; display:flex; overflow-x:auto; gap:4px; padding-bottom:10px; max-height:none;}
+  .side-list{flex-direction:row;}
+  .side-list a{white-space:nowrap;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-rail"><div class="progress-fill" id="progressFill"></div></div>
+
+<header>
+  <div class="nav-wrap">
+    <a class="back-link" href="qml-roadmap-landing-page.html#curriculum">← Back to Curriculum</a>
+    <div class="crumb">LEVEL 2 · INTERMEDIATE — <b>MODULE 9</b></div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a class="back-link" href="progress-hub.html">My Progress</a>
+      <div class="xp-badge">⚡ <span id="xpCount">0</span> XP</div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="side-title">Module 9 Chapters</div>
+    <ul class="side-list" id="sideList">
+      <li><a href="#ch1" data-target="ch1"><span class="side-dot" id="dot-ch1"></span>The Variational Idea</a></li>
+      <li><a href="#ch2" data-target="ch2"><span class="side-dot" id="dot-ch2"></span>Parameterized Quantum Circuits</a></li>
+      <li><a href="#ch3" data-target="ch3"><span class="side-dot" id="dot-ch3"></span>Variational Quantum Classifiers</a></li>
+      <li><a href="#ch4" data-target="ch4"><span class="side-dot" id="dot-ch4"></span>Quantum Support Vector Machines</a></li>
+      <li><a href="#ch5" data-target="ch5"><span class="side-dot" id="dot-ch5"></span>Quantum Neural Networks</a></li>
+      <li><a href="#ch6" data-target="ch6"><span class="side-dot" id="dot-ch6"></span>Quantum Kernel Methods</a></li>
+      <li><a href="#ch7" data-target="ch7"><span class="side-dot" id="dot-ch7"></span>Quantum PCA</a></li>
+      <li><a href="#ch8" data-target="ch8"><span class="side-dot" id="dot-ch8"></span>Quantum Autoencoders</a></li>
+      <li><a href="#final" data-target="final"><span class="side-dot" id="dot-final"></span>Module Assessment</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <div class="tut-hero reveal">
+      <div class="module-eyebrow">◆ Module 9 · Intermediate</div>
+      <h1>Variational Quantum Circuits &amp; Core QML Algorithms</h1>
+      <p class="lede">Maya's data can finally get into a circuit. Now: what makes that circuit actually <i>learn</i> something? This module is the payoff of everything so far — seven real algorithms built from one shared trainable idea.</p>
+      <div class="chip-row">
+        <span class="chip">8 Chapters</span>
+        <span class="chip">7 Core Algorithms</span>
+        <span class="chip">24 Quick-Check Questions</span>
+        <span class="chip">1 Adaptive Assessment</span>
+        <span class="chip">~55 min</span>
+      </div>
+      <div class="character-card">
+        <div class="avatar-ring">M</div>
+        <div>
+          <div class="cname">Maya &amp; Dr. Okafor, continued</div>
+          <div class="crole">Same lab, the actual learning part</div>
+          <p>Module 8 ended with Maya's molecule data properly loaded into a quantum state. Today she asks the question that's been sitting under everything: encoding gets the data in — what makes the circuit smart?</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAPTER 1 -->
+    <section class="chapter reveal" id="ch1">
+      <div class="chapter-head"><div class="chapter-icon">↻</div><div><span class="chapter-num">CHAPTER 01</span><h2>The Variational Idea</h2></div></div>
+      <div class="story-panel">"Encoding gets your data into the circuit," Dr. Okafor says. "It doesn't make the circuit smart." Maya frowns — so what does? He draws the same loop she saw all the way back in Module 6, but this time he fills in the blanks with real, nameable algorithms. <b>"Every single one of these seven ideas,"</b> he says, circling the diagram, "is this exact loop, wearing a different costume."</div>
+      <p class="body-text">Every algorithm in this module shares one skeleton: <b>encode data → apply a trainable parameterized circuit → measure → let a classical optimizer update the parameters → repeat.</b> What changes between VQC, QSVM, QNN, and the rest is which part of that loop does the heavy lifting, and what you do with the result.</p>
+      <div class="visual-box">
+        <div class="visual-label">The Shared Loop, Once More</div>
+        <div class="loop-wrap">
+          <svg viewBox="0 0 460 200" width="460">
+            <defs><marker id="arrow9" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L6,3 L0,6 Z" fill="#5f7089"/></marker></defs>
+            <rect class="loop-node" x="15" y="75" width="110" height="50" rx="10"/>
+            <text class="loop-text" x="30" y="105">Encode Data</text>
+            <rect class="loop-node" x="175" y="75" width="110" height="50" rx="10"/>
+            <text class="loop-text" x="188" y="98">Trainable</text>
+            <text class="loop-text" x="188" y="112">Circuit</text>
+            <rect class="loop-node" x="335" y="75" width="110" height="50" rx="10"/>
+            <text class="loop-text" x="352" y="105">Measure</text>
+            <path class="loop-arrow" d="M125,100 L175,100" marker-end="url(#arrow9)"/>
+            <path class="loop-arrow" d="M285,100 L335,100" marker-end="url(#arrow9)"/>
+            <path class="loop-arrow" d="M390,125 C 390,165 230,175 175,145" marker-end="url(#arrow9)"/>
+            <text class="loop-text" x="220" y="185">classical optimizer updates parameters</text>
+            <circle class="loop-pulse" r="4"><animateMotion dur="2.4s" repeatCount="indefinite" path="M125,100 L175,100"/></circle>
+            <circle class="loop-pulse" r="4"><animateMotion dur="2.4s" repeatCount="indefinite" begin="0.8s" path="M285,100 L335,100"/></circle>
+            <circle class="loop-pulse" r="4"><animateMotion dur="2.4s" repeatCount="indefinite" begin="1.6s" path="M390,125 C 390,165 230,175 175,145"/></circle>
+          </svg>
+        </div>
+      </div>
+      <p class="body-text">Tap each card below for a one-line preview of where this module is headed.</p>
+      <div class="visual-box">
+        <div class="visual-label">Algorithm Menu — Tap Each Card</div>
+        <div class="encoding-grid" id="encodingGrid"></div>
+      </div>
+      <div class="callout"><b>Takeaway:</b> You already know this loop from Module 6. This module just spends eight chapters showing you exactly how many different, genuinely useful things you can build out of it.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch1">0 / 3</div></div>
+        <div id="quiz-ch1"></div>
+        <div class="chapter-status" id="status-ch1"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 2 -->
+    <section class="chapter reveal" id="ch2">
+      <div class="chapter-head"><div class="chapter-icon">▧</div><div><span class="chapter-num">CHAPTER 02</span><h2>Parameterized Quantum Circuits</h2></div></div>
+      <div class="story-panel">Dr. Okafor sketches a repeating block: a row of rotation gates, then a row of entangling gates, then the same thing again. "This," he says, "is the one shape almost everything in this module is built from. We call it an <b>ansatz</b> — a template with blanks left for the optimizer to fill in."</div>
+      <p class="body-text">A <b>Parameterized Quantum Circuit (PQC)</b> is a fixed circuit <i>structure</i> with free parameters θ — usually rotation angles — that get tuned by training, exactly like weights in a classical network. Drag the slider to add more layers and watch the ansatz grow.</p>
+      <div class="spotlight">
+        <div class="sicon">⌗</div>
+        <div class="stext"><b>Platform Feature Spotlight — Quantum Circuit Simulator</b>This is a simplified preview of building an ansatz layer-by-layer in the full drag-and-drop Circuit Simulator on the live platform.</div>
+      </div>
+      <div class="visual-box">
+        <div class="visual-label">Ansatz Layers</div>
+        <div class="ctrl-row">
+          <label for="pqcSlider">Layers =</label>
+          <input type="range" id="pqcSlider" min="1" max="4" value="1">
+          <span class="ctrl-readout" id="pqcReadout">1</span>
+        </div>
+        <div class="pqc-wrap">
+          <svg viewBox="0 0 460 140" width="460" id="pqcSvg"></svg>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>Two gate types alternate:</b> single-qubit rotations (Rx, Ry, Rz) hold the trainable parameters; entangling gates (usually CNOT) let qubits influence each other.</li>
+        <li><b>Parameter count scales with layers and qubits</b> — more layers means more expressive power, but also more parameters to train.</li>
+        <li><b>The familiar tension returns:</b> deeper ansätze are more expressive, but also more prone to the barren plateaus you met in Module 7.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Every algorithm in this module starts by choosing an ansatz shape. Get comfortable with this diagram — you'll see it, in disguise, in every chapter that follows.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch2">0 / 3</div></div>
+        <div id="quiz-ch2"></div>
+        <div class="chapter-status" id="status-ch2"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 3 -->
+    <section class="chapter reveal" id="ch3">
+      <div class="chapter-head"><div class="chapter-icon">✓</div><div><span class="chapter-num">CHAPTER 03</span><h2>Variational Quantum Classifiers (VQC)</h2></div></div>
+      <div class="story-panel">"Let's make this concrete," Dr. Okafor says. "Your actual job: does this molecule bind, yes or no." He walks Maya through her first real algorithm — encode the molecule, run it through the ansatz, measure one qubit, and read the result as a class score.</div>
+      <p class="body-text">A <b>Variational Quantum Classifier</b> is the loop from Chapter 1, made literal: encode → ansatz → measure an observable (commonly ⟨Z⟩ on one qubit) → compare against the true label → compute a loss → let a classical optimizer adjust the ansatz's parameters. Click through the pipeline, then hit train.</p>
+      <div class="spotlight">
+        <div class="sicon">▤</div>
+        <div class="stext"><b>Platform Feature Spotlight — Hands-on Coding Labs</b>Here's roughly what a VQC training step looks like as real PennyLane code on the live platform.</div>
+      </div>
+      <div class="visual-box">
+        <div class="visual-label">VQC Pipeline</div>
+        <div class="pipeline-row">
+          <div class="pipe-step"><div class="pn">Step 1</div><div class="pl">Encode Molecule</div></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step"><div class="pn">Step 2</div><div class="pl">Ansatz</div></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step"><div class="pn">Step 3</div><div class="pl">Measure ⟨Z⟩</div></div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-step"><div class="pn">Step 4</div><div class="pl">Compare to Label</div></div>
+        </div>
+        <div class="ctrl-row" style="justify-content:center;">
+          <button class="toggle-btn active" id="trainBtn" onclick="runTraining()">▶ Train for 20 Steps</button>
+        </div>
+        <div class="train-plot-wrap">
+          <svg viewBox="0 0 460 140" width="460" height="140" id="trainSvg">
+            <line x1="10" y1="120" x2="450" y2="120" stroke="var(--line)" stroke-width="1"/>
+            <line x1="10" y1="10" x2="10" y2="120" stroke="var(--line)" stroke-width="1"/>
+            <text x="14" y="24" font-family="JetBrains Mono" font-size="10" fill="#5f7089">loss</text>
+          </svg>
+        </div>
+        <div class="code-block"><span class="cm"># one VQC training step in PennyLane</span><br><span class="kw">def</span> <span class="fn">cost</span>(params, x, y):<br>&nbsp;&nbsp;pred = circuit(params, x) <span class="cm"># encode + ansatz + measure</span><br>&nbsp;&nbsp;<span class="kw">return</span> (pred - y) ** <span class="nm">2</span><br>params = optimizer.step(cost, params)</div>
+      </div>
+      <div class="callout"><b>Takeaway:</b> A VQC isn't a new kind of physics — it's a classifier that happens to compute its predictions on a quantum circuit instead of a classical one.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch3">0 / 3</div></div>
+        <div id="quiz-ch3"></div>
+        <div class="chapter-status" id="status-ch3"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 4 -->
+    <section class="chapter reveal" id="ch4">
+      <div class="chapter-head"><div class="chapter-icon">▦</div><div><span class="chapter-num">CHAPTER 04</span><h2>Quantum Support Vector Machines (QSVM)</h2></div></div>
+      <div class="story-panel">"Not every quantum model needs full end-to-end training on a quantum computer," Dr. Okafor says. "Some just use the quantum circuit to answer one question: <i>how similar are these two data points?</i> Then they hand that answer to an ordinary classical SVM."</div>
+      <p class="body-text">This is the <b>kernel trick</b> from Module 7, wearing a quantum costume. A <b>quantum kernel</b> measures the overlap between two quantum-encoded data points: <b>K(xᵢ,xⱼ) = |⟨φ(xᵢ)|φ(xⱼ)⟩|²</b>. Feed a whole matrix of these values into a classical SVM, and the quantum computer's job is already done.</p>
+      <div class="spotlight">
+        <div class="sicon">▤</div>
+        <div class="stext"><b>Platform Feature Spotlight — QML Playground</b>The QML Playground lets you compute both kernel matrices below on real data and benchmark which one classifies your dataset better.</div>
+      </div>
+      <div class="visual-box">
+        <div class="visual-label">Classical vs Quantum Kernel Matrix <button class="toggle-btn active" id="kernelToggle" onclick="toggleKernel()">Show Quantum Kernel</button></div>
+        <div class="kernel-wrap">
+          <div class="kernel-col">
+            <div class="kernel-col-label" id="kernelColLabel">Classical (RBF) Kernel</div>
+            <div class="kernel-grid" id="kernelGrid"></div>
+          </div>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>Two-step split:</b> quantum computer → kernel matrix; classical computer → the actual SVM optimization.</li>
+        <li>Often easier to get running on today's hardware than a fully-trained VQC, since the quantum circuit is only called once per pair of points, not once per training iteration.</li>
+        <li>Directly reuses <b>IQP encoding</b> from Module 8 as one popular choice of quantum feature map.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> QSVM is a reminder that "quantum machine learning" doesn't always mean training on a quantum computer — sometimes it just means computing one clever number there.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch4">0 / 3</div></div>
+        <div id="quiz-ch4"></div>
+        <div class="chapter-status" id="status-ch4"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 5 -->
+    <section class="chapter reveal" id="ch5">
+      <div class="chapter-head"><div class="chapter-icon">⌬</div><div><span class="chapter-num">CHAPTER 05</span><h2>Quantum Neural Networks (QNN)</h2></div></div>
+      <div class="story-panel">Maya has seen the term "QNN" everywhere and assumed it meant something different from VQC. "Honestly?" Dr. Okafor shrugs. "Most people use them interchangeably. QNN is really just the umbrella term — any layered, trainable quantum circuit built to echo the structure of a classical neural network."</div>
+      <p class="body-text">The analogy is genuinely useful, with one honest wrinkle: <b>quantum evolution is linear</b> (unitary), so the nonlinearity that gives classical networks their power has to sneak in some other way — usually through measurement, or a small classical layer stitched on afterward.</p>
+      <div class="visual-box">
+        <div class="visual-label">The Analogy, Side by Side</div>
+        <div class="nn-compare">
+          <div class="nn-col classical">
+            <h5>Classical Neural Network</h5>
+            <div class="nn-map-row"><span>Neuron</span><span>→</span></div>
+            <div class="nn-map-row"><span>Weight</span><span>→</span></div>
+            <div class="nn-map-row"><span>Weighted sum</span><span>→</span></div>
+            <div class="nn-map-row"><span>Activation function</span><span>→</span></div>
+          </div>
+          <div class="nn-col quantum">
+            <h5>Quantum Neural Network</h5>
+            <div class="nn-map-row"><span>← Qubit</span></div>
+            <div class="nn-map-row"><span>← Gate parameter (θ)</span></div>
+            <div class="nn-map-row"><span>← Entangling gate layer</span></div>
+            <div class="nn-map-row"><span>← Measurement + classical nonlinearity</span></div>
+          </div>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>Same skeleton as Chapter 2's PQC</b> — QNN is a framing, not a different circuit structure.</li>
+        <li>Nonlinearity is the honest sticking point: unitary operations alone can't produce it, so QNNs borrow it from measurement statistics or a small classical post-processing step.</li>
+        <li>Layered QNN variants with local, weight-shared structure lead directly to <b>QCNNs</b>, which you'll meet properly in Module 11.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> If a paper's "QNN" and another paper's "VQC" look identical, that's not a mistake — the terms really do overlap that much in practice.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch5">0 / 3</div></div>
+        <div id="quiz-ch5"></div>
+        <div class="chapter-status" id="status-ch5"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 6 -->
+    <section class="chapter reveal" id="ch6">
+      <div class="chapter-head"><div class="chapter-icon">◈</div><div><span class="chapter-num">CHAPTER 06</span><h2>Quantum Kernel Methods</h2></div></div>
+      <div class="story-panel">"QSVM was one example," Dr. Okafor says. "But quantum kernels aren't married to SVMs. Ridge regression, Gaussian processes, anything that classically takes a kernel — you can hand it a quantum-computed one instead." Then his tone shifts, the way it did for QRAM. "Just know this trick has a real failure mode."</div>
+      <p class="body-text">As a quantum feature map (like IQP from Module 8) gets more expressive, the kernel values it produces can start to <b>concentrate</b> — collapsing toward a near-constant value almost everywhere. When that happens, the kernel can no longer tell data points apart, and both trainability and generalization suffer.</p>
+      <div class="spotlight">
+        <div class="sicon">▧</div>
+        <div class="stext"><b>Platform Feature Spotlight — Research Hub</b>Kernel concentration is an active research topic — the Research Hub tracks the current best mitigations, including bandwidth tuning and shallower feature maps.</div>
+      </div>
+      <div class="visual-box">
+        <div class="visual-label">Expressivity vs. Generalization</div>
+        <div class="ctrl-row">
+          <label for="expSlider">Feature map depth =</label>
+          <input type="range" id="expSlider" min="1" max="10" value="3">
+          <span class="ctrl-readout" id="expReadout">3</span>
+        </div>
+        <div class="curve-wrap">
+          <svg viewBox="0 0 460 160" width="460" height="160" id="curveSvg"></svg>
+        </div>
+        <div class="dial-readout" id="curveReadout" style="text-align:center; margin-top:10px; font-family:JetBrains Mono; font-size:12.5px; color:var(--ink-dim);"></div>
+      </div>
+      <ul class="points">
+        <li><b>The general idea:</b> any kernel method can plug in a quantum kernel instead of a classical one.</li>
+        <li><b>The real risk:</b> kernel concentration — deep, highly expressive feature maps can wash out the very differences a kernel is supposed to detect.</li>
+        <li>The sweet spot is often a shallower, carefully-designed feature map — not the deepest one available.</li>
+      </ul>
+      <div class="callout warn"><b>Careful:</b> More expressive is not automatically better. This is the kernel-method version of the barren plateau problem from Module 7.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch6">0 / 3</div></div>
+        <div id="quiz-ch6"></div>
+        <div class="chapter-status" id="status-ch6"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 7 -->
+    <section class="chapter reveal" id="ch7">
+      <div class="chapter-head"><div class="chapter-icon">▥</div><div><span class="chapter-num">CHAPTER 07</span><h2>Quantum PCA</h2></div></div>
+      <div class="story-panel">Maya's molecule descriptors number in the hundreds — she'd normally run PCA to compress them before anything else. "There's a quantum version of that too," Dr. Okafor says, "and it comes with the same asterisk you saw with QRAM."</div>
+      <p class="body-text">Classical <b>PCA</b> finds directions of maximum variance via eigen-decomposition of a covariance matrix. <b>Quantum PCA (qPCA)</b> uses phase estimation and density matrix exponentiation to extract dominant eigenvalues/eigenvectors — claimed to scale exponentially better in the number of features, <i>under specific assumptions</i>.</p>
+      <div class="visual-box">
+        <div class="visual-label">Classical PCA vs Quantum PCA — Scaling Claim</div>
+        <div class="compare-bars" id="pcaBars"></div>
+      </div>
+      <ul class="points">
+        <li><b>Classical PCA:</b> cost grows polynomially with the number of features (roughly cubic for a direct eigen-decomposition).</li>
+        <li><b>Quantum PCA:</b> claimed logarithmic scaling in feature count — a dramatic theoretical improvement.</li>
+        <li><b>The asterisk:</b> that speedup typically assumes the data is already available as an efficiently-preparable quantum state — the same efficient-state-preparation assumption that made QRAM (Module 8) an open problem, not a solved one.</li>
+      </ul>
+      <div class="callout warn"><b>Careful:</b> A speedup that "assumes efficient state preparation" is a conditional result, not an unconditional one — the same pattern you learned to watch for with QRAM.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch7">0 / 3</div></div>
+        <div id="quiz-ch7"></div>
+        <div class="chapter-status" id="status-ch7"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 8 -->
+    <section class="chapter reveal" id="ch8">
+      <div class="chapter-head"><div class="chapter-icon">⧉</div><div><span class="chapter-num">CHAPTER 08</span><h2>Quantum Autoencoders</h2></div></div>
+      <div class="story-panel">Dr. Okafor saves a fun one for last. "What if you trained a circuit to compress quantum data itself — and just threw away the qubits that didn't matter?" Maya's molecule outliers, he points out, might reveal themselves exactly this way: data that refuses to compress cleanly is often the data worth a second look.</div>
+      <p class="body-text">A <b>quantum autoencoder</b> is a PQC trained to squeeze an n-qubit state into fewer "latent" qubits, while the discarded <b>"trash" qubits</b> are pushed toward a fixed reference state — typically |0⟩. Drag the slider to change how many qubits get kept versus discarded.</p>
+      <div class="spotlight">
+        <div class="sicon">▤</div>
+        <div class="stext"><b>Platform Feature Spotlight — Hands-on Coding Labs</b>Training a quantum autoencoder end-to-end is a full walkthrough available in the Coding Labs, including the fidelity-based loss function used to judge the trash qubits.</div>
+      </div>
+      <div class="visual-box">
+        <div class="visual-label">Latent vs. Trash Qubits</div>
+        <div class="ctrl-row">
+          <label for="aeSlider">Qubits kept (latent) =</label>
+          <input type="range" id="aeSlider" min="1" max="5" value="3">
+          <span class="ctrl-readout" id="aeReadout">3</span>
+        </div>
+        <div class="ae-wrap">
+          <svg viewBox="0 0 400 140" width="400" height="140" id="aeSvg"></svg>
+        </div>
+      </div>
+      <ul class="points">
+        <li><b>Training goal:</b> minimize how far the trash qubits drift from |0⟩ — usually measured via a SWAP test or direct fidelity.</li>
+        <li><b>Applications:</b> compressing quantum simulation data, denoising, and anomaly detection — data that compresses poorly may be genuinely unusual.</li>
+        <li>Closes the loop on this module: like every other algorithm here, it's the same encode → ansatz → measure → optimize pattern from Chapter 1, aimed at a new goal.</li>
+      </ul>
+      <div class="callout"><b>Takeaway:</b> Compression and classification turn out to be the same trick wearing different clothes — which is exactly the point of learning the shared loop first.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch8">0 / 3</div></div>
+        <div id="quiz-ch8"></div>
+        <div class="chapter-status" id="status-ch8"></div>
+      </div>
+    </section>
+
+    <!-- FINAL ASSESSMENT -->
+    <section class="chapter reveal" id="final">
+      <div class="final-assess">
+        <div class="final-head">
+          <div class="module-eyebrow">◆ Adaptive Assessment</div>
+          <h2>Module 9 Assessment</h2>
+          <p>Eight synthesis questions, one per chapter. Your result adapts to your whole session — chapters where you struggled above get flagged for review here, regardless of how this final round goes.</p>
+        </div>
+        <div id="quiz-final"></div>
+        <div class="result-panel" id="resultPanel">
+          <div class="result-top">
+            <div>
+              <div class="result-score" id="resultScore">0%</div>
+              <div class="quiz-score" id="resultDetail">0 / 8 correct</div>
+            </div>
+            <div class="result-badge" id="resultBadge"></div>
+          </div>
+          <div id="recommendWrap"></div>
+          <div class="result-actions">
+            <a href="qml-roadmap-landing-page.html#curriculum" class="btn btn-ghost">← Back to Curriculum</a>
+            <a href="#" class="btn btn-primary" id="continueBtn">Continue to Module 10 →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="module-nav" id="moduleNav"></div>
+
+  </main>
+</div>
+
+<script>
+/* ---------------- state ---------------- */
+let state = { xp:0, chapters:{
+  ch1:{correct:0,total:3,done:false}, ch2:{correct:0,total:3,done:false}, ch3:{correct:0,total:3,done:false},
+  ch4:{correct:0,total:3,done:false}, ch5:{correct:0,total:3,done:false}, ch6:{correct:0,total:3,done:false},
+  ch7:{correct:0,total:3,done:false}, ch8:{correct:0,total:3,done:false}
+}, finalDone:false };
+try{ const saved = localStorage.getItem('qml_module9_state'); if(saved) state = JSON.parse(saved); }catch(e){}
+function saveState(){ try{ localStorage.setItem('qml_module9_state', JSON.stringify(state)); }catch(e){} }
+function addXP(n){ state.xp += n; document.getElementById('xpCount').textContent = state.xp; saveState(); }
+document.getElementById('xpCount').textContent = state.xp;
+
+/* ================= CHAPTER 1: algorithm preview grid ================= */
+const encodingPreview = [
+  {en:'01', name:'Parameterized Quantum Circuits', desc:'The trainable ansatz shape almost everything below is built from.'},
+  {en:'02', name:'Variational Quantum Classifier', desc:'Encode, ansatz, measure, compare to label \u2014 a quantum classifier.'},
+  {en:'03', name:'Quantum SVM', desc:'Quantum computer finds a kernel; a classical SVM does the rest.'},
+  {en:'04', name:'Quantum Neural Network', desc:'The umbrella term for layered trainable circuits, echoing classical NNs.'},
+  {en:'05', name:'Quantum Kernel Methods', desc:'Any kernel method can borrow a quantum-computed similarity measure.'},
+  {en:'06', name:'Quantum PCA', desc:'Compress features via eigen-decomposition \u2014 with an efficiency asterisk.'},
+  {en:'07', name:'Quantum Autoencoder', desc:'Compress quantum states themselves, discarding what doesn\u2019t matter.'},
+];
+(function(){
+  const grid = document.getElementById('encodingGrid');
+  encodingPreview.forEach(e=>{
+    const card = document.createElement('div');
+    card.className = 'enc-card';
+    card.innerHTML = '<div class="enc-inner">'
+      + '<div class="enc-face enc-front"><div class="en">'+e.en+'</div><h6>'+e.name+'</h6></div>'
+      + '<div class="enc-face enc-back">'+e.desc+'</div>'
+      + '</div>';
+    card.addEventListener('click', ()=>{ card.classList.toggle('flipped'); addXP(1); });
+    grid.appendChild(card);
+  });
+})();
+
+/* ================= CHAPTER 2: PQC circuit builder ================= */
+(function(){
+  const slider = document.getElementById('pqcSlider');
+  const readout = document.getElementById('pqcReadout');
+  const svg = document.getElementById('pqcSvg');
+  function drawPQC(layers){
+    const wireYs = [30,70,110];
+    let html = '';
+    wireYs.forEach((y,i)=>{
+      html += '<line class="pqc-wire" x1="20" y1="'+y+'" x2="440" y2="'+y+'"/>';
+      html += '<text class="pqc-label" x="2" y="'+(y+4)+'">q'+i+'</text>';
+    });
+    const layerWidth = 400/layers;
+    for(let l=0;l<layers;l++){
+      const xBase = 40 + l*layerWidth;
+      wireYs.forEach((y,i)=>{
+        html += '<rect class="pqc-gate" x="'+xBase+'" y="'+(y-13)+'" width="28" height="26" rx="5"/>';
+        html += '<text class="pqc-label" x="'+(xBase+4)+'" y="'+(y+4)+'">R'+(['x','y','z'][i%3])+'</text>';
+      });
+      const entX = xBase + 46;
+      html += '<line class="pqc-wire" x1="'+entX+'" y1="30" x2="'+entX+'" y2="110" stroke="var(--violet)" stroke-width="1.5"/>';
+      html += '<circle cx="'+entX+'" cy="30" r="4" fill="var(--violet)"/>';
+      html += '<circle cx="'+entX+'" cy="70" r="4" fill="var(--violet)"/>';
+      html += '<circle cx="'+entX+'" cy="110" r="7" fill="none" stroke="var(--violet)" stroke-width="1.5"/>';
+    }
+    svg.innerHTML = html;
+  }
+  slider.addEventListener('input', ()=>{ const n = parseInt(slider.value); readout.textContent = n; drawPQC(n); });
+  drawPQC(1);
+})();
+
+/* ================= CHAPTER 3: VQC training curve ================= */
+function runTraining(){
+  const svg = document.getElementById('trainSvg');
+  const btn = document.getElementById('trainBtn');
+  btn.disabled = true;
+  btn.textContent = 'Training...';
+  let points = [];
+  let step = 0;
+  const total = 20;
+  function tick(){
+    step++;
+    const loss = 0.9 * Math.exp(-step/7) + 0.05 + Math.random()*0.03;
+    const px = 10 + (step/total)*440;
+    const py = 120 - loss*100;
+    points.push(px+','+py);
+    let path = '<line x1="10" y1="120" x2="450" y2="120" stroke="var(--line)" stroke-width="1"/><line x1="10" y1="10" x2="10" y2="120" stroke="var(--line)" stroke-width="1"/><text x="14" y="24" font-family="JetBrains Mono" font-size="10" fill="#5f7089">loss</text>';
+    path += '<polyline points="'+points.join(' ')+'" fill="none" stroke="var(--cyan)" stroke-width="2"/>';
+    svg.innerHTML = path;
+    if(step < total){ setTimeout(tick, 90); }
+    else { btn.disabled = false; btn.textContent = '▶ Train Again'; addXP(3); }
+  }
+  tick();
+}
+
+/* ================= CHAPTER 4: kernel heatmap ================= */
+let showingQuantumKernel = false;
+const classicalKernelVals = [
+  [1.0,0.8,0.6,0.3,0.2,0.1],[0.8,1.0,0.7,0.4,0.3,0.2],[0.6,0.7,1.0,0.5,0.4,0.3],
+  [0.3,0.4,0.5,1.0,0.7,0.6],[0.2,0.3,0.4,0.7,1.0,0.8],[0.1,0.2,0.3,0.6,0.8,1.0]
+];
+const quantumKernelVals = [
+  [1.0,0.6,0.2,0.5,0.1,0.4],[0.6,1.0,0.5,0.2,0.4,0.1],[0.2,0.5,1.0,0.4,0.3,0.6],
+  [0.5,0.2,0.4,1.0,0.6,0.2],[0.1,0.4,0.3,0.6,1.0,0.5],[0.4,0.1,0.6,0.2,0.5,1.0]
+];
+function renderKernel(vals){
+  const grid = document.getElementById('kernelGrid');
+  grid.innerHTML = '';
+  vals.forEach(row=>{
+    row.forEach(v=>{
+      const cell = document.createElement('div');
+      cell.className = 'kernel-cell';
+      const c = Math.round(90 + v*140);
+      cell.style.background = showingQuantumKernel ? 'rgba(90,209,230,'+ (0.15+v*0.75) +')' : 'rgba(242,163,65,'+ (0.15+v*0.75) +')';
+      cell.textContent = v.toFixed(1);
+      grid.appendChild(cell);
+    });
+  });
+}
+function toggleKernel(){
+  showingQuantumKernel = !showingQuantumKernel;
+  document.getElementById('kernelColLabel').textContent = showingQuantumKernel ? 'Quantum Kernel' : 'Classical (RBF) Kernel';
+  document.getElementById('kernelToggle').textContent = showingQuantumKernel ? 'Show Classical Kernel' : 'Show Quantum Kernel';
+  renderKernel(showingQuantumKernel ? quantumKernelVals : classicalKernelVals);
+  addXP(1);
+}
+renderKernel(classicalKernelVals);
+
+/* ================= CHAPTER 6: expressivity vs generalization curve ================= */
+(function(){
+  const slider = document.getElementById('expSlider');
+  const readout = document.getElementById('expReadout');
+  const svg = document.getElementById('curveSvg');
+  const readoutText = document.getElementById('curveReadout');
+  function score(depth){
+    // rises then falls - peak around depth 4
+    return 100 - Math.pow(depth-4, 2)*6;
+  }
+  function draw(depth){
+    let d = 'M 10 140';
+    for(let x=1; x<=10; x+=0.2){
+      const y = 140 - Math.max(5, score(x))*1.05;
+      const px = 10 + (x/10)*440;
+      d += ' L '+px+' '+y;
+    }
+    const markerX = 10 + (depth/10)*440;
+    const markerY = 140 - Math.max(5, score(depth))*1.05;
+    let html = '<line x1="10" y1="140" x2="450" y2="140" stroke="var(--line)" stroke-width="1"/>';
+    html += '<path d="'+d+'" fill="none" stroke="var(--cyan)" stroke-width="2"/>';
+    html += '<circle cx="'+markerX+'" cy="'+markerY+'" r="6" fill="var(--amber)" stroke="var(--bg)" stroke-width="2"/>';
+    svg.innerHTML = html;
+    let zone = depth <= 3 ? 'Underfit zone \u2014 feature map too simple to separate the data.' : (depth <= 6 ? 'Sweet spot \u2014 expressive enough without concentrating.' : 'Danger zone \u2014 kernel values are concentrating; generalization degrades.');
+    readoutText.textContent = 'Depth '+depth+': '+zone;
+  }
+  slider.addEventListener('input', ()=>{ const n = parseInt(slider.value); readout.textContent = n; draw(n); });
+  draw(3);
+})();
+
+/* ================= CHAPTER 7: PCA compare bars ================= */
+(function(){
+  const wrap = document.getElementById('pcaBars');
+  const ns = [50, 200, 1000];
+  ns.forEach(n=>{
+    const classicalCost = Math.min(100, Math.pow(n,3)/Math.pow(1000,3)*100 + (n===50?8:n===200?35:100));
+    const quantumCost = Math.min(100, Math.log2(n)*4);
+    const row1 = document.createElement('div');
+    row1.className = 'cbrow';
+    row1.innerHTML = '<div class="cblabel">Classical PCA \u00b7 N='+n+'</div><div class="cbtrack"><div class="cbfill standard" style="width:'+classicalCost+'%"></div></div><div class="cbval">~O(N\u00b3) cost</div>';
+    wrap.appendChild(row1);
+    const row2 = document.createElement('div');
+    row2.className = 'cbrow';
+    row2.innerHTML = '<div class="cblabel">Quantum PCA* \u00b7 N='+n+'</div><div class="cbtrack"><div class="cbfill dense" style="width:'+quantumCost+'%"></div></div><div class="cbval">~O(log N) cost*</div>';
+    wrap.appendChild(row2);
+  });
+  const note = document.createElement('div');
+  note.style.cssText = 'font-family:JetBrains Mono; font-size:11px; color:var(--ink-faint); margin-top:4px;';
+  note.textContent = '* assumes efficient quantum state preparation \u2014 see the callout below.';
+  wrap.appendChild(note);
+})();
+
+/* ================= CHAPTER 8: autoencoder diagram ================= */
+(function(){
+  const slider = document.getElementById('aeSlider');
+  const readout = document.getElementById('aeReadout');
+  const svg = document.getElementById('aeSvg');
+  function draw(latentCount){
+    const total = 5;
+    let html = '<rect x="20" y="20" width="90" height="100" rx="10" fill="none" stroke="var(--line-strong)" stroke-width="1.2"/>';
+    html += '<text x="30" y="14" font-family="JetBrains Mono" font-size="10" fill="#5f7089">input (n qubits)</text>';
+    for(let i=0;i<total;i++){
+      html += '<circle class="ae-qubit" cx="65" cy="'+(35+i*18)+'" r="7"/>';
+    }
+    html += '<rect x="160" y="35" width="90" height="70" rx="10" fill="none" stroke="var(--violet)" stroke-width="1.2" stroke-dasharray="4 3"/>';
+    html += '<text x="165" y="28" font-family="JetBrains Mono" font-size="10" fill="#9fb0c9">PQC (ansatz)</text>';
+    html += '<text x="185" y="75" font-family="JetBrains Mono" font-size="11" fill="#b39bff">U(\u03B8)</text>';
+    for(let i=0;i<total;i++){
+      const isLatent = i < latentCount;
+      html += '<circle class="ae-qubit '+(isLatent?'latent':'trash')+'" cx="330" cy="'+(35+i*18)+'" r="7"/>';
+      html += '<text x="345" y="'+(38+i*18)+'" font-family="JetBrains Mono" font-size="9" fill="'+(isLatent?'#5ad1e6':'#f2726a')+'">'+(isLatent?'latent':'trash \u2192 |0\u27E9')+'</text>';
+    }
+    for(let i=0;i<total;i++){
+      html += '<line x1="72" y1="'+(35+i*18)+'" x2="160" y2="'+(35+i*18)+'" stroke="var(--line)" stroke-width="1"/>';
+      html += '<line x1="250" y1="'+(35+i*18)+'" x2="323" y2="'+(35+i*18)+'" stroke="var(--line)" stroke-width="1"/>';
+    }
+    svg.innerHTML = html;
+  }
+  slider.addEventListener('input', ()=>{ const n = parseInt(slider.value); readout.textContent = n; draw(n); });
+  draw(3);
+})();
+
+/* ================= quiz data ================= */
+const quizzes = {
+  ch1: [
+    {q:"What is the shared variational pattern behind every algorithm in this module?", opts:["Encode data, apply a trainable parameterized circuit, measure, and classically update parameters in a loop","Encode data once and never touch it again","Skip encoding entirely","Only use classical computers"], correct:0, explain:"This is the exact hybrid loop from Module 6, reused as the skeleton for every algorithm in this module."},
+    {q:"Why does Dr. Okafor say 'encoding gets your data into the circuit, it doesn't make the circuit smart'?", opts:["Encoding is the only step that matters","Encoding sets up the state but a separate trainable structure is needed to actually learn a task","Encoding always includes training","Only measurement matters"], correct:1, explain:"Module 8 covered how data becomes a quantum state; this module covers what makes that state useful for learning."},
+    {q:"How many core algorithms does this module tour, following the shared loop?", opts:["2","7","20","100"], correct:1, explain:"PQC, VQC, QSVM, QNN, Quantum Kernel Methods, Quantum PCA, and Quantum Autoencoders — seven in total."}
+  ],
+  ch2: [
+    {q:"What is a 'PQC'?", opts:["A fixed circuit with no parameters","A circuit template (ansatz) with tunable parameters trained via optimization","A purely classical neural network","A type of quantum error correction code"], correct:1, explain:"The ansatz is the reusable shape; the parameters inside it are what training actually adjusts."},
+    {q:"What two types of gates typically alternate in a PQC layer?", opts:["Rotation gates and entangling gates (e.g. CNOT)","Only Hadamard gates","Only measurement operations","Only classical bit flips"], correct:0, explain:"Rotations hold the trainable parameters; entangling gates let qubits influence one another — visible in the circuit diagram above."},
+    {q:"What tension does increasing PQC layers create, referencing an earlier module?", opts:["No tension exists, more layers are always better","A trade-off between expressivity and trainability — more layers can trigger barren plateaus","PQCs cannot have more than one layer","Layers only affect qubit count"], correct:1, explain:"This callback to Module 7's barren plateau chapter is intentional — the same tension shows up here."}
+  ],
+  ch3: [
+    {q:"In a VQC pipeline, what happens after the trainable ansatz is applied?", opts:["The circuit is deleted","An observable is measured and interpreted as a class score, compared against the true label","The data is re-encoded from scratch","Nothing further happens"], correct:1, explain:"Step 3 and 4 of the pipeline diagram — measure, then compare to the label to compute a loss."},
+    {q:"What updates the VQC's parameters during training?", opts:["Random chance","A classical optimizer using the measured loss, in the same hybrid loop from Module 6","A quantum-only optimizer with no classical component","The data encoding step"], correct:1, explain:"Training a VQC is still a hybrid loop — the quantum circuit only computes the prediction; a classical optimizer does the updating."},
+    {q:"What is the VQC essentially doing conceptually?", opts:["Running the exact same fixed circuit forever","Acting as a trainable quantum classifier, learning parameters like a classical model learns weights", "Only compressing data","Only measuring noise"], correct:1, explain:"It's a classifier — the quantum part is where the prediction gets computed, not a difference in what's being learned."}
+  ],
+  ch4: [
+    {q:"What role does the quantum circuit play in a QSVM?", opts:["It replaces the SVM's optimization entirely","It computes a quantum kernel (similarity measure) that a classical SVM then uses","It has no role","It only measures binary bits"], correct:1, explain:"The quantum computer's entire job is producing the kernel matrix — the SVM optimization itself stays classical."},
+    {q:"What is a quantum kernel mathematically related to?", opts:["A random number","The inner product (overlap) between quantum feature-mapped data points","A classical file hash","An unrelated statistical test"], correct:1, explain:"K(x\u1D62,x\u2C7C) = |\u27E8\u03C6(x\u1D62)|\u03C6(x\u2C7C)\u27E9|\u00B2 — the overlap between two quantum-encoded states."},
+    {q:"What makes QSVM different from a fully end-to-end trained VQC?", opts:["QSVM uses no quantum computer at all","QSVM uses the quantum computer only to compute the kernel; classical optimization does the actual training","QSVM has no classical component whatsoever","They are exactly identical algorithms"], correct:1, explain:"QSVM splits the work: quantum for similarity, classical for training — a lighter quantum workload than a full VQC."}
+  ],
+  ch5: [
+    {q:"How does this module describe the relationship between 'VQC' and 'QNN' terminology?", opts:["They are completely unrelated concepts","VQC and QNN are often used interchangeably, with QNN being the broader umbrella term for layered trainable quantum circuits","QNN never involves training","VQC is always bigger than a QNN"], correct:1, explain:"Dr. Okafor's honest answer: in practice, the terms overlap heavily."},
+    {q:"What is trickier to implement in a QNN compared to a classical neural network?", opts:["Nothing is different","Nonlinearity, since unitary quantum evolution is inherently linear","Addition","Qubit initialization"], correct:1, explain:"Classical activation functions are nonlinear by design; unitary quantum gates are linear, so nonlinearity has to be introduced another way."},
+    {q:"What classical neural network concept maps to 'gate parameters' in the quantum analogy?", opts:["Weights","Activation functions","Input pixels","Loss functions"], correct:0, explain:"The comparison table above maps this directly — gate parameters (\u03B8) play the role classical weights play."}
+  ],
+  ch6: [
+    {q:"What can any classical kernel method potentially borrow from quantum computing?", opts:["A classically-computed kernel only","A quantum-computed kernel derived from a quantum feature map","Nothing at all","Only binary classification labels"], correct:1, explain:"Ridge regression, Gaussian processes, and other kernel methods can all swap in a quantum kernel in place of a classical one."},
+    {q:"What real, documented pitfall can affect quantum kernels as circuits get more expressive?", opts:["They become too classical","Kernel values can concentrate exponentially close to a constant, hurting trainability and generalization","They always improve without limit","They stop requiring any qubits"], correct:1, explain:"This is kernel concentration — the expressivity-vs-generalization curve above shows the danger zone directly."},
+    {q:"What earlier module chapter does quantum kernel methods connect back to?", opts:["Module 6's intro","Module 8's IQP encoding chapter","Module 5","None, it's unrelated"], correct:1, explain:"IQP encoding is one of the most common quantum feature maps used to build a quantum kernel."}
+  ],
+  ch7: [
+    {q:"What does classical PCA find?", opts:["Random directions in data","Directions of maximum variance via eigen-decomposition of the covariance matrix","The exact labels of a dataset","A quantum circuit's depth"], correct:1, explain:"Standard dimensionality reduction — find the axes that capture the most variance."},
+    {q:"What does quantum PCA (qPCA) claim to offer under certain assumptions?", opts:["No advantage of any kind","An exponential speedup in extracting dominant eigenvalues/eigenvectors","A way to avoid needing any data","Guaranteed real-world speedup with no caveats"], correct:1, explain:"The bar chart above shows the claimed O(log N) scaling versus classical PCA's much steeper cost."},
+    {q:"What honest caveat applies to qPCA's speedup claim, echoing earlier modules?", opts:["No caveats apply, it's fully unconditional","The speedup often assumes efficient quantum state preparation, an assumption that isn't automatically true in practice","qPCA has been completely disproven","qPCA requires no quantum computer"], correct:1, explain:"Same pattern as QRAM in Module 8 — the headline speedup is conditional on an assumption that's genuinely hard to satisfy."}
+  ],
+  ch8: [
+    {q:"What is a quantum autoencoder trained to do?", opts:["Increase the number of qubits needed","Compress an n-qubit input state into fewer 'latent' qubits, discarding unneeded ones","Encode classical bits only","Replace all measurement steps"], correct:1, explain:"The diagram above shows exactly this — an ansatz splitting qubits into a kept 'latent' group and a discarded 'trash' group."},
+    {q:"What should the discarded 'trash qubits' ideally end up close to, if compression succeeds?", opts:["A random state","A fixed reference state, typically |0\u27E9","The original input state exactly","Maximum entanglement with the environment"], correct:1, explain:"Training pushes the trash qubits toward |0\u27E9 — the closer they get, the more successful the compression."},
+    {q:"What is one practical application of quantum autoencoders mentioned in this chapter?", opts:["Increasing dataset size artificially","Anomaly detection — data that doesn't compress well may be unusual","Deleting all training data","Replacing classical hard drives"], correct:1, explain:"Molecules or data points that resist compression are, by that very fact, behaving unusually — a natural anomaly signal."}
+  ]
+};
+const finalQuiz = [
+  {q:"What's the shared variational pattern behind every algorithm in this module?", opts:["Encode \u2192 trainable parameterized circuit \u2192 measure \u2192 classical parameter update, repeated","Random guessing with no structure","Only classical computation","One-shot encoding with no training"], correct:0, explain:"Chapter 1's central diagram — every algorithm that follows is a variation on this loop."},
+  {q:"What is the fundamental trainable building block behind VQC, QNN, and most other algorithms in this module?", opts:["A fixed, unparameterized circuit","A parameterized quantum circuit (PQC) with tunable rotation and entangling gates","A purely classical lookup table","QRAM"], correct:1, explain:"The ansatz from Chapter 2 recurs, in disguise, through nearly every later chapter."},
+  {q:"What does a VQC do with the trainable circuit's output?", opts:["Discards it immediately","Measures an observable, interprets it as a class score, and updates parameters via a classical loss","Sends it directly to a spreadsheet","Ignores the label entirely"], correct:1, explain:"This is the full pipeline from Chapter 3 — measurement feeds directly into the training loop."},
+  {q:"What's the defining move of QSVM versus a fully-trained VQC?", opts:["QSVM avoids quantum computers entirely","QSVM only uses the quantum computer to compute a kernel, then trains classically","QSVM has no relationship to kernels","QSVM and VQC are identical"], correct:1, explain:"QSVM splits the workload differently than a VQC — quantum for similarity, classical for the rest."},
+  {q:"What's the honest relationship between the terms VQC and QNN in practice?", opts:["Completely unrelated","Frequently used interchangeably, with QNN as the broader umbrella term","QNN cannot be trained","VQC only applies to images"], correct:1, explain:"Chapter 5's clarification — the overlap between these terms is real, not a simplification for beginners."},
+  {q:"What real risk grows as quantum kernel circuits get more expressive?", opts:["Nothing, performance only improves","Kernel value concentration, which can hurt trainability and generalization","Qubit count decreases automatically","Kernels become classical"], correct:1, explain:"The expressivity-vs-generalization curve in Chapter 6 shows this danger zone directly."},
+  {q:"What assumption does quantum PCA's exponential speedup claim typically rely on?", opts:["No assumptions at all","Efficient quantum state preparation of the input data, which isn't automatically available","Guaranteed classical hardware failure","Infinite qubits"], correct:1, explain:"The same efficient-state-preparation caveat that applies to QRAM shows up again for qPCA."},
+  {q:"What does a quantum autoencoder try to achieve?", opts:["Increase the qubit count needed for a task","Compress quantum information into fewer qubits by driving 'trash' qubits toward a reference state","Replace the need for any encoding","Eliminate the need for training entirely"], correct:1, explain:"Chapter 8's closing idea — the same trainable loop from Chapter 1, now aimed at compression instead of classification."}
+];
+
+/* ================= render quizzes (shared engine) ================= */
+function renderQuiz(containerId, items, chapterKey){
+  const container = document.getElementById(containerId);
+  items.forEach((item, idx)=>{
+    const qDiv = document.createElement('div');
+    qDiv.className = 'q-item';
+    qDiv.innerHTML = '<div class="q-text">'+(idx+1)+'. '+item.q+'</div>'
+      + '<div class="q-options">'+item.opts.map((o,i)=>'<button class="q-opt" data-i="'+i+'">'+o+'</button>').join('')+'</div>'
+      + '<div class="q-explain">'+item.explain+'</div>';
+    container.appendChild(qDiv);
+    const buttons = qDiv.querySelectorAll('.q-opt');
+    const explainEl = qDiv.querySelector('.q-explain');
+    buttons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = parseInt(btn.dataset.i);
+        buttons.forEach(b=>b.disabled = true);
+        if(i === item.correct){
+          btn.classList.add('correct');
+          if(chapterKey) onCorrect(chapterKey);
+          else onFinalAnswer(idx, true);
+        } else {
+          btn.classList.add('incorrect');
+          buttons[item.correct].classList.add('correct');
+          if(chapterKey) onIncorrect(chapterKey);
+          else onFinalAnswer(idx, false);
+        }
+        explainEl.classList.add('show');
+      });
+    });
+  });
+}
+Object.keys(quizzes).forEach(key=>{ renderQuiz('quiz-'+key, quizzes[key], key); updateChapterScore(key); });
+renderQuiz('quiz-final', finalQuiz, null);
+
+function updateChapterScore(key){
+  const s = state.chapters[key];
+  document.getElementById('score-'+key).textContent = s.correct+' / '+s.total;
+}
+function onCorrect(key){
+  const s = state.chapters[key];
+  s.correct = Math.min(s.correct+1, s.total);
+  addXP(10);
+  checkChapterDone(key);
+  updateChapterScore(key);
+  saveState();
+}
+function onIncorrect(key){
+  const s = state.chapters[key];
+  s.hadMiss = true;
+  checkChapterDone(key);
+  updateChapterScore(key);
+  saveState();
+}
+let answeredCount = { ch1:0, ch2:0, ch3:0, ch4:0, ch5:0, ch6:0, ch7:0, ch8:0 };
+function checkChapterDone(key){
+  answeredCount[key]++;
+  const s = state.chapters[key];
+  if(answeredCount[key] >= s.total){
+    s.done = true;
+    const dot = document.getElementById('dot-'+key);
+    const statusEl = document.getElementById('status-'+key);
+    statusEl.classList.add('show');
+    if(s.hadMiss){
+      dot.classList.add('warn');
+      statusEl.classList.add('review');
+      statusEl.innerHTML = '\u26A0 Review suggested \u2014 you missed at least one question in this chapter.';
+    } else {
+      dot.classList.add('done');
+      statusEl.classList.add('mastered');
+      statusEl.innerHTML = '\u2713 Mastered \u2014 perfect score on this chapter.';
+      addXP(15);
+    }
+    saveState();
+  }
+}
+
+let finalAnswers = [];
+function onFinalAnswer(idx, correct){
+  finalAnswers[idx] = correct;
+  if(finalAnswers.filter(a=>a!==undefined).length === finalQuiz.length){
+    showFinalResult();
+  }
+}
+function showFinalResult(){
+  const correctCount = finalAnswers.filter(a=>a===true).length;
+  const pct = Math.round((correctCount/finalQuiz.length)*100);
+  document.getElementById('resultScore').textContent = pct+'%';
+  document.getElementById('resultDetail').textContent = correctCount+' / '+finalQuiz.length+' correct';
+  const badge = document.getElementById('resultBadge');
+  const pass = pct >= 70;
+  badge.textContent = pass ? 'Passed' : 'Retry Recommended';
+  badge.className = 'result-badge ' + (pass ? 'pass' : 'retry');
+  addXP(correctCount*10 + (pass?25:0));
+
+  const weakChapters = Object.keys(state.chapters).filter(k => state.chapters[k].hadMiss);
+  const wrap = document.getElementById('recommendWrap');
+  if(weakChapters.length === 0 && pass){
+    wrap.innerHTML = '<div class="callout" style="margin-top:4px;"><b>Great work.</b> No flagged chapters and a passing assessment score \u2014 you are ready for Module 10: Real-World QML Applications.</div>';
+  } else {
+    const names = { ch1:"The Variational Idea", ch2:"Parameterized Quantum Circuits", ch3:"Variational Quantum Classifiers", ch4:"Quantum Support Vector Machines", ch5:"Quantum Neural Networks", ch6:"Quantum Kernel Methods", ch7:"Quantum PCA", ch8:"Quantum Autoencoders" };
+    let html = '<div class="visual-label" style="margin-top:18px;">Recommended Review</div><ul class="recommend-list">';
+    weakChapters.forEach(k=> html += '<li>\u21BA Revisit <b>'+names[k]+'</b> \u2014 a quick-check answer there was missed.</li>');
+    if(!pass){ html += '<li>\u21BA Your assessment score was below 70% \u2014 consider re-reading the callout boxes at the end of each chapter before continuing.</li>'; }
+    html += '</ul>';
+    wrap.innerHTML = html;
+  }
+  document.getElementById('resultPanel').classList.add('show');
+  document.getElementById('dot-final').classList.add(pass ? 'done' : 'warn');
+  state.finalDone = true;
+  saveState();
+}
+
+/* ---------------- scrollspy + progress bar ---------------- */
+const sections = document.querySelectorAll('.chapter');
+const sideLinks = document.querySelectorAll('.side-list a');
+const spyObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      sideLinks.forEach(a=>a.classList.remove('active'));
+      const link = document.querySelector('.side-list a[data-target="'+entry.target.id+'"]');
+      if(link) link.classList.add('active');
+    }
+  });
+},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>spyObserver.observe(s));
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+  document.getElementById('progressFill').style.width = scrolled+'%';
+});
+
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+},{threshold:0.08});
+revealEls.forEach(el=>io.observe(el));
+
+/* ---------------- prev/next module nav, from the shared registry ---------------- */
+(function(){
+  const { prev, next } = qmlGetAdjacentModules(9);
+  const wrap = document.getElementById('moduleNav');
+  function cardHTML(mod, dir){
+    if(!mod){
+      return '<div class="mn-card disabled '+dir+'"><span class="mn-eyebrow">'+(dir==='next'?'Up Next':'Previous')+'</span><span class="mn-title">\u2014 none \u2014</span></div>';
+    }
+    const available = !!mod.file;
+    const arrow = dir==='prev' ? '\u2190 ' : '';
+    const arrowEnd = dir==='next' ? ' \u2192' : '';
+    const eyebrow = (dir==='prev' ? 'Previous \u2014 Module '+mod.id : 'Up Next \u2014 Module '+mod.id) + (available ? '' : ' (Coming Soon)');
+    if(available){
+      return '<a class="mn-card enabled '+dir+'" href="'+mod.file+'">'
+        + '<span class="mn-eyebrow">'+eyebrow+'</span>'
+        + '<span class="mn-title">'+arrow+mod.title+arrowEnd+'</span>'
+        + '<span class="mn-arrow">Open tutorial</span>'
+        + '</a>';
+    }
+    return '<div class="mn-card disabled '+dir+'">'
+      + '<span class="mn-eyebrow">'+eyebrow+'</span>'
+      + '<span class="mn-title">'+mod.title+'</span>'
+      + '<span class="mn-arrow">Not published yet</span>'
+      + '</div>';
+  }
+  wrap.innerHTML = cardHTML(prev,'prev') + cardHTML(next,'next');
+
+  const continueBtn = document.getElementById('continueBtn');
+  if(continueBtn){
+    if(next && next.file){
+      continueBtn.href = next.file;
+      continueBtn.textContent = 'Continue to Module '+next.id+' \u2192';
+    } else if(next){
+      continueBtn.href = 'qml-roadmap-landing-page.html#curriculum';
+      continueBtn.textContent = 'Module '+next.id+' — Coming Soon';
+      continueBtn.style.opacity = '0.6';
+    }
+  }
+})();
+</script>
+
+</body>
+</html>

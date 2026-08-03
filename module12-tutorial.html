@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 12 — Research & Capstone Project | QML Curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="modules-registry.js"></script>
+<style>
+:root{
+  --bg:#070b14; --bg-2:#0b111f; --panel:#0e1526; --panel-2:#101a2e;
+  --line:rgba(148,178,224,0.14); --line-strong:rgba(148,178,224,0.28);
+  --ink:#e9eef8; --ink-dim:#9fb0c9; --ink-faint:#5f7089;
+  --cyan:#5ad1e6; --cyan-dim:rgba(90,209,230,0.14);
+  --violet:#b39bff; --violet-dim:rgba(179,155,255,0.14);
+  --amber:#f2a341; --amber-dim:rgba(242,163,65,0.14);
+  --green:#5ee6a0; --green-dim:rgba(94,230,160,0.14);
+  --red:#f2726a; --red-dim:rgba(242,114,106,0.14);
+  --blue:#4fa3f7;
+  --serif:'Fraunces', Georgia, serif; --sans:'Inter', -apple-system, sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.7;}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto !important;}}
+
+.progress-rail{position:fixed; top:0; left:0; right:0; height:3px; background:var(--line); z-index:100;}
+.progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--cyan),var(--violet),var(--amber)); transition:width .1s linear;}
+
+header{position:sticky; top:3px; z-index:60; backdrop-filter:blur(14px); background:rgba(7,11,20,0.82); border-bottom:1px solid var(--line);}
+.nav-wrap{max-width:1280px; margin:0 auto; padding:14px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
+.back-link{display:flex; align-items:center; gap:8px; color:var(--ink-dim); text-decoration:none; font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; transition:color .2s;}
+.back-link:hover{color:var(--cyan);}
+.crumb{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); letter-spacing:0.06em; text-transform:uppercase;}
+.crumb b{color:var(--amber);}
+.xp-badge{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12.5px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; color:var(--amber); background:var(--amber-dim);}
+
+.layout{max-width:1280px; margin:0 auto; padding:52px 32px 120px; display:grid; grid-template-columns:260px 1fr; gap:56px;}
+.sidebar{position:sticky; top:80px; align-self:start; height:fit-content; max-height:calc(100vh - 100px); overflow-y:auto;}
+.side-title{font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px;}
+.side-list{list-style:none; display:flex; flex-direction:column; gap:1px;}
+.side-list a{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink-dim); font-size:12.5px; padding:8px 12px; border-radius:8px; border-left:2px solid transparent; transition:background .2s, color .2s, border-color .2s;}
+.side-list a:hover{background:var(--panel);}
+.side-list a.active{color:var(--ink); background:var(--panel); border-left-color:var(--amber);}
+.side-dot{width:7px; height:7px; border-radius:50%; background:#2a3550; flex-shrink:0; transition:background .3s;}
+.side-dot.done{background:var(--green); box-shadow:0 0 6px var(--green);}
+.side-dot.warn{background:var(--amber); box-shadow:0 0 6px var(--amber);}
+
+.tut-hero{margin-bottom:44px;}
+.module-eyebrow{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--amber); background:var(--amber-dim); margin-bottom:20px;}
+.tut-hero h1{font-family:var(--serif); font-weight:600; font-size:clamp(30px,4vw,44px); line-height:1.1; letter-spacing:-0.01em;}
+.tut-hero p.lede{margin-top:16px; color:var(--ink-dim); font-size:16px; max-width:660px;}
+.chip-row{display:flex; gap:8px; margin-top:22px; flex-wrap:wrap;}
+.chip{font-family:var(--mono); font-size:10.5px; letter-spacing:0.04em; color:var(--ink-faint); border:1px solid var(--line); padding:5px 11px; border-radius:100px;}
+
+.character-card{margin-top:28px; display:flex; gap:18px; align-items:center; padding:20px 22px; background:linear-gradient(120deg, rgba(242,163,65,0.08), rgba(90,209,230,0.05)); border:1px solid var(--line-strong); border-radius:14px;}
+.avatar-ring{width:56px; height:56px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1.5px solid var(--amber); font-family:var(--serif); font-size:22px; color:var(--amber);}
+.character-card .cname{font-weight:700; font-size:14.5px; color:var(--ink);}
+.character-card .crole{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:2px;}
+.character-card p{font-size:13.5px; color:var(--ink-dim); margin-top:6px;}
+
+.chapter{margin-bottom:80px; scroll-margin-top:90px;}
+.chapter-head{display:flex; align-items:center; gap:14px; margin-bottom:20px;}
+.chapter-icon{width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--panel); border:1px solid var(--line-strong); font-size:18px; color:var(--amber); flex-shrink:0;}
+.chapter-num{font-family:var(--mono); font-size:12px; color:var(--ink-faint); letter-spacing:0.08em; display:block;}
+.chapter h2{font-family:var(--serif); font-weight:600; font-size:clamp(23px,2.8vw,30px); letter-spacing:-0.01em;}
+
+.story-panel{position:relative; margin:18px 0 24px; padding:22px 26px 22px 52px; border-radius:12px; background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--amber); font-family:var(--serif); font-style:italic; font-size:15.5px; color:var(--ink-dim); line-height:1.75;}
+.story-panel::before{content:'\201C'; position:absolute; left:16px; top:8px; font-size:38px; color:var(--amber); font-style:normal; opacity:0.6;}
+.story-panel b{color:var(--ink); font-style:normal;}
+
+.chapter > p.body-text{color:var(--ink-dim); font-size:15px; margin-bottom:16px;}
+.chapter > p.body-text b{color:var(--ink); font-weight:600;}
+.chapter ul.points{margin:16px 0 20px 0; padding-left:0; list-style:none; display:flex; flex-direction:column; gap:10px;}
+.chapter ul.points li{display:flex; gap:10px; font-size:14px; color:var(--ink-dim); padding:12px 14px; background:var(--panel); border:1px solid var(--line); border-radius:10px;}
+.chapter ul.points li::before{content:'\25C6'; color:var(--amber); font-size:8px; margin-top:5px; flex-shrink:0;}
+.callout{margin:22px 0; padding:16px 18px; border-radius:10px; border-left:3px solid var(--cyan); background:var(--cyan-dim); font-size:13.5px; color:var(--ink-dim);}
+.callout b{color:var(--ink);}
+.callout.warn{border-left-color:var(--amber); background:var(--amber-dim);}
+
+.spotlight{display:flex; align-items:center; gap:14px; margin:22px 0; padding:16px 18px; border-radius:12px; background:var(--violet-dim); border:1px solid rgba(179,155,255,0.35);}
+.spotlight .sicon{font-size:20px; color:var(--violet); flex-shrink:0;}
+.spotlight .stext{font-size:12.5px; color:var(--ink-dim);}
+.spotlight .stext b{color:var(--violet); font-family:var(--mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; display:block; margin-bottom:3px;}
+
+.visual-box{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:26px; margin:24px 0; overflow-x:auto;}
+.visual-label{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;}
+
+/* Ch1: preview grid (flip cards) */
+.encoding-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+.enc-card{perspective:1000px; height:120px; cursor:pointer;}
+.enc-inner{position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d;}
+.enc-card.flipped .enc-inner{transform:rotateY(180deg);}
+.enc-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:12px; padding:14px; display:flex; flex-direction:column; justify-content:center; border:1px solid var(--line-strong);}
+.enc-front{background:var(--panel-2);}
+.enc-front .en{font-family:var(--mono); font-size:9.5px; color:var(--ink-faint); margin-bottom:4px;}
+.enc-front h6{font-size:12.5px; font-weight:700; color:var(--ink);}
+.enc-back{background:var(--panel); transform:rotateY(180deg); font-size:11px; color:var(--ink-dim); line-height:1.5;}
+@media (max-width:900px){.encoding-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:480px){.encoding-grid{grid-template-columns:1fr;}}
+
+/* Ch2 anatomy diagram */
+.anatomy-wrap{display:flex; flex-direction:column; gap:8px;}
+.anatomy-row{display:grid; grid-template-columns:140px 1fr; gap:14px; padding:12px 14px; background:var(--panel-2); border:1px solid var(--line); border-radius:10px; align-items:center;}
+.anatomy-row .an-label{font-family:var(--mono); font-size:11.5px; color:var(--amber); font-weight:700;}
+.anatomy-row .an-text{font-size:12.5px; color:var(--ink-dim);}
+
+/* checklist component (reused ch2/ch4/ch5) */
+.check-list{display:flex; flex-direction:column; gap:8px;}
+.check-item{display:flex; align-items:flex-start; gap:12px; padding:12px 14px; background:var(--panel-2); border:1px solid var(--line); border-radius:10px; cursor:pointer; transition:border-color .2s;}
+.check-item:hover{border-color:var(--line-strong);}
+.check-circle{width:20px; height:20px; border-radius:6px; border:1.5px solid var(--line-strong); flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; font-size:12px; color:transparent; transition:all .2s;}
+.check-item.checked .check-circle{background:var(--green-dim); border-color:var(--green); color:var(--green);}
+.check-item.checked .check-text{color:var(--ink);}
+.check-text{font-size:13px; color:var(--ink-dim);}
+.checklist-progress{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:10px;}
+
+/* Ch3 challenge recap grid */
+.recap-card{background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:14px 16px;}
+.recap-card .rc-mod{font-family:var(--mono); font-size:9.5px; color:var(--violet); text-transform:uppercase; letter-spacing:0.05em;}
+.recap-card h6{font-size:13px; font-weight:700; color:var(--ink); margin:4px 0 6px;}
+.recap-card p{font-size:12px; color:var(--ink-faint); line-height:1.5;}
+.recap-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+@media (max-width:700px){.recap-grid{grid-template-columns:1fr;}}
+
+/* Ch6 horizon cards */
+.horizon-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+@media (max-width:800px){.horizon-grid{grid-template-columns:1fr;}}
+.horizon-card{background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:18px;}
+.horizon-card h5{font-family:var(--mono); font-size:11.5px; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink); margin-bottom:10px;}
+.horizon-card ul{list-style:none; display:flex; flex-direction:column; gap:8px;}
+.horizon-card li{font-size:12.5px; color:var(--ink-dim); padding-left:0;}
+.htag{font-family:var(--mono); font-size:9px; letter-spacing:0.05em; text-transform:uppercase; padding:2px 7px; border-radius:100px; margin-right:6px; display:inline-block;}
+.htag.plausible{background:var(--cyan-dim); color:var(--cyan);}
+.htag.speculative{background:var(--amber-dim); color:var(--amber);}
+
+/* Ch7: capstone builder */
+.cap-progress-wrap{margin-bottom:22px;}
+.cap-progress-track{height:10px; background:var(--panel-2); border-radius:6px; overflow:hidden; border:1px solid var(--line);}
+.cap-progress-fill{height:100%; background:linear-gradient(90deg,var(--cyan),var(--violet),var(--amber)); width:0%; transition:width .4s ease;}
+.cap-progress-label{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); margin-top:8px;}
+.cap-section{margin-bottom:26px; padding:20px 22px; background:var(--panel-2); border:1px solid var(--line); border-radius:12px;}
+.cap-section-head{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+.cap-num{width:26px; height:26px; border-radius:50%; background:var(--panel); border:1px solid var(--line-strong); display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:11px; color:var(--amber); flex-shrink:0;}
+.cap-section h5{font-size:14.5px; font-weight:700; color:var(--ink);}
+.cap-prompts{font-size:12px; color:var(--ink-faint); margin-bottom:10px; line-height:1.6;}
+.cap-textarea{width:100%; min-height:90px; background:var(--bg); border:1px solid var(--line-strong); border-radius:8px; padding:12px 14px; color:var(--ink); font-family:var(--sans); font-size:13.5px; resize:vertical;}
+.cap-textarea:focus{outline:none; border-color:var(--cyan);}
+.cap-select-row{display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap;}
+.cap-select{background:var(--bg); border:1px solid var(--line-strong); border-radius:8px; padding:9px 12px; color:var(--ink); font-family:var(--mono); font-size:12.5px;}
+.cap-hint{margin-top:8px; padding:10px 12px; border-radius:8px; background:var(--violet-dim); border-left:2px solid var(--violet); font-size:12px; color:var(--ink-dim); display:none;}
+.cap-hint.show{display:block;}
+.cap-actions{display:flex; gap:12px; margin-top:20px; flex-wrap:wrap;}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:9px; font-size:13.5px; font-weight:600; text-decoration:none; cursor:pointer; border:1px solid transparent; transition:transform .2s, box-shadow .2s;}
+.btn-primary{background:var(--blue); color:#04101f;}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 26px -8px rgba(79,163,247,0.5);}
+.btn-ghost{background:transparent; border-color:var(--line-strong); color:var(--ink);}
+.btn-ghost:hover{border-color:var(--ink-dim); transform:translateY(-2px);}
+.btn-amber{background:var(--amber-dim); border-color:var(--amber); color:var(--amber);}
+
+.tutor-widget{background:var(--panel); border:1px solid var(--line-strong); border-radius:14px; padding:22px; margin:24px 0;}
+.tutor-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+.tutor-avatar{width:32px; height:32px; border-radius:9px; background:var(--violet-dim); color:var(--violet); display:flex; align-items:center; justify-content:center; font-size:15px;}
+.tutor-title{font-family:var(--mono); font-size:12px; letter-spacing:0.04em; color:var(--ink);}
+
+/* quiz (shared pattern) */
+.quiz-box{margin-top:28px; background:var(--panel); border:1px solid var(--line-strong); border-radius:14px; padding:24px;}
+.quiz-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
+.quiz-title{font-family:var(--mono); font-size:11.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--amber); display:flex; align-items:center; gap:8px;}
+.quiz-score{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);}
+.q-item{margin-bottom:22px;}
+.q-item:last-child{margin-bottom:0;}
+.q-text{font-size:14px; font-weight:600; margin-bottom:12px; color:var(--ink);}
+.q-options{display:flex; flex-direction:column; gap:8px;}
+.q-opt{text-align:left; padding:11px 14px; border-radius:9px; border:1px solid var(--line-strong); background:var(--panel-2); color:var(--ink-dim); font-size:13px; cursor:pointer; transition:border-color .2s, background .2s, color .2s; font-family:var(--sans);}
+.q-opt:hover:not(:disabled){border-color:var(--ink-dim); color:var(--ink);}
+.q-opt.correct{border-color:var(--green); background:var(--green-dim); color:var(--green);}
+.q-opt.incorrect{border-color:var(--red); background:var(--red-dim); color:var(--red);}
+.q-opt:disabled{cursor:default;}
+.q-explain{margin-top:10px; font-size:12.5px; color:var(--ink-dim); padding:11px 14px; border-radius:8px; background:var(--panel-2); border-left:2px solid var(--amber); display:none;}
+.q-explain.show{display:block;}
+.chapter-status{margin-top:16px; padding:10px 14px; border-radius:8px; font-family:var(--mono); font-size:11.5px; display:none; align-items:center; gap:8px;}
+.chapter-status.show{display:flex;}
+.chapter-status.mastered{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.35);}
+.chapter-status.review{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.35);}
+
+.final-assess{margin-top:20px; background:linear-gradient(180deg,var(--panel-2),var(--panel)); border:1px solid var(--line-strong); border-radius:16px; padding:34px;}
+.final-head{margin-bottom:26px;}
+.final-head .module-eyebrow{color:var(--amber); border-color:var(--line-strong); background:var(--amber-dim);}
+.final-head h2{font-family:var(--serif); font-size:clamp(26px,3vw,34px); font-weight:600;}
+.final-head p{color:var(--ink-dim); margin-top:10px; font-size:14.5px;}
+.result-panel{margin-top:28px; padding:24px; border-radius:12px; border:1px solid var(--line-strong); background:var(--bg); display:none;}
+.result-panel.show{display:block;}
+.result-top{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:18px;}
+.result-score{font-family:var(--serif); font-size:44px; font-weight:600;}
+.result-badge{font-family:var(--mono); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; padding:6px 14px; border-radius:100px;}
+.result-badge.pass{background:var(--green-dim); color:var(--green); border:1px solid rgba(94,230,160,0.4);}
+.result-badge.retry{background:var(--amber-dim); color:var(--amber); border:1px solid rgba(242,163,65,0.4);}
+.recommend-list{list-style:none; display:flex; flex-direction:column; gap:8px; margin-top:10px;}
+.recommend-list li{font-size:13px; color:var(--ink-dim); padding:10px 12px; background:var(--panel-2); border-radius:8px; border:1px solid var(--line);}
+.result-actions{display:flex; gap:12px; margin-top:22px; flex-wrap:wrap;}
+
+.reveal{opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease;}
+.reveal.in{opacity:1; transform:translateY(0);}
+
+.module-nav{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:70px; padding-top:36px; border-top:1px solid var(--line);}
+.mn-card{display:flex; flex-direction:column; gap:6px; padding:20px 22px; border-radius:14px; background:var(--panel); border:1px solid var(--line); text-decoration:none; transition:border-color .25s, transform .25s;}
+.mn-card.enabled:hover{border-color:var(--line-strong); transform:translateY(-3px);}
+.mn-card.disabled{opacity:0.5; cursor:default;}
+.mn-card.next{align-items:flex-end; text-align:right;}
+.mn-eyebrow{font-family:var(--mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint);}
+.mn-title{font-family:var(--serif); font-size:16px; font-weight:600; color:var(--ink);}
+.mn-arrow{font-family:var(--mono); font-size:12px; color:var(--amber);}
+@media (max-width:700px){.module-nav{grid-template-columns:1fr;}}
+
+/* course-complete banner */
+.complete-banner{
+  margin-top:20px; padding:26px; border-radius:14px; text-align:center;
+  background:linear-gradient(120deg, rgba(90,209,230,0.1), rgba(179,155,255,0.08), rgba(242,163,65,0.08));
+  border:1px solid var(--line-strong); display:none;
+}
+.complete-banner.show{display:block;}
+.complete-banner h3{font-family:var(--serif); font-size:22px; font-weight:600; margin-bottom:8px;}
+.complete-banner p{color:var(--ink-dim); font-size:13.5px; max-width:520px; margin:0 auto 16px;}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static; display:flex; overflow-x:auto; gap:4px; padding-bottom:10px; max-height:none;}
+  .side-list{flex-direction:row;}
+  .side-list a{white-space:nowrap;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-rail"><div class="progress-fill" id="progressFill"></div></div>
+
+<header>
+  <div class="nav-wrap">
+    <a class="back-link" href="qml-roadmap-landing-page.html#curriculum">← Back to Curriculum</a>
+    <div class="crumb">LEVEL 3 · ADVANCED — <b>MODULE 12</b></div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a class="back-link" href="progress-hub.html">My Progress</a>
+      <div class="xp-badge">⚡ <span id="xpCount">0</span> XP</div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="side-title">Module 12 Chapters</div>
+    <ul class="side-list" id="sideList">
+      <li><a href="#ch1" data-target="ch1"><span class="side-dot" id="dot-ch1"></span>The Last Mile</a></li>
+      <li><a href="#ch2" data-target="ch2"><span class="side-dot" id="dot-ch2"></span>Reading QML Papers</a></li>
+      <li><a href="#ch3" data-target="ch3"><span class="side-dot" id="dot-ch3"></span>Open Research Challenges</a></li>
+      <li><a href="#ch4" data-target="ch4"><span class="side-dot" id="dot-ch4"></span>Benchmarking Quantum Models</a></li>
+      <li><a href="#ch5" data-target="ch5"><span class="side-dot" id="dot-ch5"></span>Responsible AI &amp; QC</a></li>
+      <li><a href="#ch6" data-target="ch6"><span class="side-dot" id="dot-ch6"></span>Future Directions</a></li>
+      <li><a href="#ch7" data-target="ch7"><span class="side-dot" id="dot-ch7"></span>Capstone Project Builder</a></li>
+      <li><a href="#final" data-target="final"><span class="side-dot" id="dot-final"></span>Module Assessment</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <div class="tut-hero reveal">
+      <div class="module-eyebrow">◆ Module 12 · Advanced</div>
+      <h1>Research &amp; Capstone Project</h1>
+      <p class="lede">Every module until now handed Maya a problem already framed for her. This one doesn't. It's the last mile — reading real papers, knowing this course's own open questions cold, and finally, planning a complete project of her own.</p>
+      <div class="chip-row">
+        <span class="chip">7 Chapters</span>
+        <span class="chip">1 Working Capstone Builder</span>
+        <span class="chip">21 Quick-Check Questions</span>
+        <span class="chip">1 Adaptive Assessment</span>
+        <span class="chip">~50 min + project time</span>
+      </div>
+      <div class="character-card">
+        <div class="avatar-ring">M</div>
+        <div>
+          <div class="cname">Maya &amp; Dr. Okafor, closing chapter</div>
+          <div class="crole">Same lab, her own project now</div>
+          <p>"You don't need me to hand you the next problem anymore," Dr. Okafor says. "You need to know how to find one, read what's already been tried, and plan the rest yourself." This module is that handoff — to Maya, and to you.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAPTER 1 -->
+    <section class="chapter reveal" id="ch1">
+      <div class="chapter-head"><div class="chapter-icon">⌘</div><div><span class="chapter-num">CHAPTER 01</span><h2>The Last Mile</h2></div></div>
+      <div class="story-panel">"Modules 6 through 11 gave you a toolbox," Dr. Okafor says. "This one asks a harder question: what do you build with it, when nobody hands you the blueprint?" He isn't being dramatic — it's just true. Every problem so far had a name and a shape already. From here, that's Maya's job.</div>
+      <p class="body-text">This closing module has two halves. The first five chapters are skills: reading research honestly, knowing this course's own unresolved questions cold, comparing methods fairly, thinking about responsibility, and reading the horizon without overclaiming it. The last chapter is a real tool — a working capstone project planner you can actually fill in and export.</p>
+      <div class="visual-box">
+        <div class="visual-label">This Module — Tap Each Card</div>
+        <div class="encoding-grid" id="encodingGrid"></div>
+      </div>
+      <div class="callout"><b>Takeaway:</b> "Advanced" in Module 11 meant harder open problems. "Advanced" here means fewer instructions — which is really just what research is.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch1">0 / 3</div></div>
+        <div id="quiz-ch1"></div>
+        <div class="chapter-status" id="status-ch1"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 2 -->
+    <section class="chapter reveal" id="ch2">
+      <div class="chapter-head"><div class="chapter-icon">▧</div><div><span class="chapter-num">CHAPTER 02</span><h2>Reading QML Research Papers</h2></div></div>
+      <div class="story-panel">Dr. Okafor slides a printed paper across the table — one with a bold, exciting title. "Before you believe the title," he says, "read it like a skeptic who wants to believe it anyway. That's the whole skill."</div>
+      <p class="body-text">Every paper has roughly the same anatomy. Knowing what each part is actually for — not just what it says — is most of the skill.</p>
+      <div class="visual-box">
+        <div class="visual-label">Paper Anatomy</div>
+        <div class="anatomy-wrap">
+          <div class="anatomy-row"><div class="an-label">Abstract</div><div class="an-text">The headline claim, compressed. Treat it as a hypothesis to verify, not a conclusion to accept.</div></div>
+          <div class="anatomy-row"><div class="an-label">Methods</div><div class="an-text">What was actually built and run. This is where hidden assumptions — like "efficient state preparation" — usually hide.</div></div>
+          <div class="anatomy-row"><div class="an-label">Results</div><div class="an-text">What the data shows, on the specific setup tested — not automatically the general claim in the abstract.</div></div>
+          <div class="anatomy-row"><div class="an-label">Discussion</div><div class="an-text">The authors' own interpretation and limitations — often more honest and more interesting than the abstract.</div></div>
+          <div class="anatomy-row"><div class="an-label">Related Work</div><div class="an-text">How this fits (or doesn't) with what came before — useful for spotting cherry-picked comparisons.</div></div>
+        </div>
+      </div>
+      <div class="spotlight">
+        <div class="sicon">▧</div>
+        <div class="stext"><b>Platform Feature Spotlight — Research Hub</b>The Research Hub curates exactly this kind of skeptical summary for current QML papers, including the papers referenced throughout this course (Havlíček et al. on IQP encoding, McClean et al. on barren plateaus, and more).</div>
+      </div>
+      <div class="visual-box">
+        <div class="visual-label">Red-Flag Checklist — Tap What You'd Watch For</div>
+        <div class="check-list" id="redFlagList"></div>
+        <div class="checklist-progress" id="redFlagProgress"></div>
+      </div>
+      <div class="callout"><b>Takeaway:</b> You've been practicing this all course — every "careful" callout box since Module 8 was this exact skill, applied for you in advance.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch2">0 / 3</div></div>
+        <div id="quiz-ch2"></div>
+        <div class="chapter-status" id="status-ch2"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 3 -->
+    <section class="chapter reveal" id="ch3">
+      <div class="chapter-head"><div class="chapter-icon">⬡</div><div><span class="chapter-num">CHAPTER 03</span><h2>Open Research Challenges</h2></div></div>
+      <div class="story-panel">"Before you go looking for a new open problem," Dr. Okafor says, "here's a secret — you've already met most of the field's real ones. You just met them one module at a time." He's right. This chapter is the reunion.</div>
+      <p class="body-text">Every "careful" and "honest caveat" box across this entire course points at a real, currently unsolved research question. Here they all are, together.</p>
+      <div class="visual-box">
+        <div class="visual-label">The Course's Open Questions, Collected</div>
+        <div class="recap-grid" id="recapGrid"></div>
+      </div>
+      <div class="callout"><b>Takeaway:</b> A good capstone project doesn't need to invent a new open problem — picking one of these, honestly, is already a real contribution.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch3">0 / 3</div></div>
+        <div id="quiz-ch3"></div>
+        <div class="chapter-status" id="status-ch3"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 4 -->
+    <section class="chapter reveal" id="ch4">
+      <div class="chapter-head"><div class="chapter-icon">⚖</div><div><span class="chapter-num">CHAPTER 04</span><h2>Benchmarking Quantum Models</h2></div></div>
+      <div class="story-panel">"When your own capstone shows a quantum model 'winning,'" Dr. Okafor warns, "the first person who should doubt that result is you." He's not being harsh — a fair benchmark is one of the hardest, most valuable skills in this entire field.</div>
+      <p class="body-text">The same skepticism from Chapter 2 turns inward here. Before claiming any advantage in your own project, run it through this checklist.</p>
+      <div class="spotlight">
+        <div class="sicon">▤</div>
+        <div class="stext"><b>Platform Feature Spotlight — QML Playground</b>The QML Playground runs classical and quantum models side by side on the same dataset, with matched settings, specifically to make fair benchmarking the default rather than extra work.</div>
+      </div>
+      <div class="visual-box">
+        <div class="visual-label">Fair Comparison Checklist</div>
+        <div class="check-list" id="benchList"></div>
+        <div class="checklist-progress" id="benchProgress"></div>
+      </div>
+      <ul class="points">
+        <li><b>Best available baseline, not a strawman</b> — compare against a well-tuned classical method, not whatever was easiest to implement.</li>
+        <li><b>Matched budget</b> — compute time, shot count, or wall-clock time, not just qubit count.</li>
+        <li><b>Report variance</b>, not a single favorable run — averages and spread across multiple seeds tell the real story.</li>
+      </ul>
+      <div class="callout warn"><b>Careful:</b> A benchmark that only makes your own method look good is the easiest mistake to make without noticing — and the easiest one for a reader to catch.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch4">0 / 3</div></div>
+        <div id="quiz-ch4"></div>
+        <div class="chapter-status" id="status-ch4"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 5 -->
+    <section class="chapter reveal" id="ch5">
+      <div class="chapter-head"><div class="chapter-icon">◎</div><div><span class="chapter-num">CHAPTER 05</span><h2>Responsible AI &amp; Quantum Computing</h2></div></div>
+      <div class="story-panel">"One more thing before you plan anything," Dr. Okafor says, more quietly than usual. "None of what we've built together stops being an AI system just because it runs on qubits. Every responsibility question you'd ask about classical ML still applies."</div>
+      <p class="body-text">A few of these are genuinely new wrinkles; most are the same classical-ML questions, unchanged.</p>
+      <ul class="points">
+        <li><b>Bias doesn't disappear at the encoding step.</b> Whatever bias exists in your training data carries straight through Module 8's encodings into your quantum model — quantum mechanics doesn't launder data.</li>
+        <li><b>Dual use is real, not hypothetical.</b> Module 10's cybersecurity chapter already showed this directly — the same classifier that defends a system could, with different labels, attack one.</li>
+        <li><b>Access isn't equal.</b> Real quantum hardware is currently concentrated among well-funded institutions and companies — worth naming as a fairness question, not ignoring.</li>
+        <li><b>Hype has a cost.</b> Overselling a result — skipping Module 7's hype-o-meter honesty — misleads other researchers, funders, and the public, and it's avoidable.</li>
+      </ul>
+      <div class="visual-box">
+        <div class="visual-label">Self-Check Before You Publish</div>
+        <div class="check-list" id="respList"></div>
+        <div class="checklist-progress" id="respProgress"></div>
+      </div>
+      <div class="callout"><b>Takeaway:</b> Responsible research isn't a separate chore from good research — the honesty habits this whole course has modeled are the same thing.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch5">0 / 3</div></div>
+        <div id="quiz-ch5"></div>
+        <div class="chapter-status" id="status-ch5"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 6 -->
+    <section class="chapter reveal" id="ch6">
+      <div class="chapter-head"><div class="chapter-icon">◑</div><div><span class="chapter-num">CHAPTER 06</span><h2>Future Directions in QML</h2></div></div>
+      <div class="story-panel">"Last question before your project," Dr. Okafor says. "Where's this all going?" He pauses. "I'll tell you what I actually think — and I'll tell you exactly how confident I am about each part, because pretending otherwise would undo everything else we've covered."</div>
+      <p class="body-text">Every item below is labeled by confidence, not certainty — consistent with this course's approach from Module 7's hype-o-meter onward.</p>
+      <div class="visual-box">
+        <div class="visual-label">Three Horizons, Honestly Labeled</div>
+        <div class="horizon-grid">
+          <div class="horizon-card">
+            <h5>Near-Term</h5>
+            <ul>
+              <li><span class="htag plausible">Plausible</span>Continued error-mitigation improvements (Module 11)</li>
+              <li><span class="htag plausible">Plausible</span>Larger, higher-fidelity NISQ devices</li>
+              <li><span class="htag plausible">Plausible</span>More standardized QML benchmarks (Chapter 4)</li>
+            </ul>
+          </div>
+          <div class="horizon-card">
+            <h5>Mid-Term</h5>
+            <ul>
+              <li><span class="htag speculative">Speculative</span>Early, small-scale fault-tolerant demonstrations</li>
+              <li><span class="htag speculative">Speculative</span>Hybrid algorithms maturing past current QNN/VQC designs</li>
+              <li><span class="htag speculative">Speculative</span>Clearer, reproducible advantage on at least one niche task</li>
+            </ul>
+          </div>
+          <div class="horizon-card">
+            <h5>Long-Term</h5>
+            <ul>
+              <li><span class="htag speculative">Speculative</span>Large-scale fault-tolerant QML (Module 11's threshold theorem, realized)</li>
+              <li><span class="htag speculative">Speculative</span>Broad, proven advantage across multiple real-world domains</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="callout warn"><b>Careful:</b> Nothing above is a promise. "Plausible" and "speculative" are doing real work in these labels — treat any source (including this one) that drops them as a source to double-check.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch6">0 / 3</div></div>
+        <div id="quiz-ch6"></div>
+        <div class="chapter-status" id="status-ch6"></div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 7: CAPSTONE BUILDER -->
+    <section class="chapter reveal" id="ch7">
+      <div class="chapter-head"><div class="chapter-icon">★</div><div><span class="chapter-num">CHAPTER 07</span><h2>Capstone Project Builder</h2></div></div>
+      <div class="story-panel">"No more examples," Dr. Okafor says, sliding a blank page across the table instead of a paper this time. "This one's yours." Below is a real planning tool — fill in each section for your own project. It autosaves in this browser, and you can export it as a document whenever you're ready.</div>
+      <p class="body-text">Seven sections, matching a complete QML project end to end. None are required to be perfect on the first pass — the point is to make every decision deliberate, not accidental.</p>
+      <div class="spotlight">
+        <div class="sicon">⚡</div>
+        <div class="stext"><b>Platform Feature Spotlight — Gamification &amp; Certificates</b>Completing and exporting a capstone plan here is exactly the kind of milestone the platform's certificate-of-completion system is built around.</div>
+      </div>
+
+      <div class="visual-box">
+        <div class="cap-progress-wrap">
+          <div class="cap-progress-track"><div class="cap-progress-fill" id="capProgressFill"></div></div>
+          <div class="cap-progress-label" id="capProgressLabel">0 / 7 sections started</div>
+        </div>
+
+        <div class="cap-section">
+          <div class="cap-section-head"><div class="cap-num">1</div><h5>Problem Definition</h5></div>
+          <div class="cap-prompts">Which domain from Module 10 does this address? What decision or prediction will your model make? Who would use the result?</div>
+          <textarea class="cap-textarea" id="cap1" placeholder="Describe the problem you're solving..."></textarea>
+        </div>
+
+        <div class="cap-section">
+          <div class="cap-section-head"><div class="cap-num">2</div><h5>Data Preprocessing</h5></div>
+          <div class="cap-prompts">What's your data source? How many features and samples? How will you handle missing or noisy values before encoding?</div>
+          <textarea class="cap-textarea" id="cap2" placeholder="Describe your dataset and preprocessing plan..."></textarea>
+        </div>
+
+        <div class="cap-section">
+          <div class="cap-section-head"><div class="cap-num">3</div><h5>Quantum Data Encoding</h5></div>
+          <div class="cap-prompts">Which Module 8 encoding fits your data and qubit budget?</div>
+          <div class="cap-select-row">
+            <select class="cap-select" id="capEncodingSelect">
+              <option value="">Select an encoding...</option>
+              <option value="basis">Basis Encoding</option>
+              <option value="angle">Angle Encoding</option>
+              <option value="dense">Dense Angle Encoding</option>
+              <option value="amplitude">Amplitude Encoding</option>
+              <option value="iqp">IQP Encoding</option>
+              <option value="hamiltonian">Hamiltonian Encoding</option>
+              <option value="qsample">QSample Encoding</option>
+              <option value="reupload">Data Re-uploading</option>
+            </select>
+          </div>
+          <div class="cap-hint" id="capEncodingHint"></div>
+          <textarea class="cap-textarea" id="cap3" placeholder="Explain why this encoding fits your data..."></textarea>
+        </div>
+
+        <div class="cap-section">
+          <div class="cap-section-head"><div class="cap-num">4</div><h5>Model Implementation</h5></div>
+          <div class="cap-prompts">Which Module 9 algorithm are you building on?</div>
+          <div class="cap-select-row">
+            <select class="cap-select" id="capAlgoSelect">
+              <option value="">Select an algorithm...</option>
+              <option value="pqc">Parameterized Quantum Circuit</option>
+              <option value="vqc">Variational Quantum Classifier</option>
+              <option value="qsvm">Quantum SVM</option>
+              <option value="qnn">Quantum Neural Network</option>
+              <option value="kernel">Quantum Kernel Methods</option>
+              <option value="qpca">Quantum PCA</option>
+              <option value="qae">Quantum Autoencoder</option>
+            </select>
+          </div>
+          <div class="cap-hint" id="capAlgoHint"></div>
+          <textarea class="cap-textarea" id="cap4" placeholder="Describe your ansatz, layers, and architecture choices..."></textarea>
+        </div>
+
+        <div class="cap-section">
+          <div class="cap-section-head"><div class="cap-num">5</div><h5>Training &amp; Evaluation</h5></div>
+          <div class="cap-prompts">Loss function? Optimizer? Train/test split? What metrics will count as success?</div>
+          <textarea class="cap-textarea" id="cap5" placeholder="Describe your training and evaluation plan..."></textarea>
+        </div>
+
+        <div class="cap-section">
+          <div class="cap-section-head"><div class="cap-num">6</div><h5>Execution on Simulators / Hardware</h5></div>
+          <div class="cap-prompts">Simulator or real hardware? Qubit budget? Shot count? How will you apply Module 11's error mitigation if needed?</div>
+          <textarea class="cap-textarea" id="cap6" placeholder="Describe where and how this will actually run..."></textarea>
+        </div>
+
+        <div class="cap-section">
+          <div class="cap-section-head"><div class="cap-num">7</div><h5>Documentation &amp; Presentation</h5></div>
+          <div class="cap-prompts">Code repository? Written report? Demo or slides? Who's the audience, and what do they need to walk away understanding?</div>
+          <textarea class="cap-textarea" id="cap7" placeholder="Describe your deliverables and presentation plan..."></textarea>
+        </div>
+
+        <div class="cap-actions">
+          <button class="btn btn-primary" id="exportCapstoneBtn">↓ Export My Capstone Plan</button>
+          <button class="btn btn-ghost" id="clearCapstoneBtn">Clear All Fields</button>
+        </div>
+      </div>
+
+      <div class="callout"><b>Takeaway:</b> A filled-in version of this page is, functionally, a real capstone proposal — problem, data, encoding, model, training, execution, and documentation, all named on purpose.</div>
+
+      <div class="quiz-box">
+        <div class="quiz-head"><div class="quiz-title">◈ Quick Check</div><div class="quiz-score" id="score-ch7">0 / 3</div></div>
+        <div id="quiz-ch7"></div>
+        <div class="chapter-status" id="status-ch7"></div>
+      </div>
+    </section>
+
+    <!-- FINAL ASSESSMENT -->
+    <section class="chapter reveal" id="final">
+      <div class="final-assess">
+        <div class="final-head">
+          <div class="module-eyebrow">◆ Adaptive Assessment</div>
+          <h2>Module 12 Assessment</h2>
+          <p>Seven synthesis questions, one per chapter. Your result adapts to your whole session — chapters where you struggled above get flagged for review here, regardless of how this final round goes.</p>
+        </div>
+        <div id="quiz-final"></div>
+        <div class="result-panel" id="resultPanel">
+          <div class="result-top">
+            <div>
+              <div class="result-score" id="resultScore">0%</div>
+              <div class="quiz-score" id="resultDetail">0 / 7 correct</div>
+            </div>
+            <div class="result-badge" id="resultBadge"></div>
+          </div>
+          <div id="recommendWrap"></div>
+          <div class="complete-banner" id="completeBanner">
+            <h3>🎉 You've completed every published module.</h3>
+            <p>Twelve modules, from "what is AI?" to your own capstone plan. Your full XP, mastery, and badge record is on your progress dashboard.</p>
+          </div>
+          <div class="result-actions">
+            <a href="qml-roadmap-landing-page.html#curriculum" class="btn btn-ghost">← Back to Curriculum</a>
+            <a href="progress-hub.html" class="btn btn-primary" id="continueBtn">View My Progress →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="module-nav" id="moduleNav"></div>
+
+  </main>
+</div>
+
+<script>
+/* ---------------- state ---------------- */
+let state = { xp:0, chapters:{
+  ch1:{correct:0,total:3,done:false}, ch2:{correct:0,total:3,done:false}, ch3:{correct:0,total:3,done:false},
+  ch4:{correct:0,total:3,done:false}, ch5:{correct:0,total:3,done:false}, ch6:{correct:0,total:3,done:false},
+  ch7:{correct:0,total:3,done:false}
+}, finalDone:false };
+try{ const saved = localStorage.getItem('qml_module12_state'); if(saved) state = JSON.parse(saved); }catch(e){}
+function saveState(){ try{ localStorage.setItem('qml_module12_state', JSON.stringify(state)); }catch(e){} }
+function addXP(n){ state.xp += n; document.getElementById('xpCount').textContent = state.xp; saveState(); }
+document.getElementById('xpCount').textContent = state.xp;
+
+/* ================= CHAPTER 1: preview grid ================= */
+const encodingPreview = [
+  {en:'01', name:'Reading QML Papers', desc:'A skeptic\u2019s framework for abstracts, methods, and hidden assumptions.'},
+  {en:'02', name:'Open Research Challenges', desc:'Every honest caveat from Modules 6\u201311, collected in one place.'},
+  {en:'03', name:'Benchmarking', desc:'How to compare quantum and classical models fairly \u2014 including your own.'},
+  {en:'04', name:'Responsible AI & QC', desc:'Bias, dual use, access, and hype \u2014 the same questions classical ML faces.'},
+  {en:'05', name:'Future Directions', desc:'Near, mid, and long-term possibilities, each labeled by confidence.'},
+  {en:'06', name:'Capstone Builder', desc:'A real, exportable planning tool for your own complete QML project.'},
+];
+(function(){
+  const grid = document.getElementById('encodingGrid');
+  encodingPreview.forEach(e=>{
+    const card = document.createElement('div');
+    card.className = 'enc-card';
+    card.innerHTML = '<div class="enc-inner">'
+      + '<div class="enc-face enc-front"><div class="en">'+e.en+'</div><h6>'+e.name+'</h6></div>'
+      + '<div class="enc-face enc-back">'+e.desc+'</div>'
+      + '</div>';
+    card.addEventListener('click', ()=>{ card.classList.toggle('flipped'); addXP(1); });
+    grid.appendChild(card);
+  });
+})();
+
+/* ================= generic checklist builder (reused ch2/ch4/ch5) ================= */
+function buildChecklist(containerId, progressId, items, storageKey){
+  const wrap = document.getElementById(containerId);
+  let checked = {};
+  try{ const saved = localStorage.getItem(storageKey); if(saved) checked = JSON.parse(saved); }catch(e){}
+  function renderProgress(){
+    const count = Object.values(checked).filter(Boolean).length;
+    document.getElementById(progressId).textContent = count+' / '+items.length+' considered';
+  }
+  items.forEach((text,idx)=>{
+    const row = document.createElement('div');
+    row.className = 'check-item' + (checked[idx] ? ' checked' : '');
+    row.innerHTML = '<div class="check-circle">\u2713</div><div class="check-text">'+text+'</div>';
+    row.addEventListener('click', ()=>{
+      checked[idx] = !checked[idx];
+      row.classList.toggle('checked', checked[idx]);
+      try{ localStorage.setItem(storageKey, JSON.stringify(checked)); }catch(e){}
+      renderProgress();
+      addXP(1);
+    });
+    wrap.appendChild(row);
+  });
+  renderProgress();
+}
+buildChecklist('redFlagList', 'redFlagProgress', [
+  "Does the comparison use the best available classical method, or a weaker strawman?",
+  "Are error bars or variance across multiple runs reported, not just a single best case?",
+  "Is 'efficient state preparation' or another key assumption stated explicitly \u2014 or quietly assumed?",
+  "Is code or data available for someone else to actually reproduce the result?",
+  "Does the abstract's claim match what the results section actually demonstrates?"
+], 'qml_m12_redflags');
+buildChecklist('benchList', 'benchProgress', [
+  "Classical baseline is well-tuned, not a strawman",
+  "Compute budget or wall-clock time is matched, not just qubit count",
+  "Results are averaged with variance across multiple runs/seeds",
+  "Any 'assumes efficient state preparation'-style shortcuts are named explicitly",
+  "The comparison dataset is realistic, not cherry-picked to favor one method"
+], 'qml_m12_bench');
+buildChecklist('respList', 'respProgress', [
+  "Have I checked my training data for bias the same way I would classically?",
+  "Could this technique be repurposed for harm as easily as its intended use?",
+  "Have I been honest about hardware/resource access assumptions in my writeup?",
+  "Does my abstract's claim match what my results actually show, without overclaiming?"
+], 'qml_m12_resp');
+
+/* ================= CHAPTER 3: open challenges recap ================= */
+const recapItems = [
+  {mod:'Module 7 & 11', title:'Barren Plateaus', text:'Gradients vanishing exponentially in deep, generic circuits \u2014 computed live in Module 11.'},
+  {mod:'Module 8', title:'QRAM', text:'A proposed but largely unbuilt architecture for fast classical-to-quantum data loading.'},
+  {mod:'Module 9', title:'Kernel Concentration', text:'Overly expressive quantum kernels can wash out the differences they\u2019re meant to detect.'},
+  {mod:'Module 9', title:'qPCA\u2019s State-Prep Assumption', text:'Its exponential speedup assumes efficient state preparation \u2014 not automatically available.'},
+  {mod:'Module 11', title:'NISQ Noise', text:'Decoherence, gate errors, and readout errors limiting practical circuit depth today.'},
+  {mod:'Module 11', title:'Fault-Tolerance Overhead', text:'Large physical-qubit counts per logical qubit keep full fault tolerance a future goal.'},
+  {mod:'Module 10', title:'Image Encoding Bottleneck', text:'Amplitude encoding\u2019s qubit savings don\u2019t solve the state-preparation depth problem for real images.'},
+  {mod:'Module 6 & 7', title:'Benchmark Standardization', text:'No universally agreed way to fairly compare quantum and classical methods \u2014 this module\u2019s Chapter 4 topic.'}
+];
+(function(){
+  const grid = document.getElementById('recapGrid');
+  recapItems.forEach(r=>{
+    const card = document.createElement('div');
+    card.className = 'recap-card';
+    card.innerHTML = '<div class="rc-mod">'+r.mod+'</div><h6>'+r.title+'</h6><p>'+r.text+'</p>';
+    grid.appendChild(card);
+  });
+})();
+
+/* ================= CHAPTER 7: capstone builder ================= */
+const encodingHints = {
+  basis: "Basis encoding: exact, no compression \u2014 best for genuinely discrete/binary features. One qubit per bit.",
+  angle: "Angle encoding: one feature per qubit as a rotation \u2014 simple, shallow, and hardware-friendly for continuous features.",
+  dense: "Dense angle encoding: two features per qubit via Ry+Rz \u2014 roughly halves qubit count vs. standard angle encoding.",
+  amplitude: "Amplitude encoding: a length-2\u207F vector in n qubits \u2014 huge compression, but watch the state-preparation depth cost.",
+  iqp: "IQP encoding: captures pairwise feature interactions in phase \u2014 pairs well with quantum kernel methods.",
+  hamiltonian: "Hamiltonian encoding: data sets a physical Hamiltonian \u2014 natural fit for chemistry/materials-style problems.",
+  qsample: "QSample encoding: matches a quantum state's measurement odds to a target probability distribution.",
+  reupload: "Data re-uploading: re-encode data across multiple layers to boost expressivity without more qubits."
+};
+const algoHints = {
+  pqc: "PQC: the trainable ansatz itself \u2014 you'll likely wrap this inside one of the algorithms below.",
+  vqc: "VQC: encode \u2192 ansatz \u2192 measure \u2192 compare to label. The most direct fit for a classification problem.",
+  qsvm: "QSVM: quantum computer produces a kernel matrix; a classical SVM does the actual training \u2014 lighter quantum workload.",
+  qnn: "QNN: the general layered/trainable framing \u2014 useful if your architecture doesn't map cleanly to a VQC.",
+  kernel: "Quantum Kernel Methods: pair a quantum feature map with any classical kernel method, not just SVM.",
+  qpca: "Quantum PCA: dimensionality reduction \u2014 remember the efficient-state-preparation caveat from Module 9.",
+  qae: "Quantum Autoencoder: compress quantum data itself \u2014 a strong fit for anomaly-detection-style capstones."
+};
+(function(){
+  const encSel = document.getElementById('capEncodingSelect');
+  const encHint = document.getElementById('capEncodingHint');
+  encSel.addEventListener('change', ()=>{
+    if(encodingHints[encSel.value]){ encHint.textContent = encodingHints[encSel.value]; encHint.classList.add('show'); }
+    else { encHint.classList.remove('show'); }
+    saveCapstone();
+  });
+  const algoSel = document.getElementById('capAlgoSelect');
+  const algoHint = document.getElementById('capAlgoHint');
+  algoSel.addEventListener('change', ()=>{
+    if(algoHints[algoSel.value]){ algoHint.textContent = algoHints[algoSel.value]; algoHint.classList.add('show'); }
+    else { algoHint.classList.remove('show'); }
+    saveCapstone();
+  });
+})();
+
+const capFieldIds = ['cap1','cap2','cap3','cap4','cap5','cap6','cap7'];
+const capLabels = {
+  cap1:'1. Problem Definition', cap2:'2. Data Preprocessing', cap3:'3. Quantum Data Encoding',
+  cap4:'4. Model Implementation', cap5:'5. Training & Evaluation', cap6:'6. Execution on Simulators / Hardware',
+  cap7:'7. Documentation & Presentation'
+};
+function loadCapstone(){
+  try{
+    const saved = localStorage.getItem('qml_m12_capstone');
+    if(saved){
+      const data = JSON.parse(saved);
+      capFieldIds.forEach(id=>{ if(data[id]) document.getElementById(id).value = data[id]; });
+      if(data.encoding){ document.getElementById('capEncodingSelect').value = data.encoding; document.getElementById('capEncodingSelect').dispatchEvent(new Event('change')); }
+      if(data.algo){ document.getElementById('capAlgoSelect').value = data.algo; document.getElementById('capAlgoSelect').dispatchEvent(new Event('change')); }
+    }
+  }catch(e){}
+}
+function saveCapstone(){
+  const data = {};
+  capFieldIds.forEach(id=>{ data[id] = document.getElementById(id).value; });
+  data.encoding = document.getElementById('capEncodingSelect').value;
+  data.algo = document.getElementById('capAlgoSelect').value;
+  try{ localStorage.setItem('qml_m12_capstone', JSON.stringify(data)); }catch(e){}
+  updateCapProgress();
+}
+function updateCapProgress(){
+  const filled = capFieldIds.filter(id=> document.getElementById(id).value.trim().length > 0).length;
+  document.getElementById('capProgressFill').style.width = (filled/7*100)+'%';
+  document.getElementById('capProgressLabel').textContent = filled+' / 7 sections started';
+}
+capFieldIds.forEach(id=>{
+  document.getElementById(id).addEventListener('input', ()=>{ saveCapstone(); });
+});
+loadCapstone();
+updateCapProgress();
+
+document.getElementById('exportCapstoneBtn').addEventListener('click', ()=>{
+  const encSel = document.getElementById('capEncodingSelect');
+  const algoSel = document.getElementById('capAlgoSelect');
+  let md = '# My Quantum Machine Learning Capstone Plan\n\n';
+  md += '_Generated from the QML Curriculum Capstone Builder \u2014 Module 12_\n\n';
+  capFieldIds.forEach(id=>{
+    const val = document.getElementById(id).value.trim();
+    md += '## '+capLabels[id]+'\n\n';
+    if(id==='cap3' && encSel.value){ md += '**Chosen encoding:** '+encSel.options[encSel.selectedIndex].text+'\n\n'; }
+    if(id==='cap4' && algoSel.value){ md += '**Chosen algorithm:** '+algoSel.options[algoSel.selectedIndex].text+'\n\n'; }
+    md += (val || '_Not yet filled in._') + '\n\n';
+  });
+  const blob = new Blob([md], {type:'text/markdown'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'my-qml-capstone-plan.md';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  addXP(20);
+});
+document.getElementById('clearCapstoneBtn').addEventListener('click', ()=>{
+  if(!confirm('Clear all capstone builder fields? This cannot be undone.')) return;
+  capFieldIds.forEach(id=> document.getElementById(id).value = '');
+  document.getElementById('capEncodingSelect').value = '';
+  document.getElementById('capAlgoSelect').value = '';
+  document.getElementById('capEncodingHint').classList.remove('show');
+  document.getElementById('capAlgoHint').classList.remove('show');
+  saveCapstone();
+});
+
+/* ================= quiz data ================= */
+const quizzes = {
+  ch1: [
+    {q:"What is the overall purpose of Module 12?", opts:["To repeat all previous modules verbatim","To transition from following tutorials to doing original, self-directed QML work, culminating in a capstone project","To end the course with no practical outcome","To only cover unrelated new algorithms"], correct:1, explain:"This is explicitly the 'handoff' module \u2014 skills for independent work, then a real planning tool."},
+    {q:"What are the two halves this module is described as having?", opts:["Five research-and-honesty skill chapters, then one hands-on capstone-building chapter","Two identical chapters repeated six times","No structure at all","Only quizzes, no content"], correct:0, explain:"Chapters 2\u20136 are skills; Chapter 7 is the working tool."},
+    {q:"How does Dr. Okafor describe what's different about this module compared to earlier ones?", opts:["Nothing is different at all","Earlier problems came pre-shaped; this module asks Maya to shape her own", "This module has no connection to anything learned before","It's purely about memorizing new vocabulary"], correct:1, explain:"The 'nobody hands you the blueprint' framing from the story panel."}
+  ],
+  ch2: [
+    {q:"When reading a QML paper's abstract, what should you specifically watch for?", opts:["Only the paper's title","Whether the claimed result matches what the methods and results sections actually support, not just the headline framing","The journal's name only","Nothing, abstracts are always fully accurate summaries"], correct:1, explain:"Treat the abstract as a hypothesis to verify against the methods and results, not a conclusion to accept outright."},
+    {q:"What is a common 'red flag' when reading a claimed quantum speedup?", opts:["Comparing against a well-tuned, state-of-the-art classical baseline","Comparing only against a weak or outdated classical method instead of the best available one","Reporting error bars across multiple runs","Making code and data available"], correct:1, explain:"A weak baseline can make almost any method look impressive \u2014 exactly what the red-flag checklist above calls out."},
+    {q:"Why does checking a paper's assumptions matter, tying back to earlier modules?", opts:["Assumptions never matter","Claims like qPCA's or QRAM-dependent speedups can quietly assume efficient state preparation, which may not be realistic \u2014 exactly the pattern flagged in Modules 8 and 9","Assumptions are always stated in the title","Papers never contain hidden assumptions"], correct:1, explain:"This exact pattern recurred across the course \u2014 now it's a general reading skill, not a one-off caveat."}
+  ],
+  ch3: [
+    {q:"Which of these is a real, recurring open challenge covered across this entire course?", opts:["Barren plateaus limiting trainability of deep circuits","The complete absence of any quantum hardware anywhere","The fact that qubits are too cheap","QML having zero open questions left"], correct:0, explain:"One of eight real challenges collected in the recap grid above."},
+    {q:"What does the recurring 'assumes efficient state preparation' caveat, seen with QRAM and quantum PCA, illustrate?", opts:["That every quantum speedup claim is entirely false","That some claimed advantages are conditional on unsolved prerequisites, not unconditional guarantees","That state preparation is always trivial","That this issue only affects one single algorithm"], correct:1, explain:"This exact caveat appears at least twice across the course, for two different algorithms \u2014 a pattern, not a coincidence."},
+    {q:"Why is a lack of standardized benchmarks (first raised in Module 6) still an open challenge?", opts:["It isn't a real issue","Without agreed, fair comparisons, it remains hard to know when a quantum method genuinely outperforms a classical one","Benchmarks are irrelevant to science","This was fully solved in Module 7"], correct:1, explain:"Directly sets up this module's own Chapter 4 on benchmarking."}
+  ],
+  ch4: [
+    {q:"Why is comparing a new quantum method only against a weak classical baseline misleading?", opts:["It isn't misleading at all","It can make a quantum method look advantageous when it wouldn't beat the best available classical approach","Weak baselines are always the correct choice","Classical baselines don't matter for benchmarking"], correct:1, explain:"The checklist above lists exactly this as the first thing to check."},
+    {q:"Why does reporting variance across multiple runs matter for fair benchmarking?", opts:["It doesn't matter, one run is always enough","A single favorable run can misrepresent a method's typical, reliable performance","Variance should never be reported","Multiple runs always take too long to be worthwhile"], correct:1, explain:"A best-case single run is easy to cherry-pick, intentionally or not."},
+    {q:"What should a fair benchmark match between classical and quantum approaches, beyond just accuracy?", opts:["Nothing else needs to be matched","Comparable compute budget or wall-clock time, not just a raw accuracy number","Only the programming language used","The color scheme of the results chart"], correct:1, explain:"Accuracy alone, without matched resources, doesn't tell you which method is actually more efficient."}
+  ],
+  ch5: [
+    {q:"Does encoding data into a quantum state remove bias that was already present in that data?", opts:["Yes, quantum encoding automatically removes all bias","No \u2014 bias present in the training data carries through the encoding into the quantum model, the same as in classical ML","Bias only exists in classical systems","This question has no real answer"], correct:1, explain:"Quantum encoding is a representation change, not a bias filter."},
+    {q:"What dual-use concern was raised in Module 10's Cybersecurity chapter that applies here too?", opts:["None, there is no dual-use concern anywhere in this course","The same QML classification techniques that defend systems could, in principle, also be used to attack them","Dual-use only applies to classical software","Cybersecurity has nothing to do with responsible AI"], correct:1, explain:"A direct callback to Module 10, now framed as a general responsibility question."},
+    {q:"Why does equitable access to quantum computing resources matter as a responsibility question?", opts:["It doesn't matter at all","Quantum hardware access is currently concentrated among well-resourced institutions, raising fairness questions about who gets to do this research","Everyone already has equal access to quantum computers","Access has nothing to do with responsible research"], correct:1, explain:"Named explicitly as a real, current fairness consideration, not a hypothetical."}
+  ],
+  ch6: [
+    {q:"How does this chapter frame near-term, mid-term, and long-term QML developments?", opts:["As absolute, guaranteed facts","As clearly-labeled, varying-confidence possibilities \u2014 not certainties","As already fully achieved","As entirely impossible to predict at all"], correct:1, explain:"Every item in the horizon cards above carries an explicit Plausible/Speculative tag."},
+    {q:"What is a plausible near-term development mentioned in this chapter?", opts:["Large-scale fault-tolerant QML deployed everywhere","Continued improvement in error mitigation techniques and larger NISQ devices","The end of all classical computing","Guaranteed proof of quantum advantage on every ML task"], correct:1, explain:"Listed in the Near-Term horizon card, tagged Plausible."},
+    {q:"Why does this chapter avoid making confident long-term predictions?", opts:["Because confident predictions are always accurate","Because genuine scientific honesty means labeling speculation as speculation, consistent with this course's approach throughout","Long-term predictions are irrelevant to the field","This chapter secretly does make guaranteed predictions"], correct:1, explain:"Direct continuity with Module 7's hype-o-meter and every 'careful' callout since."}
+  ],
+  ch7: [
+    {q:"Why is defining the problem clearly the first step of a capstone project?", opts:["It's not important, everything else matters more","Without a clear problem statement, later choices like encoding and model design have nothing concrete to be judged against","Problem definition should always be skipped","Only the final results matter, not the starting question"], correct:1, explain:"Every later section of the builder above depends on a clearly stated problem to make sense."},
+    {q:"Why does documenting a capstone project matter as much as building it?", opts:["Documentation is optional busywork","Undocumented results can't be verified, reproduced, or built on by anyone else \u2014 including your future self","Documentation replaces the need for any code","Only famous researchers need to document their work"], correct:1, explain:"This connects directly to Chapter 2's paper-reading skill \u2014 someone else will eventually read your work the same skeptical way."},
+    {q:"Why is it useful to explicitly name which encoding and algorithm choices you're using, early in a capstone plan?", opts:["It's not useful at all","It forces you to justify the tradeoffs (qubit count, circuit depth, expressivity) from Modules 8 and 9 for your specific problem, rather than picking arbitrarily","Naming choices has no effect on project quality","Encoding and algorithm choices don't matter for a capstone"], correct:1, explain:"The hint boxes next to the encoding/algorithm dropdowns above exist for exactly this reason."}
+  ]
+};
+const finalQuiz = [
+  {q:"What is the overall purpose of Module 12?", opts:["To transition from following tutorials to doing original, self-directed QML work, culminating in a capstone project","To repeat all previous modules verbatim","To end the course with no practical outcome","To only cover unrelated new algorithms"], correct:0, explain:"Chapter 1's framing carries through the whole module."},
+  {q:"What should you check in a QML paper beyond its headline claim?", opts:["Whether the methods and results actually support that claim, and what assumptions are baked in","Nothing, headline claims are always accurate","Only the publication date","The author's job title"], correct:0, explain:"The skeptical-reading skill from Chapter 2."},
+  {q:"What does this course's recurring 'assumes efficient state preparation' caveat illustrate about some quantum advantage claims?", opts:["That they can be conditional on unsolved prerequisites, not unconditional guarantees","That all quantum claims are entirely false","That this issue is unique to one algorithm","That state preparation is always free"], correct:0, explain:"The pattern collected across the whole course in Chapter 3's recap."},
+  {q:"What makes a benchmark comparison fair?", opts:["A strong classical baseline, matched compute budget, and reported variance across runs \u2014 not a cherry-picked best case","Only comparing against the weakest available method","Reporting a single favorable run only","Ignoring compute budget entirely"], correct:0, explain:"Chapter 4's fair-comparison checklist, applied to your own future results."},
+  {q:"What is one genuine responsibility consideration for QML researchers?", opts:["Bias in training data carries through quantum encoding just as in classical ML, so it still needs addressing","Quantum models are automatically bias-free","Responsible AI concerns don't apply to quantum computing","Equitable hardware access is not a real issue"], correct:0, explain:"Chapter 5's central point \u2014 quantum doesn't exempt a model from classical ML's responsibility questions."},
+  {q:"How does this course frame predictions about QML's future?", opts:["As labeled, varying-confidence possibilities, not guaranteed facts","As absolute certainties","As entirely unknowable with no useful discussion possible","As already fully realized today"], correct:0, explain:"Chapter 6's Plausible/Speculative tags, applied honestly rather than hyped."},
+  {q:"What is the value of explicitly planning each capstone stage \u2014 problem, data, encoding, model, training, execution, documentation \u2014 before building it?", opts:["It forces concrete, justified decisions at each stage instead of arbitrary ones, and produces documentation as a side effect","Planning is unnecessary busywork","Only the final code matters, planning has no value","Documentation should happen only after everything is finished, never before"], correct:0, explain:"The exact design logic behind the Capstone Builder in Chapter 7."}
+];
+
+/* ================= render quizzes (shared engine) ================= */
+function renderQuiz(containerId, items, chapterKey){
+  const container = document.getElementById(containerId);
+  items.forEach((item, idx)=>{
+    const qDiv = document.createElement('div');
+    qDiv.className = 'q-item';
+    qDiv.innerHTML = '<div class="q-text">'+(idx+1)+'. '+item.q+'</div>'
+      + '<div class="q-options">'+item.opts.map((o,i)=>'<button class="q-opt" data-i="'+i+'">'+o+'</button>').join('')+'</div>'
+      + '<div class="q-explain">'+item.explain+'</div>';
+    container.appendChild(qDiv);
+    const buttons = qDiv.querySelectorAll('.q-opt');
+    const explainEl = qDiv.querySelector('.q-explain');
+    buttons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = parseInt(btn.dataset.i);
+        buttons.forEach(b=>b.disabled = true);
+        if(i === item.correct){
+          btn.classList.add('correct');
+          if(chapterKey) onCorrect(chapterKey);
+          else onFinalAnswer(idx, true);
+        } else {
+          btn.classList.add('incorrect');
+          buttons[item.correct].classList.add('correct');
+          if(chapterKey) onIncorrect(chapterKey);
+          else onFinalAnswer(idx, false);
+        }
+        explainEl.classList.add('show');
+      });
+    });
+  });
+}
+Object.keys(quizzes).forEach(key=>{ renderQuiz('quiz-'+key, quizzes[key], key); updateChapterScore(key); });
+renderQuiz('quiz-final', finalQuiz, null);
+
+function updateChapterScore(key){
+  const s = state.chapters[key];
+  document.getElementById('score-'+key).textContent = s.correct+' / '+s.total;
+}
+function onCorrect(key){
+  const s = state.chapters[key];
+  s.correct = Math.min(s.correct+1, s.total);
+  addXP(10);
+  checkChapterDone(key);
+  updateChapterScore(key);
+  saveState();
+}
+function onIncorrect(key){
+  const s = state.chapters[key];
+  s.hadMiss = true;
+  checkChapterDone(key);
+  updateChapterScore(key);
+  saveState();
+}
+let answeredCount = { ch1:0, ch2:0, ch3:0, ch4:0, ch5:0, ch6:0, ch7:0 };
+function checkChapterDone(key){
+  answeredCount[key]++;
+  const s = state.chapters[key];
+  if(answeredCount[key] >= s.total){
+    s.done = true;
+    const dot = document.getElementById('dot-'+key);
+    const statusEl = document.getElementById('status-'+key);
+    statusEl.classList.add('show');
+    if(s.hadMiss){
+      dot.classList.add('warn');
+      statusEl.classList.add('review');
+      statusEl.innerHTML = '\u26A0 Review suggested \u2014 you missed at least one question in this chapter.';
+    } else {
+      dot.classList.add('done');
+      statusEl.classList.add('mastered');
+      statusEl.innerHTML = '\u2713 Mastered \u2014 perfect score on this chapter.';
+      addXP(15);
+    }
+    saveState();
+  }
+}
+
+let finalAnswers = [];
+function onFinalAnswer(idx, correct){
+  finalAnswers[idx] = correct;
+  if(finalAnswers.filter(a=>a!==undefined).length === finalQuiz.length){
+    showFinalResult();
+  }
+}
+function showFinalResult(){
+  const correctCount = finalAnswers.filter(a=>a===true).length;
+  const pct = Math.round((correctCount/finalQuiz.length)*100);
+  document.getElementById('resultScore').textContent = pct+'%';
+  document.getElementById('resultDetail').textContent = correctCount+' / '+finalQuiz.length+' correct';
+  const badge = document.getElementById('resultBadge');
+  const pass = pct >= 70;
+  badge.textContent = pass ? 'Passed' : 'Retry Recommended';
+  badge.className = 'result-badge ' + (pass ? 'pass' : 'retry');
+  addXP(correctCount*10 + (pass?25:0));
+
+  const weakChapters = Object.keys(state.chapters).filter(k => state.chapters[k].hadMiss);
+  const wrap = document.getElementById('recommendWrap');
+  if(weakChapters.length === 0 && pass){
+    wrap.innerHTML = '<div class="callout" style="margin-top:4px;"><b>Great work.</b> No flagged chapters and a passing assessment score \u2014 and that\u2019s the full curriculum, start to finish.</div>';
+  } else {
+    const names = { ch1:"The Last Mile", ch2:"Reading QML Papers", ch3:"Open Research Challenges", ch4:"Benchmarking Quantum Models", ch5:"Responsible AI & Quantum Computing", ch6:"Future Directions in QML", ch7:"Capstone Project Builder" };
+    let html = '<div class="visual-label" style="margin-top:18px;">Recommended Review</div><ul class="recommend-list">';
+    weakChapters.forEach(k=> html += '<li>\u21BA Revisit <b>'+names[k]+'</b> \u2014 a quick-check answer there was missed.</li>');
+    if(!pass){ html += '<li>\u21BA Your assessment score was below 70% \u2014 consider re-reading the callout boxes at the end of each chapter before continuing.</li>'; }
+    html += '</ul>';
+    wrap.innerHTML = html;
+  }
+  document.getElementById('resultPanel').classList.add('show');
+  document.getElementById('completeBanner').classList.add('show');
+  document.getElementById('dot-final').classList.add(pass ? 'done' : 'warn');
+  state.finalDone = true;
+  saveState();
+}
+
+/* ---------------- scrollspy + progress bar ---------------- */
+const sections = document.querySelectorAll('.chapter');
+const sideLinks = document.querySelectorAll('.side-list a');
+const spyObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      sideLinks.forEach(a=>a.classList.remove('active'));
+      const link = document.querySelector('.side-list a[data-target="'+entry.target.id+'"]');
+      if(link) link.classList.add('active');
+    }
+  });
+},{rootMargin:'-20% 0px -70% 0px'});
+sections.forEach(s=>spyObserver.observe(s));
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+  document.getElementById('progressFill').style.width = scrolled+'%';
+});
+
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} });
+},{threshold:0.08});
+revealEls.forEach(el=>io.observe(el));
+
+/* ---------------- prev/next module nav, from the shared registry ---------------- */
+(function(){
+  const { prev, next } = qmlGetAdjacentModules(12);
+  const wrap = document.getElementById('moduleNav');
+  function cardHTML(mod, dir){
+    if(!mod){
+      return '<div class="mn-card disabled '+dir+'"><span class="mn-eyebrow">'+(dir==='next'?'Up Next':'Previous')+'</span><span class="mn-title">\u2014 none \u2014</span></div>';
+    }
+    const available = !!mod.file;
+    const arrow = dir==='prev' ? '\u2190 ' : '';
+    const arrowEnd = dir==='next' ? ' \u2192' : '';
+    const eyebrow = (dir==='prev' ? 'Previous \u2014 Module '+mod.id : 'Up Next \u2014 Module '+mod.id) + (available ? '' : ' (Coming Soon)');
+    if(available){
+      return '<a class="mn-card enabled '+dir+'" href="'+mod.file+'">'
+        + '<span class="mn-eyebrow">'+eyebrow+'</span>'
+        + '<span class="mn-title">'+arrow+mod.title+arrowEnd+'</span>'
+        + '<span class="mn-arrow">Open tutorial</span>'
+        + '</a>';
+    }
+    return '<div class="mn-card disabled '+dir+'">'
+      + '<span class="mn-eyebrow">'+eyebrow+'</span>'
+      + '<span class="mn-title">'+mod.title+'</span>'
+      + '<span class="mn-arrow">Not published yet</span>'
+      + '</div>';
+  }
+  if(!next){
+    wrap.innerHTML = cardHTML(prev,'prev') + '<a class="mn-card enabled next" href="progress-hub.html"><span class="mn-eyebrow">Course Complete</span><span class="mn-title">View My Progress \u2192</span><span class="mn-arrow">Open dashboard</span></a>';
+  } else {
+    wrap.innerHTML = cardHTML(prev,'prev') + cardHTML(next,'next');
+  }
+})();
+</script>
+
+</body>
+</html>
