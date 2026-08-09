@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Notebooks — Schrödinger's Cats | Quantum Machine Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070b14; --bg-2:#0b111f; --panel:#0e1526; --panel-2:#101a2e;
+  --line:rgba(148,178,224,0.14); --line-strong:rgba(148,178,224,0.28);
+  --ink:#e9eef8; --ink-dim:#9fb0c9; --ink-faint:#5f7089;
+  --cyan:#5ad1e6; --cyan-dim:rgba(90,209,230,0.14);
+  --violet:#b39bff; --violet-dim:rgba(179,155,255,0.14);
+  --amber:#f2a341; --amber-dim:rgba(242,163,65,0.14);
+  --green:#5ee6a0; --green-dim:rgba(94,230,160,0.14);
+  --blue:#4fa3f7; --grey-dim:rgba(148,178,224,0.12);
+  --serif:'Fraunces', Georgia, serif; --sans:'Inter', -apple-system, sans-serif; --mono:'JetBrains Mono','Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.6; position:relative; overflow-x:hidden;}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto !important;}}
+
+.bg-grid{position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:linear-gradient(rgba(148,178,224,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(148,178,224,0.035) 1px, transparent 1px);
+  background-size:44px 44px; mask-image:radial-gradient(ellipse 90% 70% at 50% 0%, black 40%, transparent 100%);}
+
+header{position:sticky; top:0; z-index:50; backdrop-filter:blur(14px); background:rgba(7,11,20,0.72); border-bottom:1px solid var(--line);}
+.nav-wrap{max-width:1280px; margin:0 auto; padding:16px 32px; display:flex; align-items:center; justify-content:space-between;}
+.logo{display:flex; align-items:center; justify-content:center; text-decoration:none; transition:.3s ease;}
+.logo img{height:48px; width:auto; display:block; transition:.3s ease;}
+.logo:hover img{transform:scale(1.06); filter:drop-shadow(0 0 12px rgba(90,209,230,.45));}
+nav ul{list-style:none; display:flex; gap:30px;}
+nav a{color:var(--ink-dim); text-decoration:none; font-size:13px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; transition:color .2s; position:relative;}
+nav a:hover{color:var(--ink);}
+nav a::after{content:''; position:absolute; left:0; bottom:-6px; width:0; height:1px; background:var(--cyan); transition:width .25s ease;}
+nav a:hover::after{width:100%;}
+nav a.current{color:var(--cyan);}
+.nav-cta{display:flex; align-items:center; gap:14px;}
+.burger{display:none; flex-direction:column; gap:5px; cursor:pointer; background:none; border:none;}
+.burger span{width:22px; height:2px; background:var(--ink); display:block;}
+
+.btn{display:inline-flex; align-items:center; gap:8px; padding:13px 24px; border-radius:9px; font-size:14px; font-weight:600; text-decoration:none; cursor:pointer; border:1px solid transparent; transition:transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s; font-family:var(--sans);}
+.btn-primary{background:var(--blue); color:#04101f;}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 30px -8px rgba(79,163,247,0.55);}
+.btn-ghost{background:transparent; border-color:var(--line-strong); color:var(--ink);}
+.btn-ghost:hover{border-color:var(--ink-dim); transform:translateY(-2px);}
+
+.page-hero{position:relative; z-index:1; max-width:1280px; margin:0 auto; padding:72px 32px 20px;}
+.eyebrow{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-strong); border-radius:100px; padding:7px 16px; font-family:var(--mono); font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--cyan); background:var(--cyan-dim); margin-bottom:22px;}
+.eyebrow .dot{width:6px; height:6px; border-radius:50%; background:var(--cyan); box-shadow:0 0 8px var(--cyan);}
+.page-hero h1{font-family:var(--serif); font-weight:600; font-size:clamp(32px,4.4vw,52px); line-height:1.08; letter-spacing:-0.01em; max-width:820px;}
+.page-hero p.lede{margin-top:18px; color:var(--ink-dim); font-size:15.5px; max-width:700px;}
+.chip-row{display:flex; gap:8px; margin-top:24px; flex-wrap:wrap;}
+.chip{font-family:var(--mono); font-size:11px; letter-spacing:0.04em; color:var(--ink-faint); border:1px solid var(--line); padding:5px 12px; border-radius:100px;}
+.notice{margin-top:28px; padding:14px 18px; border-radius:10px; border-left:3px solid var(--amber); background:var(--amber-dim); font-size:13px; color:var(--ink-dim); max-width:760px;}
+.notice b{color:var(--ink);}
+
+.jump-nav{display:flex; gap:18px; flex-wrap:wrap; margin-top:26px; padding-top:20px; border-top:1px solid var(--line);}
+.jump-nav a{font-family:var(--mono); font-size:11.5px; letter-spacing:0.04em; color:var(--ink-dim); text-decoration:none; display:flex; align-items:center; gap:6px; transition:color .2s;}
+.jump-nav a:hover{color:var(--cyan);}
+.jump-nav a span{color:var(--ink-faint);}
+
+.setup-section{scroll-margin-top:90px; margin-bottom:64px;}
+.setup-head{display:flex; align-items:center; gap:14px; margin-bottom:22px; flex-wrap:wrap;}
+.setup-head .level-tag{color:var(--green); border-color:rgba(94,230,160,0.4); background:var(--green-dim);}
+.setup-head h3{font-family:var(--serif); font-size:19px; font-weight:600; color:var(--ink);}
+.setup-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:18px; margin-bottom:22px;}
+@media (max-width:900px){.setup-grid{grid-template-columns:1fr;}}
+.setup-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:26px; min-width:0; overflow-wrap:break-word;}
+.setup-card .sc-badge{font-family:var(--mono); font-size:10px; letter-spacing:0.08em; text-transform:uppercase; padding:4px 10px; border-radius:100px; display:inline-block; margin-bottom:14px;}
+.setup-card.rec .sc-badge{color:var(--cyan); border:1px solid rgba(90,209,230,0.4); background:var(--cyan-dim);}
+.setup-card.alt .sc-badge{color:var(--ink-faint); border:1px solid var(--line-strong); background:transparent;}
+.setup-card h4{font-family:var(--serif); font-size:17px; font-weight:600; margin-bottom:14px; color:var(--ink);}
+.setup-card ol{margin:0 0 4px 18px; padding:0;}
+.setup-card ol li{font-size:13px; color:var(--ink-dim); margin-bottom:12px; line-height:1.55;}
+.setup-card ol li:last-child{margin-bottom:0;}
+.setup-card ol li b{color:var(--ink);}
+code.inline{font-family:var(--mono); font-size:12px; background:var(--panel-2); border:1px solid var(--line); padding:2px 6px; border-radius:4px; color:var(--cyan); white-space:nowrap;}
+pre.code-block{font-family:var(--mono); font-size:12px; background:var(--bg-2); border:1px solid var(--line-strong); border-radius:8px; padding:12px 14px; color:var(--ink); overflow-x:auto; margin:8px 0 4px; line-height:1.6; max-width:100%; width:100%; box-sizing:border-box; -webkit-overflow-scrolling:touch;}
+pre.code-block .cm{color:var(--ink-faint);}
+
+.req-table{width:100%; border-collapse:collapse; margin-bottom:8px;}
+.req-table th{font-family:var(--mono); font-size:10.5px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-faint); text-align:left; padding:10px 14px; border-bottom:1px solid var(--line-strong);}
+.req-table td{font-size:13px; color:var(--ink-dim); padding:11px 14px; border-bottom:1px solid var(--line);}
+.req-table td:first-child{font-family:var(--mono); color:var(--cyan); white-space:nowrap;}
+.req-table tr:last-child td{border-bottom:none;}
+.req-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:8px 18px; margin-bottom:18px; overflow-x:auto;}
+
+.tips-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px;}
+@media (max-width:900px){.tips-grid{grid-template-columns:1fr;}}
+.tip{display:flex; gap:12px; padding:14px 16px; background:var(--panel); border:1px solid var(--line); border-radius:10px;}
+.tip .tip-icon{color:var(--amber); font-size:14px; flex-shrink:0;}
+.tip p{font-size:12.5px; color:var(--ink-dim); margin:0;}
+.tip p b{color:var(--ink);}
+
+.section-inner{max-width:1280px; margin:0 auto; padding:56px 32px 100px;}
+.level-head{display:flex; align-items:center; gap:14px; margin:52px 0 22px; scroll-margin-top:90px; flex-wrap:wrap;}
+.level-head:first-child{margin-top:0;}
+.level-tag{font-family:var(--mono); font-size:11px; letter-spacing:0.1em; text-transform:uppercase; padding:5px 13px; border-radius:100px; border:1px solid var(--line-strong); white-space:nowrap;}
+.level-tag.cyan{color:var(--cyan); border-color:rgba(90,209,230,0.4); background:var(--cyan-dim);}
+.level-tag.violet{color:var(--violet); border-color:rgba(179,155,255,0.4); background:var(--violet-dim);}
+.level-tag.amber{color:var(--amber); border-color:rgba(242,163,65,0.4); background:var(--amber-dim);}
+.level-head h3{font-family:var(--serif); font-size:19px; font-weight:600; color:var(--ink);}
+.level-head .lsub{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);}
+
+.nb-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:18px;}
+@media (max-width:900px){.nb-grid{grid-template-columns:1fr;}}
+.nb-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:26px 26px 24px; transition:transform .3s, border-color .3s; display:flex; flex-direction:column; scroll-margin-top:90px; min-width:0;}
+.nb-card:hover{transform:translateY(-5px); border-color:var(--line-strong);}
+.nb-top{display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:12px;}
+.nb-num{font-family:var(--mono); font-size:11px; color:var(--ink-faint); letter-spacing:0.08em;}
+.nb-mod-tag{font-family:var(--mono); font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:var(--violet); border:1px solid rgba(179,155,255,0.35); background:var(--violet-dim); padding:4px 10px; border-radius:100px; white-space:nowrap;}
+.nb-card h4{font-family:var(--serif); font-size:18px; font-weight:600; color:var(--ink); margin-bottom:10px; line-height:1.3;}
+.nb-card p{font-size:13px; color:var(--ink-dim); margin-bottom:16px; flex-grow:1;}
+.nb-result{font-family:var(--mono); font-size:11.5px; color:var(--green); background:var(--green-dim); border:1px solid rgba(94,230,160,0.3); border-radius:8px; padding:9px 12px; margin-bottom:18px;}
+.nb-actions{display:flex; gap:10px; flex-wrap:wrap;}
+.nb-btn{font-family:var(--mono); font-size:11.5px; letter-spacing:0.03em; padding:9px 15px; border-radius:8px; border:1px solid var(--line-strong); text-decoration:none; display:inline-flex; align-items:center; gap:7px; transition:all .2s;}
+.nb-btn.colab{color:#04101f; background:var(--cyan); border-color:var(--cyan);}
+.nb-btn.colab:hover{transform:translateY(-2px); box-shadow:0 8px 20px -6px rgba(90,209,230,0.5);}
+.nb-btn.dl{color:var(--ink-dim); background:transparent;}
+.nb-btn.dl:hover{border-color:var(--ink-dim); color:var(--ink); transform:translateY(-2px);}
+
+footer{padding:60px 32px 40px; border-top:1px solid var(--line); position:relative; z-index:1;}
+.footer-inner{max-width:1280px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:24px;}
+.footer-brand{font-family:var(--mono); color:var(--ink-faint); font-size:13px; align-items:center; display:flex; gap:14px;}
+.footer-logo{width:44px; height:44px; object-fit:contain; transition:.3s ease;}
+.footer-logo:hover{filter:drop-shadow(0 0 10px rgba(90,209,230,.45));}
+.footer-tagline{color:var(--ink-faint); font-weight:400;}
+.social{display:flex; gap:12px;}
+.social a{width:36px; height:36px; border-radius:8px; border:1px solid var(--line-strong); display:flex; align-items:center; justify-content:center; color:var(--ink-dim); text-decoration:none; font-size:13px; transition:border-color .2s, color .2s;}
+.social a:hover{border-color:var(--cyan); color:var(--cyan);}
+
+@media (max-width:980px){nav ul{display:none;} .burger{display:flex;}}
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+
+<header>
+  <div class="nav-wrap">
+    <a href="index.html#home" class="logo" aria-label="Schrödinger's Cats Home">
+      <img src="logo.png" alt="Schrödinger's Cats">
+    </a>
+    <nav>
+      <ul>
+        <li><a href="index.html#home">Home</a></li>
+        <li><a href="index.html#roadmap">Roadmap</a></li>
+        <li><a href="index.html#curriculum">Curriculum</a></li>
+        <li><a href="index.html#platform">Platform</a></li>
+        <li><a href="index.html#resources" class="current">Resources</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="nav-cta">
+      <a href="index.html#resources" class="btn btn-ghost" style="padding:9px 16px; font-size:13px;">← Back to Resources</a>
+      <button class="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="page-hero">
+  <div class="eyebrow"><span class="dot"></span>Code Notebooks</div>
+  <h1>Eight notebooks, one continuous QML pipeline —<br>from your first qubit to a real capstone.</h1>
+  <p class="lede">The hands-on code companion to Modules 5 through 12. Every notebook is a real, executed Jupyter notebook — run it as-is, open it directly in Google Colab with zero setup, or download it and adapt it into your own Module 12 final project.</p>
+  <div class="chip-row">
+    <span class="chip">Python</span>
+    <span class="chip">PennyLane</span>
+    <span class="chip">Qiskit</span>
+    <span class="chip">scikit-learn</span>
+    <span class="chip">Google Colab-ready</span>
+    <span class="chip">8 Notebooks</span>
+  </div>
+  <div class="notice"><b>Honest by design:</b> every result in these notebooks is real, executed output — including the ones where a classical baseline wins. Several notebooks show quantum methods matching, not beating, classical ML, which is an accurate reflection of where the field stands today, not a bug in the code.</div>
+  <div class="jump-nav">
+    <a href="#setup"><span>↓</span>Setup &amp; How to Run</a>
+    <a href="#beginner"><span>↓</span>Beginner</a>
+    <a href="#intermediate"><span>↓</span>Intermediate</a>
+    <a href="#advanced"><span>↓</span>Advanced</a>
+  </div>
+</div>
+
+<div class="section-inner">
+
+  <div class="setup-section" id="setup">
+    <div class="setup-head"><span class="level-tag">Start Here</span><h3>Setup &amp; How to Run</h3></div>
+
+    <div class="setup-grid">
+      <div class="setup-card rec">
+        <span class="sc-badge">Recommended · Zero Install</span>
+        <h4>Option A — Google Colab</h4>
+        <ol>
+          <li>Click <b>Open in Colab</b> on any notebook card below.</li>
+          <li>Colab doesn't come with quantum libraries preinstalled, so run this as the <b>very first cell</b>, before anything else, and wait for it to finish:
+            <pre class="code-block"><span class="cm"># run this first in Colab</span>
+!pip install pennylane qiskit qiskit-aer \
+    scikit-learn matplotlib numpy --quiet</pre>
+          </li>
+          <li>Then <b>Runtime → Run all</b>, or run each cell top to bottom with <code class="inline">Shift + Enter</code>.</li>
+          <li>To keep your edits, go to <b>File → Save a copy in Drive</b> — the original link stays untouched for the next person.</li>
+        </ol>
+      </div>
+
+      <div class="setup-card alt">
+        <span class="sc-badge">Local Setup</span>
+        <h4>Option B — Run in Jupyter Locally</h4>
+        <ol>
+          <li>Requires <b>Python 3.9+</b>. Check with <code class="inline">python3 --version</code>.</li>
+          <li>Create and activate a virtual environment (recommended, keeps this separate from other projects):
+            <pre class="code-block">python3 -m venv qml-env
+<span class="cm"># macOS / Linux</span>
+source qml-env/bin/activate
+<span class="cm"># Windows</span>
+qml-env\Scripts\activate</pre>
+          </li>
+          <li>Install the required libraries:
+            <pre class="code-block">pip install pennylane qiskit qiskit-aer \
+    scikit-learn matplotlib numpy jupyter</pre>
+          </li>
+          <li>Click <b>Download .ipynb</b> on any notebook below, then launch Jupyter from that folder:
+            <pre class="code-block">jupyter notebook</pre>
+          </li>
+          <li>Open the downloaded file and run cells top to bottom (<b>Cell → Run All</b>).</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="req-card">
+      <table class="req-table">
+        <tr><th>Library</th><th>Used for</th><th>Install</th></tr>
+        <tr><td>pennylane</td><td>Quantum circuits, autodiff, QML training (Notebooks 02–08)</td><td><code class="inline">pip install pennylane</code></td></tr>
+        <tr><td>qiskit</td><td>Circuit basics, Bloch sphere, statevectors (Notebook 01, 06)</td><td><code class="inline">pip install qiskit</code></td></tr>
+        <tr><td>qiskit-aer</td><td>Simulator backend + noise models (Notebook 01, 06)</td><td><code class="inline">pip install qiskit-aer</code></td></tr>
+        <tr><td>scikit-learn</td><td>Datasets, classical SVM/logistic regression baselines, PCA</td><td><code class="inline">pip install scikit-learn</code></td></tr>
+        <tr><td>matplotlib</td><td>All plots and visualizations</td><td><code class="inline">pip install matplotlib</code></td></tr>
+        <tr><td>numpy</td><td>Array math throughout every notebook</td><td><code class="inline">pip install numpy</code></td></tr>
+        <tr><td>jupyter</td><td>Only needed for Option B (local); Colab already has it</td><td><code class="inline">pip install jupyter</code></td></tr>
+      </table>
+    </div>
+    <p style="font-size:12px; color:var(--ink-faint); margin-bottom:28px;">All commands above install the same set of packages — <code class="inline">pennylane</code>, <code class="inline">qiskit</code>, <code class="inline">qiskit-aer</code>, <code class="inline">scikit-learn</code>, <code class="inline">matplotlib</code>, <code class="inline">numpy</code> — Option B adds <code class="inline">jupyter</code> since Colab already includes it.</p>
+
+    <div class="tips-grid">
+      <div class="tip"><span class="tip-icon">▸</span><p><b>Run cells top to bottom.</b> Later cells reuse variables defined earlier — skipping around out of order will throw <code class="inline">NameError</code>.</p></div>
+      <div class="tip"><span class="tip-icon">▸</span><p><b>Training cells take time.</b> Notebooks 03, 05, 07 &amp; 08 include real training loops — anywhere from a few seconds to ~1–2 minutes per cell is normal for a quantum simulator.</p></div>
+      <div class="tip"><span class="tip-icon">▸</span><p><b>Numbers may vary slightly.</b> Every notebook uses a fixed random seed, but tiny differences across library versions (PennyLane/Qiskit updates) are normal and don't indicate a broken notebook.</p></div>
+      <div class="tip"><span class="tip-icon">▸</span><p><b>Built and tested with:</b> PennyLane 0.45, Qiskit 2.5, scikit-learn 1.8, NumPy 2.4. Newer versions should work fine; if something breaks, pinning to these versions is a safe fallback.</p></div>
+    </div>
+  </div>
+
+  <div class="level-head" id="beginner"><span class="level-tag cyan">Level 1 · Beginner</span><h3>Getting Comfortable with Qubits</h3><span class="lsub">Companion to Module 5</span></div>
+  <div class="nb-grid">
+    <div class="nb-card" id="nb01">
+      <div class="nb-top"><span class="nb-num">NOTEBOOK 01</span><span class="nb-mod-tag">Module 5</span></div>
+      <h4>Quantum Computing Basics</h4>
+      <p>Build single- and multi-qubit circuits in Qiskit. Apply gates, read statevectors, visualize the Bloch sphere, simulate the Born rule, and build your first entangled Bell pair.</p>
+      <div class="nb-result">✓ Executed · real Bell pair, Bloch sphere, measurement histograms</div>
+      <div class="nb-actions">
+        <a class="nb-btn colab" href="https://colab.research.google.com/github/tanjinadnanabir/WISER-Education-Challenge/blob/main/notebooks/01_quantum_computing_basics.ipynb" target="_blank" rel="noopener"><i class="fa-solid fa-play"></i> Open in Colab</a>
+        <a class="nb-btn dl" href="notebooks/01_quantum_computing_basics.ipynb" download><i class="fa-solid fa-download"></i> Download .ipynb</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="level-head" id="intermediate"><span class="level-tag violet">Level 2 · Intermediate</span><h3>Encoding Data &amp; Core QML Algorithms</h3><span class="lsub">Companion to Modules 8 &amp; 9</span></div>
+  <div class="nb-grid">
+    <div class="nb-card" id="nb02">
+      <div class="nb-top"><span class="nb-num">NOTEBOOK 02</span><span class="nb-mod-tag">Module 8</span></div>
+      <h4>Quantum Data Encoding</h4>
+      <p>Implement basis, angle, and amplitude encoding in PennyLane, build a ZZ-style feature map, and see data re-uploading squeeze expressivity from a single qubit.</p>
+      <div class="nb-result">✓ Executed · all four encoding strategies, live</div>
+      <div class="nb-actions">
+        <a class="nb-btn colab" href="https://colab.research.google.com/github/tanjinadnanabir/WISER-Education-Challenge/blob/main/notebooks/02_quantum_data_encoding.ipynb" target="_blank" rel="noopener"><i class="fa-solid fa-play"></i> Open in Colab</a>
+        <a class="nb-btn dl" href="notebooks/02_quantum_data_encoding.ipynb" download><i class="fa-solid fa-download"></i> Download .ipynb</a>
+      </div>
+    </div>
+    <div class="nb-card" id="nb03">
+      <div class="nb-top"><span class="nb-num">NOTEBOOK 03</span><span class="nb-mod-tag">Module 9</span></div>
+      <h4>Variational Circuits &amp; QNN</h4>
+      <p>Verify the parameter-shift rule by hand, then train a full Quantum Neural Network classifier on the moons dataset and visualize its decision boundary.</p>
+      <div class="nb-result">✓ Executed · 87.5% test accuracy, trained live</div>
+      <div class="nb-actions">
+        <a class="nb-btn colab" href="https://colab.research.google.com/github/tanjinadnanabir/WISER-Education-Challenge/blob/main/notebooks/03_variational_circuits_qnn.ipynb" target="_blank" rel="noopener"><i class="fa-solid fa-play"></i> Open in Colab</a>
+        <a class="nb-btn dl" href="notebooks/03_variational_circuits_qnn.ipynb" download><i class="fa-solid fa-download"></i> Download .ipynb</a>
+      </div>
+    </div>
+    <div class="nb-card" id="nb04">
+      <div class="nb-top"><span class="nb-num">NOTEBOOK 04</span><span class="nb-mod-tag">Module 9</span></div>
+      <h4>Quantum Kernels, QSVM &amp; QPCA</h4>
+      <p>Build a quantum kernel from scratch, feed it into a classical SVM, and benchmark it head-to-head against linear and RBF kernels — plus a quantum-kernel PCA projection.</p>
+      <div class="nb-result">✓ Executed · quantum kernel ties RBF (100%), beats linear (39%)</div>
+      <div class="nb-actions">
+        <a class="nb-btn colab" href="https://colab.research.google.com/github/tanjinadnanabir/WISER-Education-Challenge/blob/main/notebooks/04_quantum_kernels_qsvm_qpca.ipynb" target="_blank" rel="noopener"><i class="fa-solid fa-play"></i> Open in Colab</a>
+        <a class="nb-btn dl" href="notebooks/04_quantum_kernels_qsvm_qpca.ipynb" download><i class="fa-solid fa-download"></i> Download .ipynb</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="level-head" id="advanced"><span class="level-tag amber">Level 3 · Advanced</span><h3>Advanced Architectures, Noise &amp; Real-World Use</h3><span class="lsub">Companion to Modules 10, 11 &amp; 12</span></div>
+  <div class="nb-grid">
+    <div class="nb-card" id="nb05">
+      <div class="nb-top"><span class="nb-num">NOTEBOOK 05</span><span class="nb-mod-tag">Module 11</span></div>
+      <h4>Advanced: QCNN &amp; Quantum GAN</h4>
+      <p>Build a Quantum Convolutional Neural Network with real conv + pooling layers, then train a minimal quantum generator against a quantum discriminator — including an honest look at why adversarial training is hard to stabilize.</p>
+      <div class="nb-result">✓ Executed · QCNN reaches 100% test accuracy</div>
+      <div class="nb-actions">
+        <a class="nb-btn colab" href="https://colab.research.google.com/github/tanjinadnanabir/WISER-Education-Challenge/blob/main/notebooks/05_advanced_qcnn_qgan.ipynb" target="_blank" rel="noopener"><i class="fa-solid fa-play"></i> Open in Colab</a>
+        <a class="nb-btn dl" href="notebooks/05_advanced_qcnn_qgan.ipynb" download><i class="fa-solid fa-download"></i> Download .ipynb</a>
+      </div>
+    </div>
+    <div class="nb-card" id="nb06">
+      <div class="nb-top"><span class="nb-num">NOTEBOOK 06</span><span class="nb-mod-tag">Module 11</span></div>
+      <h4>Noise &amp; Error Mitigation</h4>
+      <p>Add a realistic Qiskit Aer noise model, then implement readout error mitigation via a calibration matrix and Zero-Noise Extrapolation via gate folding.</p>
+      <div class="nb-result">✓ Executed · both mitigation techniques clearly reduce error</div>
+      <div class="nb-actions">
+        <a class="nb-btn colab" href="https://colab.research.google.com/github/tanjinadnanabir/WISER-Education-Challenge/blob/main/notebooks/06_noise_error_mitigation.ipynb" target="_blank" rel="noopener"><i class="fa-solid fa-play"></i> Open in Colab</a>
+        <a class="nb-btn dl" href="notebooks/06_noise_error_mitigation.ipynb" download><i class="fa-solid fa-download"></i> Download .ipynb</a>
+      </div>
+    </div>
+    <div class="nb-card" id="nb07">
+      <div class="nb-top"><span class="nb-num">NOTEBOOK 07</span><span class="nb-mod-tag">Module 10</span></div>
+      <h4>Real-World Case Studies</h4>
+      <p>Two full case studies: a QSVM diagnosing real breast cancer data, and a QNN predicting synthetic price direction — including an honest contrast between a learnable momentum market and pure random-walk noise.</p>
+      <div class="nb-result">✓ Executed · real clinical dataset + synthetic market scenarios</div>
+      <div class="nb-actions">
+        <a class="nb-btn colab" href="https://colab.research.google.com/github/tanjinadnanabir/WISER-Education-Challenge/blob/main/notebooks/07_real_world_case_studies.ipynb" target="_blank" rel="noopener"><i class="fa-solid fa-play"></i> Open in Colab</a>
+        <a class="nb-btn dl" href="notebooks/07_real_world_case_studies.ipynb" download><i class="fa-solid fa-download"></i> Download .ipynb</a>
+      </div>
+    </div>
+    <div class="nb-card" id="nb08">
+      <div class="nb-top"><span class="nb-num">NOTEBOOK 08</span><span class="nb-mod-tag">Module 12</span></div>
+      <h4>Capstone Project</h4>
+      <p>The full pipeline template: define → preprocess → encode → train → evaluate → compare, applied to handwritten digit classification — plus copy-paste-ready templates for running your circuits on real IBM Quantum hardware.</p>
+      <div class="nb-result">✓ Executed · full project template + IBM Quantum hardware guide</div>
+      <div class="nb-actions">
+        <a class="nb-btn colab" href="https://colab.research.google.com/github/tanjinadnanabir/WISER-Education-Challenge/blob/main/notebooks/08_capstone_project.ipynb" target="_blank" rel="noopener"><i class="fa-solid fa-play"></i> Open in Colab</a>
+        <a class="nb-btn dl" href="notebooks/08_capstone_project.ipynb" download><i class="fa-solid fa-download"></i> Download .ipynb</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer id="contact">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <img src="logo.png" alt="Schrödinger's Cats Logo" class="footer-logo">
+      <span>
+        Schrödinger's Cats |
+        <span class="footer-tagline">The Open Learning Platform for Quantum Machine Learning</span>
+      </span>
+    </div>
+    <div class="social">
+      <a href="https://github.com/tanjinadnanabir" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+      <a href="https://www.linkedin.com/in/tanjinadnanabir/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+      <a href="https://x.com/tanjinadnanabir" target="_blank" rel="noopener noreferrer" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
+      <a href="https://www.youtube.com/@tanjinadnanabir" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const burger = document.querySelector('.burger');
+const navUl = document.querySelector('nav ul');
+burger.addEventListener('click', ()=>{
+  const shown = navUl.style.display === 'flex';
+  navUl.style.display = shown ? 'none' : 'flex';
+  navUl.style.cssText += shown ? '' : 'position:absolute; top:64px; left:0; right:0; background:rgba(7,11,20,0.98); flex-direction:column; padding:20px 32px; gap:18px; border-bottom:1px solid var(--line); z-index:60;';
+});
+</script>
+
+</body>
+</html>

@@ -72,7 +72,7 @@ header{
   color:var(--cyan); border:1px solid var(--line-strong); border-radius:8px;
   padding:6px 12px; letter-spacing:0.5px; white-space:nowrap;
 } */
-.logo{
+/* .logo{
     font-family:var(--mono);
     font-weight:700;
     font-size:15px;
@@ -86,6 +86,29 @@ header{
     text-decoration:none;
     display:inline-block;
     transition:.25s;
+} */
+
+.logo{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    text-decoration:none;
+
+    transition:.3s ease;
+}
+
+.logo img{
+    height:48px;
+    width:auto;
+    display:block;
+
+    transition:.3s ease;
+}
+
+.logo:hover img{
+    transform:scale(1.06);
+    filter:drop-shadow(0 0 12px rgba(90,209,230,.45));
 }
 
 .logo:hover{
@@ -94,6 +117,7 @@ header{
     box-shadow:0 0 18px rgba(90,209,230,.25);
 }
 .logo span{color:var(--ink-faint);}
+
 nav ul{list-style:none; display:flex; gap:30px;}
 nav a{
   color:var(--ink-dim); text-decoration:none; font-size:13px; font-weight:600;
@@ -296,6 +320,8 @@ section{position:relative; z-index:1;}
 .module.live-linkable:hover{background:var(--panel-2);}
 .mini-link{display:inline-block; margin-top:8px; font-family:var(--mono); font-size:10.5px; color:var(--cyan); text-decoration:none; letter-spacing:0.03em;}
 .mini-link:hover{text-decoration:underline;}
+.mini-link.nb-link{color:var(--violet); margin-top:4px;}
+.mini-link.nb-link:hover{color:var(--violet);}
 @media (max-width:900px){.module-grid{grid-template-columns:repeat(2,1fr);}}
 @media (max-width:560px){.module-grid{grid-template-columns:1fr;}}
 
@@ -331,13 +357,39 @@ section{position:relative; z-index:1;}
 .resource-card h4{font-size:15.5px; font-weight:700; margin-bottom:8px;}
 .resource-card p{font-size:13px; color:var(--ink-dim); margin-bottom:16px;}
 .soon-badge{font-family:var(--mono); font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--amber); border:1px solid rgba(242,163,65,0.4); background:var(--amber-dim); padding:4px 9px; border-radius:100px; display:inline-block;}
+.live-badge{font-family:var(--mono); font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--cyan); border:1px solid rgba(90,209,230,0.4); background:var(--cyan-dim); padding:4px 9px; border-radius:100px; display:inline-flex; align-items:center; gap:6px;}
 @media (max-width:900px){.resource-grid{grid-template-columns:repeat(2,1fr);}}
 @media (max-width:560px){.resource-grid{grid-template-columns:1fr;}}
 
 /* ---------- footer ---------- */
 footer{padding:60px 32px 40px; border-top:1px solid var(--line);}
 .footer-inner{max-width:1280px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:24px;}
-.footer-brand{font-family:var(--mono); color:var(--ink-faint); font-size:13px;}
+.footer-brand{font-family:var(--mono); color:var(--ink-faint); font-size:13px; align-items:center; display:flex; gap:14px;}
+
+/* .footer-brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    font-weight:600;
+    color:var(--text);
+} */
+
+.footer-logo{
+    width:44px;
+    height:44px;
+    object-fit:contain;
+    transition:.3s ease;
+}
+
+.footer-logo:hover{
+    /* transform:rotate(-8deg) scale(1.08); */
+    filter:drop-shadow(0 0 10px rgba(90,209,230,.45));
+}
+
+.footer-tagline{
+    color:var(--muted);
+    font-weight:400;
+}
 .social{display:flex; gap:12px;}
 .social a{width:36px; height:36px; border-radius:8px; border:1px solid var(--line-strong); display:flex; align-items:center; justify-content:center; color:var(--ink-dim); text-decoration:none; font-size:13px; transition:border-color .2s, color .2s;}
 .social a:hover{border-color:var(--cyan); color:var(--cyan);}
@@ -357,7 +409,10 @@ footer{padding:60px 32px 40px; border-top:1px solid var(--line);}
 <header>
   <div class="nav-wrap">
     <!-- <div class="logo">{QML}<span></span></div> -->
-     <a href="#home" class="logo">{QML}<span></span></a>
+     <!-- <a href="#home" class="logo">{QML}<span></span></a> -->
+    <a href="#home" class="logo" aria-label="Schrödinger's Cats Home">
+      <img src="logo.png" alt="Schrödinger's Cats">
+    </a>
     <nav>
       <ul>
         <li><a href="#home">Home</a></li>
@@ -385,7 +440,7 @@ footer{padding:60px 32px 40px; border-top:1px solid var(--line);}
     <div class="hero-actions">
       <a href="#roadmap" class="btn btn-primary">View the Roadmap →</a>
       <a href="#curriculum" class="btn btn-ghost">Explore Curriculum</a>
-      <a href="https://www.thewiser.org/summer-program-2026/wisereducationchallenge" target="_blank" rel="noopener" class="btn btn-outline-amber">WISER Challenge ↗</a>
+      <!-- <a href="https://www.thewiser.org/summer-program-2026/wisereducationchallenge" target="_blank" rel="noopener" class="btn btn-outline-amber">WISER Challenge ↗</a> -->
     </div>
     <div class="hero-stats">
       <div><div class="n">03</div><div class="l">Learning Levels</div></div>
@@ -519,7 +574,7 @@ footer{padding:60px 32px 40px; border-top:1px solid var(--line);}
             <svg class="chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           </div>
           <div class="phase-body"><div class="phase-body-inner">
-            <div class="phase-desc">Not part of the core WISER curriculum, but recommended before Level 1 if vectors, complex numbers, or Python are rusty.</div>
+            <div class="phase-desc">Not part of the core curriculum, but recommended before Level 1 if vectors, complex numbers, or Python are rusty.</div>
             <div class="mod-list">
               <a class="mod-row" href="primer-tutorial.html#ch1" style="text-decoration:none; color:inherit; cursor:pointer;"><div class="mid">P.1</div><div><h5>Linear Algebra &amp; Vector Spaces</h5><div class="mtopics">Vectors, matrices, tensor products, eigenvalues — the notation quantum computing runs on.</div></div></a>
               <a class="mod-row" href="primer-tutorial.html#ch2" style="text-decoration:none; color:inherit; cursor:pointer;"><div class="mid">P.2</div><div><h5>Complex Numbers &amp; Dirac Notation Primer</h5><div class="mtopics">Amplitudes, phases, bra-ket notation before it appears in Module 5.</div></div></a>
@@ -548,7 +603,7 @@ footer{padding:60px 32px 40px; border-top:1px solid var(--line);}
               <div class="mod-row"><div class="mid">M.2</div><div><h5>Why Machine Learning?</h5><div class="mtopics">Limits of traditional programming, what ML is, types of ML, the ML workflow, real-world uses.</div></div></div>
               <div class="mod-row"><div class="mid">M.3</div><div><h5>Classical Machine Learning</h5><div class="mtopics">Supervised, unsupervised &amp; reinforcement learning; regression, classification, decision trees, random forest, SVM, neural networks, deep learning.</div></div></div>
               <div class="mod-row"><div class="mid">M.4</div><div><h5>Why Quantum Computing?</h5><div class="mtopics">Limits of classical computing, qubits, superposition, entanglement, quantum advantage, real quantum hardware.</div></div></div>
-              <div class="mod-row"><div class="mid">M.5</div><div><h5>Quantum Computing Foundations</h5><div class="mtopics">Linear algebra basics, complex numbers, Dirac notation, quantum gates, circuits, the Bloch sphere, measurement.</div></div></div>
+              <div class="mod-row"><div class="mid">M.5</div><div><h5>Quantum Computing Foundations</h5><div class="mtopics">Linear algebra basics, complex numbers, Dirac notation, quantum gates, circuits, the Bloch sphere, measurement. <a href="notebooks.html#nb01" class="mini-link nb-link" style="margin-top:0;">▤ Notebook 01 →</a></div></div></div>
             </div>
             <div class="proj-row"><b>Beginner Project</b>AI vs Machine Learning vs Quantum Computing — build simple classical and quantum examples to feel the differences between the three paradigms firsthand.</div>
           </div></div>
@@ -572,8 +627,8 @@ footer{padding:60px 32px 40px; border-top:1px solid var(--line);}
             <div class="mod-list">
               <div class="mod-row"><div class="mid">M.6</div><div><h5>Intersection Between ML and Quantum Computing</h5><div class="mtopics">Evolution of AI and quantum computing, why combine them, hybrid quantum-classical computing, the current research landscape.</div></div></div>
               <div class="mod-row"><div class="mid">M.7</div><div><h5>Why Quantum Machine Learning?</h5><div class="mtopics">Limits of classical ML, computational complexity, high-dimensional feature spaces, quantum parallelism, potential advantage, open challenges.</div></div></div>
-              <div class="mod-row"><div class="mid">M.8</div><div><h5>Quantum Data Encoding</h5><div class="mtopics">Basis, angle &amp; amplitude encoding, feature maps, data re-uploading.</div></div></div>
-              <div class="mod-row"><div class="mid">M.9</div><div><h5>Variational Quantum Circuits &amp; Core QML Algorithms</h5><div class="mtopics">Parameterized quantum circuits, VQC, QSVM, QNN, quantum kernel methods, quantum PCA, quantum autoencoders.</div></div></div>
+              <div class="mod-row"><div class="mid">M.8</div><div><h5>Quantum Data Encoding</h5><div class="mtopics">Basis, angle &amp; amplitude encoding, feature maps, data re-uploading. <a href="notebooks.html#nb02" class="mini-link nb-link" style="margin-top:0;">▤ Notebook 02 →</a></div></div></div>
+              <div class="mod-row"><div class="mid">M.9</div><div><h5>Variational Quantum Circuits &amp; Core QML Algorithms</h5><div class="mtopics">Parameterized quantum circuits, VQC, QSVM, QNN, quantum kernel methods, quantum PCA, quantum autoencoders. <a href="notebooks.html#nb03" class="mini-link nb-link" style="margin-top:0;">▤ Notebook 03 →</a> <a href="notebooks.html#nb04" class="mini-link nb-link" style="margin-top:0;">▤ Notebook 04 →</a></div></div></div>
             </div>
             <div class="proj-row"><b>Intermediate Project</b>Classical ML vs Quantum ML — implement and compare both on the same dataset, analyzing accuracy, computational cost, and scalability.</div>
           </div></div>
@@ -595,9 +650,9 @@ footer{padding:60px 32px 40px; border-top:1px solid var(--line);}
           <div class="phase-body"><div class="phase-body-inner">
             <div class="phase-desc">The application layer and the open problems — where learners move from tutorials to original, defensible work.</div>
             <div class="mod-list">
-              <div class="mod-row"><div class="mid">M.10</div><div><h5>Real-World QML Applications</h5><div class="mtopics">Healthcare, drug discovery, finance, cybersecurity, climate science, materials discovery, computer vision, NLP.</div></div></div>
-              <div class="mod-row"><div class="mid">M.11</div><div><h5>Advanced Quantum Machine Learning</h5><div class="mtopics">Quantum reinforcement learning, quantum generative models, quantum graph neural networks, error mitigation, noise, fault-tolerant computing.</div></div></div>
-              <div class="mod-row"><div class="mid">M.12</div><div><h5>Research &amp; Capstone Project</h5><div class="mtopics">Reading QML papers, open research challenges, benchmarking quantum models, responsible AI &amp; quantum computing, future directions.</div></div></div>
+              <div class="mod-row"><div class="mid">M.10</div><div><h5>Real-World QML Applications</h5><div class="mtopics">Healthcare, drug discovery, finance, cybersecurity, climate science, materials discovery, computer vision, NLP. <a href="notebooks.html#nb07" class="mini-link nb-link" style="margin-top:0;">▤ Notebook 07 →</a></div></div></div>
+              <div class="mod-row"><div class="mid">M.11</div><div><h5>Advanced Quantum Machine Learning</h5><div class="mtopics">Quantum reinforcement learning, quantum generative models, quantum graph neural networks, error mitigation, noise, fault-tolerant computing. <a href="notebooks.html#nb05" class="mini-link nb-link" style="margin-top:0;">▤ Notebook 05 →</a> <a href="notebooks.html#nb06" class="mini-link nb-link" style="margin-top:0;">▤ Notebook 06 →</a></div></div></div>
+              <div class="mod-row"><div class="mid">M.12</div><div><h5>Research &amp; Capstone Project</h5><div class="mtopics">Reading QML papers, open research challenges, benchmarking quantum models, responsible AI &amp; quantum computing, future directions. <a href="notebooks.html#nb08" class="mini-link nb-link" style="margin-top:0;">▤ Notebook 08 →</a></div></div></div>
             </div>
             <div class="proj-row"><b>Final Capstone Project</b>A complete QML application: problem definition, data preprocessing, quantum data encoding, model implementation, training &amp; evaluation, execution on a simulator or IBM Quantum hardware, and full documentation.</div>
           </div></div>
@@ -630,7 +685,7 @@ footer{padding:60px 32px 40px; border-top:1px solid var(--line);}
         <div class="module" data-module="2"><span class="mnum">2</span><h4>Why Machine Learning?</h4><p>From rule-based programming to learning from data.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Beginner</span></div></div>
         <div class="module" data-module="3"><span class="mnum">3</span><h4>Classical Machine Learning</h4><p>Regression, classification, trees, SVMs, neural nets.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Beginner</span></div></div>
         <div class="module" data-module="4"><span class="mnum">4</span><h4>Why Quantum Computing?</h4><p>Qubits, superposition, entanglement, quantum advantage.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Beginner</span></div></div>
-        <div class="module" data-module="5"><span class="mnum">5</span><h4>Quantum Computing Foundations</h4><p>Gates, circuits, the Bloch sphere, and measurement.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Beginner</span></div></div>
+        <div class="module" data-module="5"><span class="mnum">5</span><h4>Quantum Computing Foundations</h4><p>Gates, circuits, the Bloch sphere, and measurement.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Beginner</span></div><a class="mini-link nb-link" href="notebooks.html#nb01" onclick="event.stopPropagation()">▤ Notebook 01 →</a></div>
         <div class="module"><span class="mnum">★</span><h4>Beginner Project</h4><p>AI vs Machine Learning vs Quantum Computing.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Project</span></div></div>
       </div>
 
@@ -638,16 +693,16 @@ footer{padding:60px 32px 40px; border-top:1px solid var(--line);}
       <div class="module-grid">
         <div class="module" data-module="6"><span class="mnum">6</span><h4>Intersection of ML &amp; Quantum Computing</h4><p>Hybrid quantum-classical computing and the research landscape.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Intermediate</span></div></div>
         <div class="module" data-module="7"><span class="mnum">7</span><h4>Why Quantum Machine Learning?</h4><p>Complexity, high-dimensional spaces, quantum parallelism.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Intermediate</span></div></div>
-        <div class="module" data-module="8"><span class="mnum">8</span><h4>Quantum Data Encoding</h4><p>Basis, angle &amp; amplitude encoding, feature maps.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Intermediate</span></div></div>
-        <div class="module" data-module="9"><span class="mnum">9</span><h4>Variational Circuits &amp; Core QML Algorithms</h4><p>VQC, QSVM, QNN, quantum kernels, quantum PCA.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Intermediate</span></div></div>
+        <div class="module" data-module="8"><span class="mnum">8</span><h4>Quantum Data Encoding</h4><p>Basis, angle &amp; amplitude encoding, feature maps.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Intermediate</span></div><a class="mini-link nb-link" href="notebooks.html#nb02" onclick="event.stopPropagation()">▤ Notebook 02 →</a></div>
+        <div class="module" data-module="9"><span class="mnum">9</span><h4>Variational Circuits &amp; Core QML Algorithms</h4><p>VQC, QSVM, QNN, quantum kernels, quantum PCA.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Intermediate</span></div><a class="mini-link nb-link" href="notebooks.html#nb03" onclick="event.stopPropagation()">▤ Notebook 03 →</a><a class="mini-link nb-link" href="notebooks.html#nb04" onclick="event.stopPropagation()">▤ Notebook 04 →</a></div>
         <div class="module"><span class="mnum">★</span><h4>Intermediate Project</h4><p>Classical ML vs Quantum ML, benchmarked side by side.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Project</span></div></div>
       </div>
 
       <div class="phase-block-head"><span class="pn">LEVEL 03 · ADVANCED</span><h3>Real-World Applications, Research &amp; Innovation</h3></div>
       <div class="module-grid">
-        <div class="module" data-module="10"><span class="mnum">10</span><h4>Real-World QML Applications</h4><p>Healthcare, finance, cybersecurity, climate, materials, NLP.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Advanced</span></div></div>
-        <div class="module" data-module="11"><span class="mnum">11</span><h4>Advanced Quantum Machine Learning</h4><p>Quantum RL, generative models, graph neural networks.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Advanced</span></div></div>
-        <div class="module" data-module="12"><span class="mnum">12</span><h4>Research &amp; Capstone Project</h4><p>Reading papers, benchmarking, responsible AI &amp; QC.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Advanced</span></div></div>
+        <div class="module" data-module="10"><span class="mnum">10</span><h4>Real-World QML Applications</h4><p>Healthcare, finance, cybersecurity, climate, materials, NLP.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Advanced</span></div><a class="mini-link nb-link" href="notebooks.html#nb07" onclick="event.stopPropagation()">▤ Notebook 07 →</a></div>
+        <div class="module" data-module="11"><span class="mnum">11</span><h4>Advanced Quantum Machine Learning</h4><p>Quantum RL, generative models, graph neural networks.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Advanced</span></div><a class="mini-link nb-link" href="notebooks.html#nb05" onclick="event.stopPropagation()">▤ Notebook 05 →</a><a class="mini-link nb-link" href="notebooks.html#nb06" onclick="event.stopPropagation()">▤ Notebook 06 →</a></div>
+        <div class="module" data-module="12"><span class="mnum">12</span><h4>Research &amp; Capstone Project</h4><p>Reading papers, benchmarking, responsible AI &amp; QC.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Advanced</span></div><a class="mini-link nb-link" href="notebooks.html#nb08" onclick="event.stopPropagation()">▤ Notebook 08 →</a></div>
         <div class="module"><span class="mnum">★</span><h4>Final Capstone</h4><p>A complete, documented QML application on real hardware.</p><div class="mfoot"><span><span class="status-dot"></span>Planned</span><span>Project</span></div></div>
       </div>
     </div>
@@ -688,6 +743,7 @@ footer{padding:60px 32px 40px; border-top:1px solid var(--line);}
         <h4>Hands-on Coding Labs</h4>
         <p>Every concept flows Concept → Code → Execute → Visualize → Analyze in an executable notebook.</p>
         <div class="feature-tags"><span class="chip">Python</span><span class="chip">Jupyter</span></div>
+        <a href="notebooks.html" class="mini-link">Browse notebooks →</a>
       </div>
       <div class="feature-card">
         <div class="feature-icon">✓</div>
@@ -765,7 +821,8 @@ footer{padding:60px 32px 40px; border-top:1px solid var(--line);}
         <div class="resource-icon">◈</div>
         <h4>Code Notebooks</h4>
         <p>Downloadable Jupyter notebooks for every module, from the Bloch sphere to QCNNs.</p>
-        <span class="soon-badge">Coming Soon</span>
+        <span class="live-badge"><span class="status-dot dot-live"></span>8 Available</span>
+        <a href="notebooks.html" class="mini-link" style="display:block; margin-top:12px;">Browse all notebooks →</a>
       </div>
       <div class="resource-card">
         <div class="resource-icon">▥</div>
@@ -797,8 +854,19 @@ footer{padding:60px 32px 40px; border-top:1px solid var(--line);}
 
 <footer id="contact">
   <div class="footer-inner">
-    <div class="footer-brand">
+    <!-- <div class="footer-brand">
       Schrödinger's Cats | The Open Learning Platform for Quantum Machine Learning
+    </div> -->
+
+    <div class="footer-brand">
+    <img src="logo.png" alt="Schrödinger's Cats Logo" class="footer-logo">
+
+      <span>
+          Schrödinger's Cats |
+          <span class="footer-tagline">
+              The Open Learning Platform for Quantum Machine Learning | © 2026 Tanjin Adnan Abir. All Rights Reserved.
+          </span>
+      </span>
     </div>
 
     <div class="social">

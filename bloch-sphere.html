@@ -25,7 +25,36 @@
 body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.6;}
 header{position:sticky; top:0; z-index:60; backdrop-filter:blur(14px); background:rgba(7,11,20,0.82); border-bottom:1px solid var(--line);}
 .nav-wrap{max-width:1280px; margin:0 auto; padding:16px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
-.logo{font-family:var(--mono); font-weight:700; font-size:15px; color:var(--cyan); border:1px solid var(--line-strong); border-radius:8px; padding:6px 12px; letter-spacing:0.5px; white-space:nowrap;}
+/* .logo{font-family:var(--mono); font-weight:700; font-size:15px; color:var(--cyan); border:1px solid var(--line-strong); border-radius:8px; padding:6px 12px; letter-spacing:0.5px; white-space:nowrap;}
+.logo span{color:var(--ink-faint);} */
+.logo{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    text-decoration:none;
+
+    transition:.3s ease;
+}
+
+.logo img{
+    height:48px;
+    width:auto;
+    display:block;
+
+    transition:.3s ease;
+}
+
+.logo:hover img{
+    transform:scale(1.06);
+    filter:drop-shadow(0 0 12px rgba(90,209,230,.45));
+}
+
+.logo:hover{
+    color:white;
+    border-color:var(--cyan);
+    box-shadow:0 0 18px rgba(90,209,230,.25);
+}
 .logo span{color:var(--ink-faint);}
 .back-link{display:flex; align-items:center; gap:8px; color:var(--ink-dim); text-decoration:none; font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; transition:color .2s;}
 .back-link:hover{color:var(--cyan);}
@@ -81,8 +110,11 @@ footer{padding:40px 32px; border-top:1px solid var(--line); text-align:center; f
 
 <header>
   <div class="nav-wrap">
-    <div class="logo">{TAA}<span>·QML</span></div>
-    <a class="back-link" href="qml-roadmap-landing-page.html#platform">← Back to Platform</a>
+    <!-- <div class="logo">{TAA}<span>·QML</span></div> -->
+    <a href="#home" class="logo" aria-label="Schrödinger's Cats Home">
+      <img src="logo.png" alt="Schrödinger's Cats">
+    </a>
+    <a class="back-link" href="index.html#platform">← Back to Platform</a>
     <a class="back-link" href="progress-hub.html">My Progress</a>
   </div>
 </header>

@@ -1,342 +1,190 @@
-# 🌌 Quantum Machine Learning
+<div align="center">
 
-> **A complete open-source roadmap to learn Quantum Computing, Quantum Machine Learning, and Quantum AI — from absolute beginner to advanced research.**
+# 🐈⚛️ Schrödinger's Cats
 
-<p align="center">
+### *The Open Learning Platform for Quantum Machine Learning*
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge)
-![Qiskit](https://img.shields.io/badge/Qiskit-Latest-6929C4?style=for-the-badge)
-![PennyLane](https://img.shields.io/badge/PennyLane-Latest-10B981?style=for-the-badge)
-![License](https://img.shields.io/badge/License-Apache%202.0-blue?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
+*From Classical Machine Learning → Quantum Computing → Quantum Machine Learning*
 
-</p>
+[![Website](https://img.shields.io/badge/Website-Live-00C2FF?style=for-the-badge)](https://tanjinadnanabir.github.io/Quantum-Machine-Learning/)
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![PennyLane](https://img.shields.io/badge/PennyLane-QML-6E56CF?style=for-the-badge)
+![Qiskit](https://img.shields.io/badge/Qiskit-Quantum-6929C4?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
----
+**An AI-powered, interactive learning platform designed to bridge the gap between Artificial Intelligence and Quantum Computing through visual learning, coding labs, simulations, and an intelligent AI tutor.**
 
-## 🚀 Welcome
+🌐 **Live Demo:** https://tanjinadnanabir.github.io/Quantum-Machine-Learning/
 
-Welcome to the **Quantum Machine Learning (QML)** tutorial series!
+**Video Demo:** https://tinyurl.com/y72s62mn
 
-This repository is a carefully designed roadmap that guides learners from the fundamentals of **Quantum Computing** to cutting-edge **Quantum Machine Learning** and **Quantum Artificial Intelligence**.
-
-Unlike many existing resources, this series focuses on **building intuition first**, followed by mathematics, practical programming, and finally research-level topics.
-
-Whether you are a student, researcher, software engineer, or simply curious about the future of AI, this repository provides everything you need to begin your quantum journey.
+</div>
 
 ---
 
-# 🎯 What You'll Learn
+# ✨ Why Schrödinger's Cats?
 
-By completing this roadmap, you'll be able to:
+Learning Quantum Machine Learning is often overwhelming because it requires knowledge from multiple disciplines.
 
-- ✅ Understand Quantum Computing from first principles
-- ✅ Learn the mathematics behind quantum mechanics
-- ✅ Build quantum circuits from scratch
-- ✅ Master Qiskit and PennyLane
-- ✅ Implement Quantum Machine Learning algorithms
-- ✅ Build Quantum Neural Networks
-- ✅ Understand Variational Quantum Circuits
-- ✅ Develop Hybrid Quantum-Classical AI models
-- ✅ Read and reproduce QML research papers
-- ✅ Build real-world Quantum AI projects
+**Schrödinger's Cats** provides a structured learning path that gradually takes learners from:
 
----
-
-# 🗺️ Learning Roadmap
-
-```text
-Prerequisites
-      │
-      ▼
-Python Programming
-      │
-      ▼
-Mathematics
-      │
-      ▼
+```
 Artificial Intelligence
-      │
-      ▼
-Machine Learning
-      │
-      ▼
-Quantum Mechanics
-      │
-      ▼
+        ↓
+Classical Machine Learning
+        ↓
 Quantum Computing
-      │
-      ▼
-Quantum Programming
-      │
-      ▼
-Quantum Algorithms
-      │
-      ▼
+        ↓
 Quantum Machine Learning
-      │
-      ▼
-Quantum Deep Learning
-      │
-      ▼
-Quantum AI Research
 ```
 
----
-
-# 📚 Course Modules
-
-## 🌱 Module 1 — Prerequisites
-
-- Python Programming
-- NumPy
-- Git & GitHub
-- Linux Basics
-- VS Code
-- Jupyter Notebook
+Everything is organized into one modern learning ecosystem.
 
 ---
 
-## 📐 Module 2 — Mathematics
+# 🚀 Learning Roadmap
 
-- Linear Algebra
-- Complex Numbers
-- Matrix Operations
-- Vector Spaces
-- Eigenvalues & Eigenvectors
-- Probability
-- Statistics
-- Information Theory
-- Calculus
-- Optimization
+The curriculum is divided into **three progressive learning levels**.
 
----
+## 📘 Prep
 
-## 🤖 Module 3 — Artificial Intelligence
+Build the mathematical and programming foundations required for QML.
 
-- Introduction to AI
-- Machine Learning
-- Deep Learning
-- Neural Networks
-- Computer Vision
-- Natural Language Processing
-- Reinforcement Learning
+- Linear Algebra & Vector Spaces
+- Complex Numbers & Basic Calculus
+- Python & NumPy Primer
 
 ---
 
-## ⚛️ Module 4 — Quantum Computing
+## 🟢 Beginner
 
-- Qubits
-- Bloch Sphere
-- Superposition
-- Entanglement
-- Quantum Gates
-- Quantum Circuits
-- Bell States
-- Quantum Measurement
-- Density Matrix
-- Quantum Noise
-- Decoherence
+Learn the fundamentals of AI, Machine Learning, and Quantum Computing.
 
----
+Topics include:
 
-## 💻 Module 5 — Quantum Programming
-
-Programming with
-
-- Qiskit
-- PennyLane
-- Cirq
-- Q#
-
-Topics include
-
-- Quantum Circuit Design
-- Statevector Simulation
-- IBM Quantum
-- Quantum Hardware
-- Quantum Simulators
+- Introduction to Artificial Intelligence
+- Why Machine Learning?
+- Classical Machine Learning
+- Why Quantum Computing?
+- Quantum Computing Foundations
+- Beginner Coding Project
 
 ---
 
-## 🔬 Module 6 — Quantum Algorithms
+## 🔵 Intermediate
 
-Learn classical quantum algorithms including
+Bridge classical AI with Quantum Computing.
 
-- Deutsch-Jozsa
-- Bernstein-Vazirani
-- Simon's Algorithm
-- Grover's Search
-- Quantum Fourier Transform
-- Quantum Phase Estimation
-- Shor's Algorithm
-- HHL Algorithm
-- VQE
-- QAOA
+Topics include:
 
----
-
-## 🧠 Module 7 — Quantum Machine Learning
-
-- Data Encoding
-- Quantum Feature Maps
-- Quantum Kernels
+- Introduction to Quantum Machine Learning
+- Why Quantum Machine Learning?
+- Quantum Data Encoding
 - Variational Quantum Circuits
-- Parameterized Quantum Circuits
-- Quantum Neural Networks
-- Quantum CNN
-- Quantum GAN
-- Quantum Autoencoders
-- Hybrid Quantum-Classical Models
+- Intermediate Project
 
 ---
 
-## 🚀 Module 8 — Advanced Quantum AI
+## 🟣 Advanced
 
-- Quantum Natural Gradient
-- Barren Plateaus
-- Error Mitigation
-- Noise-aware Training
-- Quantum Optimization
-- Quantum Reinforcement Learning
-- Fault-Tolerant Quantum Computing
-- Quantum Generative AI
+Apply QML to real-world research and innovation.
 
----
+Topics include:
 
-## 📖 Module 9 — Research
-
-- Reading Research Papers
-- Implementing Published Models
-- Benchmarking Algorithms
-- Writing Research Articles
-- Open Source Contributions
+- Real-World QML Applications
+- Advanced Quantum Machine Learning
+- Research & Capstone Project
+- Final Capstone
 
 ---
 
-# 💻 Hands-on Projects
+# 🌟 Platform Features
 
-Throughout this tutorial series, you'll build:
+The platform includes **15+ interactive features**, including:
 
-- 🎲 Quantum Random Number Generator
-- 🪙 Quantum Coin Toss
-- 🔗 Bell State Generator
-- 📡 Quantum Teleportation
-- 📈 Quantum Classifier
-- 📉 Quantum Regression
-- 🧠 Quantum Neural Network
-- 🤖 Hybrid CNN + Quantum Layer
-- 🔬 Variational Quantum Circuit
-- 🎨 Quantum GAN
-- 🧩 Quantum Autoencoder
-- ⚡ Quantum Kernel SVM
-- 🚀 Research-grade Quantum ML Models
+- 🧠 AI-powered Quantum Tutor
+- ⚛️ Quantum Circuit Simulator
+- 📊 Interactive Visualizations
+- 💻 Hands-on Coding Labs
+- 📝 Adaptive Quizzes
+- 📈 Learning Analytics Dashboard
+- ☁️ Real Quantum Hardware Access
+- 🎮 QML Playground
+- 📚 Research Hub
+- ⚡ Quantum Simulations
+- 👨‍🏫 Educator Toolkit
+- ♿ Accessibility Features
+- 📖 Interactive Tutorials
+- 📂 Datasets & Benchmarks
+- 🏆 Challenge Projects
 
 ---
+
+# 📚 Resource Hub
+
+The learning platform also provides:
+
+- Interactive tutorials
+- Jupyter notebooks
+- Coding exercises
+- Challenge projects
+- Research datasets
+- Benchmark collections
+- Learning resources
+
+---
+
+# 🛠 Technology Stack
+
+| Category | Technologies |
+|-----------|--------------|
+| Programming | Python |
+| AI/ML | NumPy, Scikit-Learn |
+| Quantum | PennyLane, Qiskit |
+| Visualization | Matplotlib, Plotly |
+| Frontend | HTML, CSS, JavaScript |
+| Learning | Interactive Labs & Simulations |
+
+---
+
+# 🎯 Learning Outcomes
+
+After completing the curriculum, learners will be able to:
+
+- Understand Quantum Computing fundamentals
+- Build classical Machine Learning models
+- Design Quantum Circuits
+- Implement Quantum Machine Learning algorithms
+- Train Variational Quantum Circuits
+- Work with PennyLane and Qiskit
+- Apply QML to real-world research problems
+
+<!-- ---
 
 # 📂 Repository Structure
 
 ```text
-Quantum-Machine-Learning/
-│
-├── 00-Prerequisites/
-├── 01-Mathematics/
-├── 02-Artificial-Intelligence/
-├── 03-Machine-Learning/
-├── 04-Quantum-Mechanics/
-├── 05-Quantum-Computing/
-├── 06-Quantum-Programming/
-├── 07-Quantum-Algorithms/
-├── 08-Quantum-Machine-Learning/
-├── 09-Quantum-Deep-Learning/
-├── 10-Research-Papers/
-│
-├── Projects/
-├── Datasets/
-├── Resources/
-├── Assets/
-└── README.md
-```
+.
+├── assets/
+├── css/
+├── js/
+├── images/
+├── index.html
+├── README.md
+└── LICENSE
+``` -->
 
 ---
 
-# 🛠️ Technologies Used
+# 🌍 Live Website
 
-- Python
-- NumPy
-- SciPy
-- Matplotlib
-- Scikit-Learn
-- PyTorch
-- TensorFlow
-- Qiskit
-- PennyLane
-- Cirq
-- Q#
-- IBM Quantum
-- Google Cirq
+Visit the platform:
+
+### https://tanjinadnanabir.github.io/Quantum-Machine-Learning/
 
 ---
 
-# 🎯 Who Is This Course For?
-
-This repository is designed for
-
-- 🎓 Students
-- 👨‍💻 Software Engineers
-- 🤖 AI/ML Engineers
-- 🔬 Researchers
-- ⚛️ Physics Enthusiasts
-- 📊 Data Scientists
-- 🧠 Deep Learning Practitioners
-- 🌍 Anyone interested in Quantum AI
-
-No prior knowledge of Quantum Computing is required.
-
----
-
-# 🌟 Repository Features
-
-- 📚 Beginner-friendly tutorials
-- 🧠 Mathematical intuition
-- 💻 Hands-on coding notebooks
-- ⚛️ Quantum circuit visualisations
-- 📝 Exercises and quizzes
-- 🚀 Real-world projects
-- 📖 Research paper implementations
-- 📊 Benchmark comparisons
-- 🎯 Interview preparation
-- 🌍 Open-source community
-
----
-
-# 📈 Learning Path
-
-```text
-Python
-   ↓
-Mathematics
-   ↓
-Machine Learning
-   ↓
-Quantum Mechanics
-   ↓
-Quantum Computing
-   ↓
-Quantum Programming
-   ↓
-Quantum Algorithms
-   ↓
-Quantum Machine Learning
-   ↓
-Quantum Deep Learning
-   ↓
-Quantum AI Research
-```
-
----
-
-# 🤝 Contributing
+# 🤝 Contributions
 
 Contributions are always welcome!
 
@@ -354,52 +202,21 @@ If you'd like to contribute, please open an **Issue** first before submitting a 
 
 ---
 
-# ⭐ Support the Project
-
-If this repository helps you learn something new, please consider:
-
-- ⭐ Star this repository
-- 🍴 Fork the repository
-- 📢 Share it with friends and colleagues
-- 💡 Contribute to make Quantum education accessible to everyone
-
----
-
-# 📚 Recommended Background
-
-A basic understanding of the following topics is helpful:
-
-- Python Programming
-- High School Mathematics
-- Linear Algebra
-- Basic Machine Learning
-
-Don't worry if you're completely new to Quantum Computing—this roadmap starts from the very beginning.
-
----
-
 # 📜 License
 
-This project is licensed under the **Apache License 2.0**.
-
-You are free to use, modify, distribute, and contribute to this project under the terms of the Apache 2.0 License. Any contributions made to this repository will also be licensed under the Apache License 2.0 unless stated otherwise.
-
-For more details, see the [LICENSE](LICENSE) file or visit https://www.apache.org/licenses/LICENSE-2.0.
+Licensed under the **Apache 2.0 License**.
 
 ---
 
-# 🌍 Vision
+### Citation
 
-> **To build one of the world's most comprehensive open-source Quantum Machine Learning learning resources—from absolute beginner to cutting-edge research—empowering the next generation of Quantum AI scientists, engineers, and innovators.**
-
----
-
-<div align="center">
-
-## ⭐ If you find this repository helpful, please consider giving it a Star!
-
-### 🚀 Happy Learning • ⚛️ Happy Quantum Coding • 🧠 Happy Research
-
-**Made with ❤️ for the Quantum AI Community**
+```bibtex
+@misc{schrodingerscats2026,
+  author       = {Tanjin Adnan Abir},
+  title        = {Schrödinger's Cats: The Open Learning Platform for Quantum Machine Learning},
+  year         = {2026},
+  howpublished = {\url{https://tanjinadnanabir.github.io/Quantum-Machine-Learning/}}
+}
+```
 
 </div>

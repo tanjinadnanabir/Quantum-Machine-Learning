@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="modules-registry.js"></script>
+<script src="https://js.puter.com/v2/"></script>
 <style>
 :root{
   --bg:#070b14; --bg-2:#0b111f; --panel:#0e1526; --panel-2:#101a2e;
@@ -24,7 +25,36 @@
 body{background:var(--bg); color:var(--ink); font-family:var(--sans); line-height:1.6;}
 header{position:sticky; top:0; z-index:60; backdrop-filter:blur(14px); background:rgba(7,11,20,0.82); border-bottom:1px solid var(--line);}
 .nav-wrap{max-width:1280px; margin:0 auto; padding:16px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px;}
-.logo{font-family:var(--mono); font-weight:700; font-size:15px; color:var(--cyan); border:1px solid var(--line-strong); border-radius:8px; padding:6px 12px; letter-spacing:0.5px; white-space:nowrap;}
+/* .logo{font-family:var(--mono); font-weight:700; font-size:15px; color:var(--cyan); border:1px solid var(--line-strong); border-radius:8px; padding:6px 12px; letter-spacing:0.5px; white-space:nowrap;}
+.logo span{color:var(--ink-faint);} */
+.logo{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    text-decoration:none;
+
+    transition:.3s ease;
+}
+
+.logo img{
+    height:48px;
+    width:auto;
+    display:block;
+
+    transition:.3s ease;
+}
+
+.logo:hover img{
+    transform:scale(1.06);
+    filter:drop-shadow(0 0 12px rgba(90,209,230,.45));
+}
+
+.logo:hover{
+    color:white;
+    border-color:var(--cyan);
+    box-shadow:0 0 18px rgba(90,209,230,.25);
+}
 .logo span{color:var(--ink-faint);}
 .back-link{display:flex; align-items:center; gap:8px; color:var(--ink-dim); text-decoration:none; font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em; transition:color .2s;}
 .back-link:hover{color:var(--cyan);}
@@ -51,6 +81,16 @@ h1{font-family:var(--serif); font-weight:600; font-size:clamp(30px,4vw,44px); le
   border-bottom:1px solid var(--line); background:var(--panel-2);
 }
 .tutor-topbar-left{display:flex; align-items:center; gap:12px;}
+.tutor-topbar-right{display:flex; align-items:center; gap:14px;}
+.ai-toggle{position:relative; display:inline-block; width:34px; height:19px; cursor:pointer; flex-shrink:0;}
+.ai-toggle input{opacity:0; width:0; height:0; position:absolute;}
+.ai-toggle-track{position:absolute; inset:0; background:var(--line-strong); border:1px solid var(--line-strong); border-radius:100px; transition:background .2s, border-color .2s;}
+.ai-toggle-track::before{content:''; position:absolute; width:13px; height:13px; left:2px; top:2px; background:var(--ink-dim); border-radius:50%; transition:transform .2s, background .2s;}
+.ai-toggle input:checked + .ai-toggle-track{background:var(--violet-dim); border-color:var(--violet);}
+.ai-toggle input:checked + .ai-toggle-track::before{transform:translateX(15px); background:var(--violet);}
+.ai-toggle-label{font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); letter-spacing:0.03em; white-space:nowrap;}
+.ai-tag{font-family:var(--mono); font-size:9.5px; letter-spacing:0.05em; text-transform:uppercase; padding:3px 8px; border-radius:100px; background:var(--violet-dim); color:var(--violet); border:1px solid rgba(179,155,255,0.35);}
+.fallback-note{font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); margin-top:2px;}
 .tutor-orb{
   width:38px; height:38px; border-radius:50%; background:var(--violet-dim); border:1.5px solid var(--violet);
   display:flex; align-items:center; justify-content:center; font-size:17px; color:var(--violet);
@@ -131,14 +171,24 @@ h1{font-family:var(--serif); font-weight:600; font-size:clamp(30px,4vw,44px); le
 .reset-link{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); cursor:pointer; text-decoration:underline; background:none; border:none;}
 
 footer{padding:40px 32px; border-top:1px solid var(--line); text-align:center; font-family:var(--mono); font-size:12px; color:var(--ink-faint);}
+
+@media (max-width:640px){
+  .tutor-topbar{flex-wrap:wrap; gap:12px;}
+  .tutor-topbar-right{width:100%; justify-content:space-between;}
+  .wrap{padding:40px 18px 90px;}
+  .chat-area{height:400px;}
+}
 </style>
 </head>
 <body>
 
 <header>
   <div class="nav-wrap">
-    <div class="logo">{TAA}<span>·QML</span></div>
-    <a class="back-link" href="qml-roadmap-landing-page.html#platform">← Back to Platform</a>
+    <!-- <div class="logo">{TAA}<span>·QML</span></div> -->
+    <a href="#home" class="logo" aria-label="Schrödinger's Cats Home">
+      <img src="logo.png" alt="Schrödinger's Cats">
+    </a>
+    <a class="back-link" href="index.html#platform">← Back to Platform</a>
     <a class="back-link" href="progress-hub.html">My Progress</a>
   </div>
 </header>
@@ -146,17 +196,18 @@ footer{padding:40px 32px; border-top:1px solid var(--line); text-align:center; f
 <div class="wrap">
   <div class="module-eyebrow">◆ AI-Powered Quantum Tutor</div>
   <h1>Ask anything from the curriculum.</h1>
-  <p class="lede">A free, always-on tutor built from every concept across all 12 modules — encodings, algorithms, applications, the frontier, and the capstone skills. Type a question or tap a starter chip below.</p>
+  <p class="lede">A free tutor grounded in every concept across all 12 modules — from "what is AI?" in Module 1 through the capstone skills in Module 12. Type a question or tap a starter chip below.</p>
   <div class="chip-row">
     <span class="chip">Zero Cost</span>
-    <span class="chip">No API Key</span>
-    <span class="chip">Runs Entirely in Your Browser</span>
-    <span class="chip">~55 Curated Answers</span>
+    <span class="chip">No API Key Required</span>
+    <span class="chip">All 12 Modules</span>
+    <span class="chip">AI-Enhanced</span>
+    <span class="chip" id="kbCountChip">87 Curated Answers</span>
   </div>
 
   <div class="honesty-note">
     <b>How this actually works</b>
-    This tutor does not call a paid language model — that would cost money per question, and this tool is free. Instead, it searches a curated knowledge base built from this course's own content, using a real text-matching algorithm (term-frequency scoring) that runs entirely in your browser. It is genuinely useful for course questions, and honest about when it is not confident in a match — it will say so rather than guess.
+    This tutor runs in two layers, and both are genuinely free — no API key, no account, no cost to you. <b style="color:var(--ink); font-family:inherit; text-transform:none; letter-spacing:normal;">Layer 1</b> is a curated knowledge base built from this course's own content across all 12 modules, searched with a real text-matching algorithm (TF-IDF-style scoring) that runs entirely in your browser. <b style="color:var(--ink); font-family:inherit; text-transform:none; letter-spacing:normal;">Layer 2 (AI-Enhanced, toggle below)</b> takes the top curriculum matches Layer 1 finds and asks a free, keyless AI model (via <a href="https://developer.puter.com/" target="_blank" rel="noopener" style="color:var(--cyan);">Puter.js</a>) to turn them into a more natural, conversational answer — strictly grounded in that retrieved content, not free-associating. If the AI layer is slow, unavailable, or turned off, every answer instantly falls back to Layer 1's direct curriculum match instead of guessing or failing silently.
   </div>
 
   <div class="tutor-shell">
@@ -165,10 +216,17 @@ footer{padding:40px 32px; border-top:1px solid var(--line); text-align:center; f
         <div class="tutor-orb">✺</div>
         <div>
           <div class="tutor-name">Quantum Tutor</div>
-          <div class="tutor-status">Ready — searching 55 answers</div>
+          <div class="tutor-status" id="tutorStatusLine">Ready</div>
         </div>
       </div>
-      <div class="asked-counter"><span id="askedCount">0</span> questions asked</div>
+      <div class="tutor-topbar-right">
+        <label class="ai-toggle" title="Toggle AI-Enhanced answers on or off">
+          <input type="checkbox" id="aiModeToggle" checked>
+          <span class="ai-toggle-track"></span>
+        </label>
+        <span class="ai-toggle-label">AI-Enhanced</span>
+        <div class="asked-counter"><span id="askedCount">0</span> questions asked</div>
+      </div>
     </div>
 
     <div class="chat-area" id="chatArea"></div>
@@ -192,7 +250,8 @@ footer{padding:40px 32px; border-top:1px solid var(--line); text-align:center; f
   <div class="reset-row"><button class="reset-link" id="resetChatBtn">Clear conversation</button></div>
 </div>
 
-<footer>AI-Powered Quantum Tutor — a free, client-side retrieval engine. Part of the QML Curriculum platform.</footer>
+<footer>AI-Powered Quantum Tutor — a free retrieval engine grounded across all 12 modules, optionally enhanced by a free, keyless AI layer. Part of the QML Curriculum platform.</footer>
+
 
 <script>
 /* ================================================================
@@ -201,6 +260,144 @@ footer{padding:40px 32px; border-top:1px solid var(--line); text-align:center; f
    question (a natural phrasing), answer, keywords (extra search terms).
    ================================================================ */
 const KB = [
+  // ---- Module 1: Introduction to Artificial Intelligence ----
+  {id:56, module:1, chapter:"What is AI?", file:null,
+   q:"What is artificial intelligence?",
+   a:"Artificial intelligence is the field of building systems that perform tasks normally thought to require human intelligence — perceiving, reasoning, learning, and making decisions. Almost everything in practical use today is 'narrow AI', built for a specific task, rather than the more general, human-level intelligence AI sometimes refers to in fiction.",
+   kw:["ai definition","what is ai","narrow ai"]},
+  {id:57, module:1, chapter:"History and Evolution of AI", file:null,
+   q:"What is the history of AI?",
+   a:"The term 'artificial intelligence' was coined at the 1956 Dartmouth workshop. Early AI relied on hand-coded logical rules and hit repeated 'AI winters' when it overpromised and underdelivered. Statistical machine learning gained ground through the 1990s and 2000s, and a 2012 breakthrough in deep learning on image recognition kicked off the current era, which has since scaled up to today's large language models.",
+   kw:["history of ai","ai winter","dartmouth","timeline"]},
+  {id:58, module:1, chapter:"Types of AI", file:null,
+   q:"What are the different types of AI?",
+   a:"By capability, AI is usually split into narrow AI (task-specific — everything in real use today), general AI (hypothetical, human-level across any task), and superintelligence (hypothetical, beyond human ability). A separate, common framing sorts systems by design into reactive machines, limited-memory systems, theory-of-mind systems, and self-aware systems, with only the first two genuinely existing today.",
+   kw:["narrow ai","general ai","agi","superintelligence"]},
+  {id:59, module:1, chapter:"Applications of AI", file:null,
+   q:"What are real-world applications of AI?",
+   a:"AI already runs behind recommendation systems, voice assistants, medical imaging diagnostics, autonomous vehicles, fraud detection, machine translation, and generative content tools — almost all of it narrow AI, each system built and trained for one specific task.",
+   kw:["ai applications","real world ai","use cases"]},
+  {id:60, module:1, chapter:"Where AI is Heading", file:null,
+   q:"Where is AI heading?",
+   a:"Current trends point toward more capable general-purpose and multimodal models, deeper integration with specialized hardware including quantum processors, and a growing emphasis on responsible, interpretable systems as AI is deployed more widely. This course's whole premise sits at exactly that intersection of AI and specialized quantum hardware.",
+   kw:["future of ai","trends","multimodal"]},
+
+  // ---- Module 2: Why Machine Learning? ----
+  {id:61, module:2, chapter:"Limits of Traditional Programming", file:null,
+   q:"What are the limits of traditional programming?",
+   a:"Traditional, rule-based programming requires a human to explicitly write every rule the system follows. That breaks down fast for tasks like recognizing faces or filtering spam, where the patterns are too complex and numerous to hand-code — which is exactly the gap machine learning fills, by learning the rules from data instead of being told them.",
+   kw:["rule based programming","limits","traditional programming"]},
+  {id:62, module:2, chapter:"What is Machine Learning?", file:null,
+   q:"What is machine learning?",
+   a:"Machine learning is a subfield of AI where a system learns patterns directly from data rather than following explicitly programmed rules, and improves its performance on a task as it sees more examples — instead of a programmer updating the rules by hand.",
+   kw:["what is ml","machine learning definition"]},
+  {id:63, module:2, chapter:"Types of Machine Learning", file:null,
+   q:"What are the types of machine learning?",
+   a:"Machine learning splits into three broad paradigms: supervised learning, which learns from labeled examples; unsupervised learning, which finds structure in unlabeled data; and reinforcement learning, which learns by trial and error from a reward signal. Module 3 covers each of these, and their classical algorithms, in depth.",
+   kw:["supervised","unsupervised","reinforcement learning","paradigms"]},
+  {id:64, module:2, chapter:"The Machine Learning Workflow", file:null,
+   q:"What is the machine learning workflow?",
+   a:"A typical ML project moves through data collection, cleaning and preprocessing, feature selection, choosing and training a model, evaluating it on held-out data, and iterating. Every QML pipeline in this course's notebooks follows this exact same shape, just with a quantum circuit standing in for (or alongside) the classical model.",
+   kw:["ml workflow","pipeline","process"]},
+  {id:65, module:2, chapter:"Real-World Uses of ML", file:null,
+   q:"What are real-world uses of machine learning?",
+   a:"Machine learning already powers spam filtering, product recommendations, credit scoring, medical diagnosis support, speech and image recognition, and fraud detection — mostly running quietly behind the scenes of products people use every day.",
+   kw:["ml applications","real world ml","use cases"]},
+
+  // ---- Module 3: Classical Machine Learning ----
+  {id:66, module:3, chapter:"Supervised, Unsupervised & Reinforcement Learning", file:"module3-tutorial.html",
+   q:"What's the difference between supervised, unsupervised, and reinforcement learning?",
+   a:"Supervised learning trains on labeled examples, like flagging emails already marked spam or not-spam. Unsupervised learning finds structure in unlabeled data, like grouping customers into segments without being told the groups in advance. Reinforcement learning learns by trial and error from a reward signal, like a game-playing agent that only knows whether it won or lost.",
+   kw:["supervised learning","unsupervised learning","reinforcement learning"]},
+  {id:67, module:3, chapter:"Regression", file:"module3-tutorial.html",
+   q:"What is regression in machine learning?",
+   a:"Regression predicts a continuous numeric value from input features — for example, predicting a house's price from its size and location. Linear regression, fitting a straight line through the data, is the simplest and most foundational example.",
+   kw:["regression","linear regression","continuous prediction"]},
+  {id:68, module:3, chapter:"Classification", file:"module3-tutorial.html",
+   q:"What is classification in machine learning?",
+   a:"Classification predicts a discrete category or label for an input, such as spam vs. not-spam, or which digit an image shows. It's the classical counterpart to the quantum classifiers — VQC and QSVM — covered in Module 9.",
+   kw:["classification","discrete label","classifier"]},
+  {id:69, module:3, chapter:"Decision Trees", file:"module3-tutorial.html",
+   q:"What is a decision tree?",
+   a:"A decision tree splits data repeatedly on feature thresholds, forming a tree of yes/no questions that leads to a prediction at each leaf. It's simple and easy to interpret, but a single tree is prone to overfitting the data it was trained on.",
+   kw:["decision tree","splits","overfitting"]},
+  {id:70, module:3, chapter:"Random Forest", file:"module3-tutorial.html",
+   q:"What is a random forest?",
+   a:"A random forest is an ensemble of many decision trees, each trained on a random subset of the data and features, with their predictions combined — typically by majority vote. Averaging over many trees substantially reduces the overfitting a single tree is prone to.",
+   kw:["random forest","ensemble","bagging"]},
+  {id:71, module:3, chapter:"Support Vector Machines", file:"module3-tutorial.html",
+   q:"What is a support vector machine (SVM)?",
+   a:"An SVM is a classifier that finds the maximum-margin boundary separating two classes, and can use a 'kernel trick' to handle data that isn't linearly separable in its raw form. This is exactly the classical concept that QSVM (Module 9) extends, by swapping in a quantum-computed kernel.",
+   kw:["svm","support vector machine","kernel trick","margin"]},
+  {id:72, module:3, chapter:"Neural Networks", file:"module3-tutorial.html",
+   q:"What is a neural network?",
+   a:"A neural network is built from layers of simple connected units that each apply a weighted sum of their inputs followed by a nonlinearity, with all the weights learned via backpropagation. A quantum neural network (Module 9) borrows this same layered idea, just built from qubits and gates instead of classical weights.",
+   kw:["neural network","backpropagation","layers"]},
+  {id:73, module:3, chapter:"Deep Learning", file:"module3-tutorial.html",
+   q:"What is deep learning?",
+   a:"Deep learning is machine learning using neural networks with many stacked layers, letting the model build up increasingly abstract representations of data automatically instead of relying on hand-engineered features. This scaling to many layers has driven most of the recent progress across AI.",
+   kw:["deep learning","many layers","representations"]},
+
+  // ---- Module 4: Why Quantum Computing? ----
+  {id:74, module:4, chapter:"Limitations of Classical Computing", file:"module4-tutorial.html",
+   q:"What are the limitations of classical computing?",
+   a:"Every classical bit is either 0 or 1, and adding one more bit doubles the number of combinations a computer might need to check — 2 to the power of n growth that outruns any amount of added speed. It isn't that classical computers are slow; some problems' possibility space grows faster than speed alone can ever catch up to.",
+   kw:["classical computing limits","exponential growth","state space"]},
+  {id:75, module:4, chapter:"Quantum Computing Fundamentals", file:"module4-tutorial.html",
+   q:"What are the fundamentals of quantum computing?",
+   a:"Quantum computing uses three quantum-mechanical ingredients — superposition, entanglement, and interference — to represent and process information in ways no classical machine can imitate. It isn't a faster general-purpose computer; it's a specialized tool that only pulls ahead on specific kinds of problems.",
+   kw:["quantum fundamentals","superposition","entanglement","interference"]},
+  {id:76, module:4, chapter:"Qubits", file:"module4-tutorial.html",
+   q:"What is a qubit, conceptually?",
+   a:"A qubit's state is written as a combination of |0⟩ and |1⟩ using two amplitudes, and can be pictured as a point on the surface of the Bloch sphere rather than a switch fixed to one of two settings. Physically, a qubit can be built from a supercooled superconducting circuit, a trapped ion, a single photon, and several other approaches, each with different tradeoffs.",
+   kw:["qubit basics","bloch sphere","physical qubit"]},
+  {id:77, module:4, chapter:"Superposition", file:"module4-tutorial.html",
+   q:"What is superposition, and what happens when you measure it?",
+   a:"Before measurement, a qubit in superposition genuinely holds both |0⟩ and |1⟩ at once — a real physical fact, not just something hidden from view. Measurement forces one definite classical outcome at random, weighted exactly by the probabilities set by the amplitudes, and repeated measurements converge toward those probabilities.",
+   kw:["superposition","measurement collapse","born rule basics"]},
+  {id:78, module:4, chapter:"Entanglement", file:"module4-tutorial.html",
+   q:"What is entanglement?",
+   a:"Entangled qubits share one joint description that can't be broken apart into independent descriptions of each qubit — measuring one instantly tells you the other's outcome, even though each individual outcome is still perfectly random. It cannot be used to send information faster than light, since neither side can control which outcome they get.",
+   kw:["entanglement","bell pair","spooky action"]},
+  {id:79, module:4, chapter:"Quantum Advantage", file:"module4-tutorial.html",
+   q:"What is quantum advantage and where is it proven?",
+   a:"Grover's algorithm searches an unsorted list of N items in about √N steps versus roughly N/2 classically — a proven quadratic speedup. Shor's algorithm factors large numbers exponentially faster than any known classical method. Both are real, but quantum advantage is task-specific: everyday computing sees no benefit at all from quantum hardware.",
+   kw:["quantum advantage","grover","shor","speedup"]},
+  {id:80, module:4, chapter:"Real Quantum Hardware", file:"module4-tutorial.html",
+   q:"What does real quantum hardware look like today?",
+   a:"Today's machines are 'NISQ' devices — Noisy, Intermediate-Scale Quantum — built on competing physical approaches (superconducting circuits, trapped ions, photonics, neutral atoms) with no single approach having 'won' yet. Raw qubit count is a headline number, but quality measures like error rate and quantum volume matter just as much for what a machine can actually compute.",
+   kw:["nisq","quantum hardware","quantum volume"]},
+
+  // ---- Module 5: Quantum Computing Foundations ----
+  {id:81, module:5, chapter:"Linear Algebra Basics", file:"module5-tutorial.html",
+   q:"How does linear algebra relate to quantum computing?",
+   a:"Every quantum state is a vector, and every gate that acts on it is a matrix — applying a gate is exactly matrix-vector multiplication. Once that equivalence clicks, the rest of quantum computing's math is just specific matrices worth learning, not new mathematical machinery.",
+   kw:["linear algebra","vectors","matrices"]},
+  {id:82, module:5, chapter:"Complex Numbers", file:"module5-tutorial.html",
+   q:"Why do quantum amplitudes need complex numbers?",
+   a:"A quantum amplitude is a complex number a + bi, with a magnitude and a phase. Squaring the magnitude gives the measurement probability — the Born rule. The phase is invisible to a single measurement but becomes crucial once amplitudes interfere with each other, which is where quantum algorithms get their power.",
+   kw:["complex numbers","magnitude","phase","amplitude"]},
+  {id:83, module:5, chapter:"Dirac Notation", file:"module5-tutorial.html",
+   q:"What is Dirac (bra-ket) notation?",
+   a:"A ket |ψ⟩ is compact shorthand for a state vector, and a bra ⟨φ| is its mirror image used to compute overlaps. The inner product ⟨φ|ψ⟩ is just the vectors' dot product, and its squared size tells you how alike two states are — 1 for identical, 0 for completely distinguishable.",
+   kw:["dirac notation","bra ket","inner product"]},
+  {id:84, module:5, chapter:"Quantum Gates", file:"module5-tutorial.html",
+   q:"What makes a matrix a valid quantum gate?",
+   a:"A valid quantum gate matrix must be unitary, meaning it preserves total probability — after any gate, a qubit's measurement probabilities still sum to exactly 100%. X flips |0⟩ and |1⟩, Z flips the sign of the |1⟩ amplitude without changing probabilities, and H (Hadamard) turns |0⟩ into an equal superposition, |+⟩.",
+   kw:["quantum gates","unitary","hadamard","pauli x","pauli z"]},
+  {id:85, module:5, chapter:"Quantum Circuits", file:"module5-tutorial.html",
+   q:"What is a quantum circuit and does gate order matter?",
+   a:"A quantum circuit is a sequence of gates applied one after another, each acting on whatever state the previous gate left behind. Gate order matters — applying the same gates in a different order generally gives a different final state, since matrix multiplication isn't commutative.",
+   kw:["quantum circuit","gate order","sequence of gates"]},
+  {id:86, module:5, chapter:"Bloch Sphere", file:"module5-tutorial.html",
+   q:"What do the angles on the Bloch sphere mean?",
+   a:"The angle θ (theta) controls how much |0⟩ versus |1⟩ a qubit's state holds, and directly sets its measurement probabilities. The angle φ (phi) adds phase information — it rotates the state around the vertical axis without changing those probabilities at all, but it's not physically meaningless; it matters once gates interact.",
+   kw:["bloch sphere","theta","phi","angles"]},
+  {id:87, module:5, chapter:"Quantum Measurement", file:"module5-tutorial.html",
+   q:"What is the Born rule, precisely?",
+   a:"The Born rule states that the probability of any measurement outcome equals the squared overlap between the state and that outcome: P(outcome) = |⟨outcome|ψ⟩|². The same state measured in a different basis generally gives different probabilities, since probability depends on overlap with whichever basis you chose to measure in.",
+   kw:["born rule","measurement probability","measurement basis"]},
+
   // ---- Module 6: Intersection Between ML and Quantum Computing ----
   {id:1, module:6, chapter:"Evolution of AI and Quantum Computing", file:"module6-tutorial.html",
    q:"How did AI and quantum computing become connected?",
@@ -487,6 +684,67 @@ try{ askedCount = parseInt(localStorage.getItem('qml_tutor_asked')||'0'); }catch
 document.getElementById('askedCount').textContent = askedCount;
 function bumpAskedCount(){ askedCount++; try{ localStorage.setItem('qml_tutor_asked', askedCount); }catch(e){} document.getElementById('askedCount').textContent = askedCount; }
 
+document.getElementById('kbCountChip').textContent = KB.length + ' Curated Answers';
+
+let aiEnhancedEnabled = true;
+try{ const saved = localStorage.getItem('qml_tutor_ai_mode'); if(saved!==null) aiEnhancedEnabled = saved==='true'; }catch(e){}
+const aiToggleEl = document.getElementById('aiModeToggle');
+aiToggleEl.checked = aiEnhancedEnabled;
+function updateStatusLine(){
+  const statusEl = document.getElementById('tutorStatusLine');
+  statusEl.textContent = aiEnhancedEnabled
+    ? 'AI-Enhanced \u2014 grounded in ' + KB.length + ' curriculum entries'
+    : 'Retrieval-only \u2014 searching ' + KB.length + ' curriculum entries';
+}
+updateStatusLine();
+aiToggleEl.addEventListener('change', ()=>{
+  aiEnhancedEnabled = aiToggleEl.checked;
+  try{ localStorage.setItem('qml_tutor_ai_mode', aiEnhancedEnabled); }catch(e){}
+  updateStatusLine();
+});
+
+/* ----------------------------------------------------------------
+   AI-ENHANCED LAYER — uses top curriculum matches as grounding
+   context for a free, keyless AI call via Puter.js. Fully optional:
+   any failure, timeout, or disabled toggle falls back to the plain
+   retrieval answer with zero disruption to the user.
+   ---------------------------------------------------------------- */
+function withTimeout(promise, ms){
+  return Promise.race([
+    promise,
+    new Promise((_, reject)=> setTimeout(()=> reject(new Error('AI layer timed out')), ms))
+  ]);
+}
+async function getAIAnswer(query, topMatches){
+  if(!aiEnhancedEnabled) return null;
+  if(typeof puter === 'undefined' || !puter.ai || typeof puter.ai.chat !== 'function') return null;
+  if(!topMatches || topMatches.length===0) return null;
+
+  const context = topMatches.slice(0, 3).map((m, i)=>
+    '[Source ' + (i+1) + ' \u2014 Module ' + m.entry.module + ', "' + m.entry.chapter + '"]\n' +
+    'Q: ' + m.entry.q + '\nA: ' + m.entry.a
+  ).join('\n\n');
+
+  const prompt =
+    'You are a quantum machine learning course tutor. Answer the student\'s question using ONLY the curriculum context below \u2014 do not introduce outside facts. Be concise (3-5 sentences), accurate, and conversational. If the context does not actually answer the question, say so honestly instead of guessing.\n\n' +
+    'CURRICULUM CONTEXT:\n' + context + '\n\n' +
+    'STUDENT QUESTION: ' + query + '\n\nAnswer:';
+
+  try{
+    const response = await withTimeout(puter.ai.chat(prompt), 12000);
+    let text = '';
+    if(typeof response === 'string') text = response;
+    else if(response && response.message && response.message.content) text = response.message.content;
+    else if(response && typeof response.text === 'string') text = response.text;
+    else if(response) text = String(response);
+    text = (text||'').trim();
+    return text.length > 0 ? text : null;
+  }catch(e){
+    console.warn('AI-enhanced layer unavailable, falling back to direct curriculum match:', e);
+    return null;
+  }
+}
+
 const chatArea = document.getElementById('chatArea');
 function scrollChatToBottom(){ chatArea.scrollTop = chatArea.scrollHeight; }
 
@@ -516,22 +774,31 @@ function addBotMessage(result){
   const msg = document.createElement('div');
   msg.className = 'msg bot';
   if(!result){
-    msg.innerHTML = '<div class="bubble">I do not have a confident match for that in the curriculum yet. Try rephrasing, or browse by topic below \u2014 I cover encodings, algorithms, applications, the frontier topics, and research skills across all 12 modules.</div>';
+    msg.innerHTML = '<div class="bubble">I do not have a confident match for that in the curriculum yet. Try rephrasing, or browse by topic below \u2014 I cover concepts across all 12 modules, from what AI and machine learning are in Modules 1\u20133 through the capstone skills in Module 12.</div>';
     chatArea.appendChild(msg);
     scrollChatToBottom();
     return;
   }
-  const {entry, confidence} = result;
+  const {entry, confidence, aiText, sources} = result;
   const confClass = confidence==='high' ? 'high' : confidence==='medium' ? 'medium' : 'low';
   const confLabel = confidence==='high' ? 'Confident match' : confidence==='medium' ? 'Possible match' : 'Low confidence';
-  let html = '<div class="bubble">'+entry.a+'</div>';
-  html += '<div class="msg-meta"><span class="confidence-tag '+confClass+'">'+confLabel+'</span>';
-  if(entry.file){
-    html += '<a class="source-link" href="'+entry.file+'" target="_blank">Module '+entry.module+' \u2014 '+entry.chapter+' \u2192</a>';
-  } else {
-    html += '<span class="source-link" style="color:var(--ink-faint); cursor:default;">General knowledge</span>';
-  }
+  const bodyText = aiText ? aiText : entry.a;
+  let html = '<div class="bubble">'+escapeHtml(bodyText).replace(/\n/g,'<br>')+'</div>';
+  html += '<div class="msg-meta">';
+  if(aiText) html += '<span class="ai-tag">\u2728 AI-Enhanced</span>';
+  html += '<span class="confidence-tag '+confClass+'">'+confLabel+'</span>';
+  const sourceList = (sources && sources.length) ? sources : [entry];
+  sourceList.forEach(function(e){
+    if(e.file){
+      html += '<a class="source-link" href="'+e.file+'" target="_blank">Module '+e.module+' \u2014 '+e.chapter+' \u2192</a>';
+    } else {
+      html += '<span class="source-link" style="color:var(--ink-faint); cursor:default;">General knowledge</span>';
+    }
+  });
   html += '</div>';
+  if(aiText){
+    html += '<div class="fallback-note">Grounded in the curriculum source(s) above \u2014 turn off AI-Enhanced to see the direct match instead.</div>';
+  }
   html += '<div class="feedback-row"><button class="fb-btn" data-fb="up">\ud83d\udc4d Helpful</button><button class="fb-btn" data-fb="down">\ud83d\udc4e Not quite</button></div>';
   msg.innerHTML = html;
   chatArea.appendChild(msg);
@@ -550,39 +817,62 @@ function addBotMessage(result){
   scrollChatToBottom();
 }
 
-function handleAsk(query){
+async function handleAsk(query){
   if(!query || !query.trim()) return;
+  setInputEnabled(false);
   addUserMessage(query);
   bumpAskedCount();
   showTypingIndicator();
   const results = searchKB(query);
-  const delay = 450 + Math.random()*350;
-  setTimeout(()=>{
+  const minDelay = new Promise(r=> setTimeout(r, 350 + Math.random()*250));
+
+  if(results.length===0 || results[0].score < 0.35){
+    await minDelay;
     removeTypingIndicator();
-    if(results.length===0 || results[0].score < 0.35){
-      addBotMessage(null);
-      return;
-    }
-    const top = results[0];
-    const confidence = top.score > 1.4 ? 'high' : top.score > 0.7 ? 'medium' : 'low';
+    addBotMessage(null);
+    setInputEnabled(true);
+    return;
+  }
+
+  const top = results[0];
+  const confidence = top.score > 1.4 ? 'high' : top.score > 0.7 ? 'medium' : 'low';
+  const topMatches = results.slice(0, 3);
+
+  const [aiText] = await Promise.all([getAIAnswer(query, topMatches), minDelay]);
+  removeTypingIndicator();
+
+  if(aiText){
+    addBotMessage({entry: top.entry, confidence, aiText, sources: topMatches.map(r=> r.entry)});
+  } else {
     addBotMessage({entry: top.entry, confidence});
-  }, delay);
+  }
+  setInputEnabled(true);
+}
+
+function setInputEnabled(enabled){
+  const input = document.getElementById('tutorInput');
+  const btn = document.getElementById('sendBtn');
+  input.disabled = !enabled;
+  btn.disabled = !enabled;
+  if(enabled) input.focus();
 }
 
 document.getElementById('sendBtn').addEventListener('click', ()=>{
   const input = document.getElementById('tutorInput');
-  handleAsk(input.value);
+  const value = input.value;
   input.value = '';
+  handleAsk(value);
 });
 document.getElementById('tutorInput').addEventListener('keydown', (e)=>{
-  if(e.key==='Enter'){ document.getElementById('sendBtn').click(); }
+  if(e.key==='Enter' && !document.getElementById('sendBtn').disabled){ document.getElementById('sendBtn').click(); }
 });
 
 /* starter chips */
 const starterQuestions = [
-  "What is a barren plateau?",
+  "What is machine learning?",
+  "What is a qubit?",
+  "What is the Born rule?",
   "What is amplitude encoding?",
-  "What is QRAM?",
   "What is the difference between VQC and QNN?",
   "Is quantum advantage real?",
   "How do I plan a capstone project?"
@@ -602,12 +892,17 @@ const starterQuestions = [
 (function(){
   const msg = document.createElement('div');
   msg.className = 'msg bot';
-  msg.innerHTML = '<div class="bubble">Hi! I can answer questions about any encoding, algorithm, application domain, or frontier topic from this curriculum. Try a starter question below, or type your own.</div>';
+  msg.innerHTML = '<div class="bubble">Hi! I can answer questions from any of the 12 modules \u2014 AI and ML basics, quantum foundations, encodings, algorithms, applications, the frontier, and capstone skills. Try a starter question below, type your own, or toggle AI-Enhanced off if you\'d rather see direct curriculum matches.</div>';
   chatArea.appendChild(msg);
 })();
 
 /* browse by topic panel */
 const moduleTitles = {
+  1:"Module 1 \u2014 Introduction to Artificial Intelligence",
+  2:"Module 2 \u2014 Why Machine Learning?",
+  3:"Module 3 \u2014 Classical Machine Learning",
+  4:"Module 4 \u2014 Why Quantum Computing?",
+  5:"Module 5 \u2014 Quantum Computing Foundations",
   6:"Module 6 \u2014 Intersection Between ML and Quantum Computing",
   7:"Module 7 \u2014 Why Quantum Machine Learning?",
   8:"Module 8 \u2014 Quantum Data Encoding",
@@ -636,7 +931,7 @@ const moduleTitles = {
     grouped[modId].forEach(entry=>{
       const chip = document.createElement('button');
       chip.className = 'browse-chip';
-      chip.textContent = entry.chapter===entry.q ? entry.chapter : entry.chapter;
+      chip.textContent = entry.chapter==='General' ? (entry.q.length>38 ? entry.q.slice(0,36)+'\u2026' : entry.q) : entry.chapter;
       chip.title = entry.q;
       chip.addEventListener('click', ()=>{
         document.getElementById('browsePanel').classList.remove('open');
